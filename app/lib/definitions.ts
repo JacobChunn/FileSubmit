@@ -44,6 +44,30 @@ export type LatestInvoiceRaw = Omit<LatestInvoice, 'amount'> & {
   amount: number;
 };
 
+export type Employees = {
+  id: string,
+  number: number,
+  username: string,
+  password: string,
+  firstname: string,
+  lastname: string,
+  cellphone: string,
+  homephone: string,
+  email: string,
+  managerid: number,
+  accesslevel: number,
+  timesheetrequired: boolean,
+  overtimeeligible: boolean,
+  tabNavigateot: boolean,
+  emailexpensecopy: boolean,
+  activeemployee: boolean,
+  ientertimedata: boolean,
+  numtimesheetsummaries: number,
+  numexpensesummaries: number,
+  numdefaulttimeRows: number,
+  contractor: boolean
+}
+
 export type InvoicesTable = {
   id: string;
   customer_id: string;

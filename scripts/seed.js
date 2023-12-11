@@ -3,6 +3,7 @@ const {
   invoices,
   customers,
   revenue,
+  employees,
   users,
 } = require('../app/lib/placeholder-data.js');
 const bcrypt = require('bcrypt');
@@ -160,6 +161,75 @@ async function seedRevenue(client) {
   }
 }
 
+async function seedEmployees(client) {
+  try {
+    await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+
+    // Create the "employees" table if it doesn't exist
+    const createTable = await client.sql`
+      CREATE TABLE IF NOT EXISTS employees (
+        ID UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+        Number INTEGER NOT NULL,
+        UserName VARCHAR(50) NOT NULL,
+        Password VARCHAR(24) NOT NULL,
+        FirstName VARCHAR(50) NOT NULL,
+        LastName VARCHAR(50) NOT NULL,
+        CellPhone VARCHAR(32) NOT NULL,
+        HomePhone VARCHAR(32) NOT NULL,
+        EMail VARCHAR(50) NOT NULL,
+        ManagerID INTEGER NOT NULL,
+        AccessLevel INTEGER NOT NULL,
+        TimeSheetRequired BIT NOT NULL,
+        OverTimeEligible BIT NOT NULL,
+        TABNavigateOT BIT NOT NULL,
+        EMailExpenseCopy BIT NOT NULL,
+        ActiveEmployee BIT NOT NULL,
+        IEnterTimedata BIT NOT NULL,
+        NumTimeSheetSummaries INTEGER NOT NULL,
+        NumExpenseSummaries INTEGER NOT NULL,
+        NumDefaultTimeRows INTEGER NOT NULL,
+        Contractor BIT NOT NULL
+      );
+    `;
+
+    console.log(`Created "employee" table`);
+
+    // Insert data into the "employee" table
+    const insertedEmployees = await Promise.all(
+      employees.map(
+        (employee) => client.sql`
+        INSERT INTO employees (
+          ID, Number, UserName, Password,
+          FirstName, LastName, CellPhone, HomePhone, EMail,
+          ManagerID, AccessLevel,
+          TimeSheetRequired, OverTimeEligible, TABNavigateOT, EMailExpenseCopy, ActiveEmployee, IEnterTimedata,
+          NumTimeSheetSummaries, NumExpenseSummaries, NumDefaultTimeRows,
+          Contractor
+        )
+        VALUES (
+          ${employee.id},${employee.number}, ${employee.username}, ${employee.password},
+          ${employee.firstName}, ${employee.lastName}, ${employee.cellPhone}, ${employee.homePhone}, ${employee.email},
+          ${employee.managerID}, ${employee.accessLevel},
+          ${employee.timeSheetRequired}, ${employee.overtimeEligible}, ${employee.TABNavigateOT}, ${employee.emailExpenseCopy}, ${employee.activeEmployee}, ${employee.iEnterTimeData},
+          ${employee.numTimeSheetSummaries}, ${employee.numExpenseSummaries}, ${employee.numDefaultTimeRows},
+          ${employee.contractor})
+        ON CONFLICT (id) DO NOTHING;
+      `,
+      ),
+    );
+
+    console.log(`Seeded ${insertedEmployees.length} employees`);
+
+    return {
+      createTable,
+      employees: insertedEmployees,
+    };
+  } catch (error) {
+    console.error('Error seeding employees:', error);
+    throw error;
+  }
+}
+
 async function main() {
   const client = await db.connect();
 
@@ -167,6 +237,8 @@ async function main() {
   await seedCustomers(client);
   await seedInvoices(client);
   await seedRevenue(client);
+  await seedEmployees(client);
+
 
   await client.end();
 }

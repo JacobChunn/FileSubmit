@@ -7,6 +7,7 @@ import {
   LatestInvoiceRaw,
   User,
   Revenue,
+  Employees,
 } from './definitions';
 import { formatCurrency } from './utils';
 import { unstable_noStore as noStore } from 'next/cache';
@@ -31,6 +32,29 @@ export async function fetchRevenue() {
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch revenue data.');
+  }
+}
+
+export async function fetchEmployees() {
+  noStore();
+  try {
+    const data = await sql<Employees>`
+      SELECT
+        id, number, username,
+        password, firstName, lastName,
+        cellPhone, homePhone, email,
+        managerID, accessLevel, timeSheetRequired,
+        overtimeEligible, TABNavigateOT, emailExpenseCopy,
+        activeEmployee, iEnterTimeData, numTimeSheetSummaries,
+        numExpenseSummaries, numDefaultTimeRows, contractor
+      FROM employees
+      ORDER BY number;
+
+`;
+    return data.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch the latest invoices.');
   }
 }
 
