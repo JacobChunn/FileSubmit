@@ -15,6 +15,10 @@ export default async function EmployeeTable() {
 
         <div className="bg-white px-6">
           {employees.map((employee, i) => {
+            const entries = Object.entries(employee);
+            for (const [index, entry] of entries){
+              
+            }
             const empProps = employee;
             const empPropsKeys = Object.keys(empProps);
             const lastIndex = empPropsKeys.length - 1;
