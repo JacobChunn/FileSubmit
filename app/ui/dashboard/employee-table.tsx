@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import Image from 'next/image';
 import { lusitana } from '@/app/ui/fonts';
 import { fetchEmployees } from '@/app/lib/data';
+import { join } from 'path';
 export default async function EmployeeTable() {
   const employees = await fetchEmployees();
   return (
@@ -14,10 +15,15 @@ export default async function EmployeeTable() {
 
         <div className="bg-white px-6">
           {employees.map((employee, i) => {
-            const properties = employees // make this and next line iterate the individual properties of employee object
-            properties.forEach(property => {
-              
-            });
+            const empProps = employee;
+            const empPropsKeys = Object.keys(empProps);
+            const lastIndex = empPropsKeys.length - 1;
+            console.log(lastIndex);
+            for (let j in empProps) {
+              console.log(JSON.stringify(j) + " " + i);
+              if (empPropsKeys.indexOf(j) == lastIndex) {console.log("LAST!!!!!!!!!!!!!!")};
+            }
+
             return (
               <div
                 key={employee.id}
