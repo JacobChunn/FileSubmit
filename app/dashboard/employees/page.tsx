@@ -1,5 +1,5 @@
 
-import EmployeeTable from '@/app/ui/dashboard/employee-table';
+import EmployeeTable from '@/app/ui/employees/employee-table';
 import { LatestInvoicesSkeleton } from '@/app/ui/skeletons';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
