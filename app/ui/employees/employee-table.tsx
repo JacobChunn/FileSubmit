@@ -15,11 +15,11 @@ export default async function EmployeeTable() {
 
       <div className="bg-white px-6">
         <div
-          className='flex flex-row items-center justify-between py-4'
+          className='flex flex-row items-center py-4'
         >
-          <table className='grid grid-cols-${employeesProperties} gap-4'>
+          <table className={`grid grid-cols-${employeesProperties.length} gap-4 justify-around`}>
             <thead>
-              <tr>
+              <tr className='justify-around'>
                 <th>#</th>
                 <th>Number</th>
                 <th>Name</th>
