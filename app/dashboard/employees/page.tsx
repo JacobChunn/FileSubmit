@@ -1,4 +1,5 @@
 
+import SortableTable from '@/app/ui/employees/employee-sortable-table';
 import EmployeeTable from '@/app/ui/employees/employee-table';
 import { LatestInvoicesSkeleton } from '@/app/ui/skeletons';
 import { Metadata } from 'next';
@@ -12,7 +13,7 @@ export default function Page() {
     return <main>
       <p>Employee Page</p>
       <Suspense fallback={<LatestInvoicesSkeleton />}>
-          <EmployeeTable />
+          <SortableTable />
       </Suspense>
     </main>
   }
