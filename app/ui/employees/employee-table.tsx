@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { lusitana } from '@/app/ui/fonts';
 import { fetchEmployees } from '@/app/lib/data';
 import { join } from 'path';
+
 export default async function EmployeeTable() {
   const employees = await fetchEmployees();
   const employeesProperties = Object.entries(employees);
@@ -17,7 +18,7 @@ export default async function EmployeeTable() {
         <div
           className='flex flex-row items-center py-4'
         >
-          <table className={`grid grid-cols-${employeesProperties.length} gap-4 justify-around`}>
+          <table className={`grid gap-4 justify-around`}>
             <thead>
               <tr className='justify-around'>
                 <th>#</th>
@@ -27,6 +28,17 @@ export default async function EmployeeTable() {
                 <th>Cell Phone</th>
               </tr>
             </thead>
+            <tbody>
+              <tr>
+                {employees.map((employee, i) => {
+                  return (
+                    <div key={employee.id}>
+                      {employee.firstname}
+                    </div>
+                  );
+                })}
+              </tr>
+            </tbody>
           </table>
          </div>
         <div className="flex items-center pb-2 pt-6">

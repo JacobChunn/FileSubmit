@@ -10,10 +10,13 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-    return <main>
+  console.log("Hello from employee page");
+  return (
+    <main>
       <p>Employee Page</p>
-      <Suspense fallback={<LatestInvoicesSkeleton />}>
+      <Suspense >
           <SortableTable />
       </Suspense>
     </main>
-  }
+  )
+}

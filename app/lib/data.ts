@@ -50,11 +50,12 @@ export async function fetchEmployees() {
       FROM employees
       ORDER BY number;
 
-`;
+    `;
+    console.log("employee fetch!")
     return data.rows;
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch the latest invoices.');
+    throw new Error('Failed to fetch employees.');
   }
 }
 
