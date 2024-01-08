@@ -101,9 +101,9 @@ export default function SortableTable() {
 	useEffect(() => {
 		fetch('/api/employees')
 		.then((res) => res.json())
-		.then((data) => {
+		.then((data : Employees[]) => {
 			//console.log("After Set Data: " + JSON.stringify((data as QueryResult<Employees>).rows));
-			//console.log("Before Set Data: " + JSON.stringify(data));
+
 			setEmployees(data);
 			//employees = data;
 
@@ -214,8 +214,8 @@ export default function SortableTable() {
 						</tr>
 					</thead>
 					<tbody>
-						{employees != undefined && !isLoading  ? (
-							employees.map(
+						{employees !== undefined && !isLoading  ? (
+							Array.isArray(employees) && employees.map(
 								// Skip password
 								({ id, number, username, firstname, lastname, cellphone, homephone, email, 
 									managerid, accesslevel, timesheetrequired, overtimeeligible, tabNavigateot, 

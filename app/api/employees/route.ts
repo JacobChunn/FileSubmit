@@ -26,7 +26,7 @@ export async function GET(
     `;
 
     const dataRows = data.rows;
-    return Response.json({dataRows});
+    return Response.json(dataRows);
   } catch (error) {
     console.error('Database Error:', error);
     return Response.error();
