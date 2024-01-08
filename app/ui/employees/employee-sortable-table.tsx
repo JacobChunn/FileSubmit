@@ -1,3 +1,4 @@
+"use client"
 import { fetchEmployees } from "@/app/lib/data";
 import { Card, CardHeader, CardBody, CardFooter, Typography, Button, Tabs, TabsHeader, Tab, Input, Avatar, Chip, Tooltip, IconButton } from "@/app/ui/employees/sortable-table-material-tailwind-components";
 import {
@@ -8,7 +9,12 @@ import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import TableBoolEntry from "./tableboolentry";
 import TableTextEntry from "./tabletextentry";
 import TableDoubleTextEntry from "./tabledoubletextentry";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Employees } from "@/app/lib/definitions";
+import { QueryResult } from "@vercel/postgres";
+import { employees } from "@/app/lib/placeholder-data";
+
+const axios = require('axios');
 
 const TABS = [
 	{
@@ -79,41 +85,70 @@ const TABLE_ROWS = [
 	},
 ];
 
-export default async function SortableTable() {
-	const employees = await fetchEmployees();
+export default function SortableTable() {
+	const [employees, setEmployees] = useState<Employees[] | undefined>(undefined);
+	const [isLoading, setLoading] = useState<boolean>(true);
+	//let employees : Employees[] | undefined = undefined;
+	//let loading : boolean = true;
+	//console.log("Initial Data: " + employees)
+	//let employees : Employees[];
+
+	//const employees = await fetchEmployees2();
 
 	console.log("Hello from sortableTable");
-	//TODO: FINISH CUSTOM WIDTH IMPLEMENTATION
+	//TODO: FINISH CUSTOM WIDTH IMPLEMENTATION, ADD UPDATE ON DATA CHANGE
+	
 	useEffect(() => {
+		fetch('/api/employees')
+		.then((res) => res.json())
+		.then((data) => {
+			//console.log("After Set Data: " + JSON.stringify((data as QueryResult<Employees>).rows));
+			//console.log("Before Set Data: " + JSON.stringify(data));
+			setEmployees(data);
+			//employees = data;
+
+			//console.log("After data set: ");
+			//console.log(employees);
+			setLoading(false);
+			//loading = false;
+		})
+		/*
 		const calculateColumnWidths = () => {
-		  const table = document.getElementById('myTable');
-		  if (!table) return;
-	
-		  const headerCells = table.querySelectorAll('th');
-		  const bodyCells = table.querySelectorAll('td');
-	
-		  for (let i = 0; i < headerCells.length; i++) {
-			const headerWidth = headerCells[i].offsetWidth;
-			const bodyWidth = bodyCells[i].offsetWidth;
-	
-			const columnWidth = Math.max(headerWidth, bodyWidth);
-			headerCells[i].style.minWidth = `${columnWidth}px`;
-	
-			for (let j = 0; j < bodyCells.length; j += headerCells.length) {
-			  bodyCells[i + j].style.minWidth = `${columnWidth}px`;
+
+
+			const table = document.getElementById('employees-table');
+			if (!table) return;
+
+			const headerCells = table.querySelectorAll('th');
+			const bodyCells = table.querySelectorAll('td');
+
+			for (let i = 0; i < headerCells.length; i++) {
+				const headerWidth = headerCells[i].offsetWidth;
+				const bodyWidth = bodyCells[i].offsetWidth;
+
+				const columnWidth = Math.max(headerWidth, bodyWidth);
+				headerCells[i].style.minWidth = `${columnWidth}px`;
+
+				for (let j = 0; j < bodyCells.length; j += headerCells.length) {
+					bodyCells[i + j].style.minWidth = `${columnWidth}px`;
+				}
 			}
-		  }
 		};
-	
+
 		calculateColumnWidths();
-	
+
 		// Recalculate on window resize
 		window.addEventListener('resize', calculateColumnWidths);
-	
+
+
+
 		return () => {
-		  window.removeEventListener('resize', calculateColumnWidths);
+			window.removeEventListener('resize', calculateColumnWidths);
 		};
-	  }, []);
+		*/
+	}, []);
+
+	  
 
 	return (
 		<Card className="h-full w-full">
@@ -156,7 +191,7 @@ export default async function SortableTable() {
 				</div>
 			</CardHeader>
 			<CardBody className="overflow-scroll px-0">
-				<table className="mt-4 w-full min-w-min table-auto text-left">
+				<table id="employees-table" className="mt-4 w-full min-w-min table-auto text-left">
 					<thead>
 						<tr>
 							{TABLE_HEAD.map((head, index) => (
@@ -179,143 +214,151 @@ export default async function SortableTable() {
 						</tr>
 					</thead>
 					<tbody>
-						{employees.map(
-							// Skip password
-							({ id, number, username, firstname, lastname, cellphone, homephone, email, 
-								managerid, accesslevel, timesheetrequired, overtimeeligible, tabNavigateot, 
-								emailexpensecopy, activeemployee, ientertimedata, numtimesheetsummaries, 
-								numexpensesummaries, numdefaulttimeRows, contractor}, index) => {
-								const isLast = index === employees.length - 1;
-								const classes = isLast
-									? "p-4"
-									: "p-4 border-b border-blue-gray-50";
+						{employees != undefined && !isLoading  ? (
+							employees.map(
+								// Skip password
+								({ id, number, username, firstname, lastname, cellphone, homephone, email, 
+									managerid, accesslevel, timesheetrequired, overtimeeligible, tabNavigateot, 
+									emailexpensecopy, activeemployee, ientertimedata, numtimesheetsummaries, 
+									numexpensesummaries, numdefaulttimeRows, contractor}, index) => {
+									const isLast = index === employees.length - 1;
+									const classes = isLast
+										? "p-4"
+										: "p-4 border-b border-blue-gray-50";
 
-								return (
-									<tr key={firstname + index}>
-										
-										<td className={classes}>
-											<Avatar src={TABLE_ROWS[0].img} alt={firstname} variant="rounded" />
-										</td>
-
-										{/* PFF, Name, and Email */}
-										<td className={classes}>
-											<div className="flex items-center gap-3">
+									return (
+										<tr key={firstname + index}>
 											
+											<td className={classes}>
+												<Avatar src={TABLE_ROWS[0].img} alt={firstname} variant="rounded" />
+											</td>
+
+											{/* PFF, Name, and Email */}
+											<td className={classes}>
+												<div className="flex items-center gap-3">
+												
+													<div className="flex flex-col">
+														<Typography
+															variant="small"
+															color="blue-gray"
+															className="font-normal"
+														>
+															{firstname} {lastname}
+														</Typography>
+														<Typography
+															variant="small"
+															color="blue-gray"
+															className="font-normal opacity-70"
+														>
+															{email}
+														</Typography>
+													</div>
+												</div>
+											</td>
+
+											{/* Cell and Home Phone Numbers */}
+											<TableDoubleTextEntry
+												classes={classes}
+												text1={cellphone}
+												text2={homephone}
+												addonStyles2="opacity-70"
+											/>
+
+											{/* Is Active Employee */}
+											<TableBoolEntry
+												condition={activeemployee}
+												classes={classes}
+												valueTextWhenTrue="Active"
+												valueTextWhenFalse="Inactive"
+											/>
+
+											{/* Is Contractor */}
+											<TableBoolEntry
+												condition={contractor}
+												classes={classes}
+												valueTextWhenTrue="Contractor"
+												valueTextWhenFalse="Employee"
+												colorWhenTrue="yellow"
+												colorWhenFalse="blue"
+											/>
+
+											{/* Username and Password */}
+											<td className={classes}>
 												<div className="flex flex-col">
 													<Typography
 														variant="small"
 														color="blue-gray"
 														className="font-normal"
 													>
-														{firstname} {lastname}
+														{username}
 													</Typography>
 													<Typography
 														variant="small"
 														color="blue-gray"
-														className="font-normal opacity-70"
+														className="font-normal"
 													>
-														{email}
+														PASSWORD
 													</Typography>
 												</div>
-											</div>
-										</td>
+											</td>
 
-										{/* Cell and Home Phone Numbers */}
-										<TableDoubleTextEntry
-											classes={classes}
-											text1={cellphone}
-											text2={homephone}
-											addonStyles2="opacity-70"
-										/>
+											{/* Number */}
+											<TableTextEntry 
+												classes={classes}
+												text={number}
+											/>
 
-										{/* Is Active Employee */}
-										<TableBoolEntry
-											condition={activeemployee}
-											classes={classes}
-											valueTextWhenTrue="Active"
-											valueTextWhenFalse="Inactive"
-										/>
-
-										{/* Is Contractor */}
-										<TableBoolEntry
-											condition={contractor}
-											classes={classes}
-											valueTextWhenTrue="Contractor"
-											valueTextWhenFalse="Employee"
-											colorWhenTrue="yellow"
-											colorWhenFalse="blue"
-										/>
-
-										{/* Username and Password */}
-										<td className={classes}>
-											<div className="flex flex-col">
-												<Typography
-													variant="small"
-													color="blue-gray"
-													className="font-normal"
-												>
-													{username}
-												</Typography>
-												<Typography
-													variant="small"
-													color="blue-gray"
-													className="font-normal"
-												>
-													PASSWORD
-												</Typography>
-											</div>
-										</td>
-
-										{/* Number */}
-										<TableTextEntry 
-											classes={classes}
-											text={number}
-										/>
-
-										{/* Manager ID */}
+											{/* Manager ID */}
 
 
-										{/* Access Level */}
+											{/* Access Level */}
 
 
-										{/* Timesheet Required */}
+											{/* Timesheet Required */}
 
 
-										{/* Overtime Eligible */}
+											{/* Overtime Eligible */}
 
 
-										{/* Tab Navigate */}
+											{/* Tab Navigate */}
 
 
-										{/* Email Expense Copy */}
+											{/* Email Expense Copy */}
 
 
-										{/* I Enter Time Data */}
+											{/* I Enter Time Data */}
 
 
-										{/* Number of Sheet Summaries */}
+											{/* Number of Sheet Summaries */}
 
 
-										{/* Number of Expense Summaries */}
+											{/* Number of Expense Summaries */}
 
 
-										{/* Number of Default Rows */}
+											{/* Number of Default Rows */}
 
 
-										{/* ID */}
+											{/* ID */}
 
 
-										{/* Edit User */}
-										<td className={classes}>
-											<Tooltip content="Edit User">
-												<IconButton variant="text">
-													<PencilIcon className="h-4 w-4" />
-												</IconButton>
-											</Tooltip>
-										</td>
-									</tr>
-								);
-							},
+											{/* Edit User */}
+											<td className={classes}>
+												<Tooltip content="Edit User">
+													<IconButton variant="text">
+														<PencilIcon className="h-4 w-4" />
+													</IconButton>
+												</Tooltip>
+											</td>
+										</tr>
+									);
+								},
+							)
+						) : (
+							<tr>
+								<td>
+									No data available
+								</td>
+							</tr>
 						)}
 					</tbody>
 				</table>

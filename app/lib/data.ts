@@ -11,6 +11,7 @@ import {
 } from './definitions';
 import { formatCurrency } from './utils';
 import { unstable_noStore as noStore } from 'next/cache';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 
 export async function fetchRevenue() {
   // Add noStore() here prevent the response from being cached.
@@ -34,6 +35,31 @@ export async function fetchRevenue() {
     throw new Error('Failed to fetch revenue data.');
   }
 }
+ 
+
+export async function fetchEmployees2() {
+  try {
+    // Make a GET request to your API endpoint
+    const response: AxiosResponse<Employees[]> = await axios.get('/api/employees');
+
+    // Handle successful response
+    const data: Employees[] = response.data;
+    console.log('Fetched data:', data);
+
+    // Process or set the data in your application state
+    // For example, setEmployees(data);
+  } catch (error) {
+    // Handle errors
+    if (axios.isAxiosError(error)) {
+      // Axios-specific error handling
+      const axiosError: AxiosError = error;
+      console.error('Axios error:', axiosError.message);
+    } else {
+      // Other errors
+      console.error('Error fetching data:', error);
+    }
+  }
+}
 
 export async function fetchEmployees() {
   noStore();
@@ -51,7 +77,7 @@ export async function fetchEmployees() {
       ORDER BY number;
 
     `;
-    console.log("employee fetch!")
+    console.log("employee fetch!");
     return data.rows;
   } catch (error) {
     console.error('Database Error:', error);
