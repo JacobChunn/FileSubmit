@@ -103,16 +103,25 @@ export default function SortableTable() {
 		.then((res) => res.json())
 		.then((data : Employees[]) => {
 			//console.log("After Set Data: " + JSON.stringify((data as QueryResult<Employees>).rows));
+			
+			console.log(data); // TODO: figure out why default rows entry is empty in table
 
 			setEmployees(data);
 			//employees = data;
 
+			
+			//setLoading(false);
+
 			//console.log("After data set: ");
 			//console.log(employees);
-			setLoading(false);
 			//loading = false;
 		})
-		/*
+		
+		
+	
+	}, []);
+
+	useEffect(() => {
 		const calculateColumnWidths = () => {
 
 
@@ -122,31 +131,37 @@ export default function SortableTable() {
 			const headerCells = table.querySelectorAll('th');
 			const bodyCells = table.querySelectorAll('td');
 
+			//console.log(headerCells);
+			//console.log(bodyCells);
+
+			
+
+			//Commented out until all row entries are added, matching length of headers and columns.
+			/*
 			for (let i = 0; i < headerCells.length; i++) {
 				const headerWidth = headerCells[i].offsetWidth;
-				const bodyWidth = bodyCells[i].offsetWidth;
+				const bodyWidth = bodyCells[i % (headerCells.length + 1)].offsetWidth; // Plus 1 because of pencil symbol?
 
 				const columnWidth = Math.max(headerWidth, bodyWidth);
-				headerCells[i].style.minWidth = `${columnWidth}px`;
 
-				for (let j = 0; j < bodyCells.length; j += headerCells.length) {
-					bodyCells[i + j].style.minWidth = `${columnWidth}px`;
-				}
+				headerCells[i].style.maxWidth = `${columnWidth}px`;
 			}
+			*/
 		};
 
-		calculateColumnWidths();
+		if (employees !== undefined) {
+			calculateColumnWidths();
 
-		// Recalculate on window resize
-		window.addEventListener('resize', calculateColumnWidths);
+			setLoading(false);
 
+			// Recalculate on window resize
+			window.addEventListener('resize', calculateColumnWidths);
 
-
-		return () => {
-			window.removeEventListener('resize', calculateColumnWidths);
-		};
-		*/
-	}, []);
+			return () => {
+				window.removeEventListener('resize', calculateColumnWidths);
+			};
+		}
+	}, [employees]);
 
 	  
 
@@ -191,7 +206,7 @@ export default function SortableTable() {
 				</div>
 			</CardHeader>
 			<CardBody className="overflow-scroll px-0">
-				<table id="employees-table" className="mt-4 w-full min-w-min table-auto text-left">
+				<table id="employees-table" className="mt-4 w-full table-auto text-left">
 					<thead>
 						<tr>
 							{TABLE_HEAD.map((head, index) => (
@@ -214,7 +229,8 @@ export default function SortableTable() {
 						</tr>
 					</thead>
 					<tbody>
-						{employees !== undefined && !isLoading  ? (
+						{employees !== undefined ? (
+
 							Array.isArray(employees) && employees.map(
 								// Skip password
 								({ id, number, username, firstname, lastname, cellphone, homephone, email, 
@@ -227,16 +243,12 @@ export default function SortableTable() {
 										: "p-4 border-b border-blue-gray-50";
 
 									return (
-										<tr key={firstname + index}>
+										<tr className={isLoading ? "hidden" : ""} key={firstname + index}>
 											
-											<td className={classes}>
-												<Avatar src={TABLE_ROWS[0].img} alt={firstname} variant="rounded" />
-											</td>
-
 											{/* PFF, Name, and Email */}
 											<td className={classes}>
 												<div className="flex items-center gap-3">
-												
+													<Avatar src={TABLE_ROWS[0].img} alt={firstname} variant="rounded" />
 													<div className="flex flex-col">
 														<Typography
 															variant="small"
@@ -309,37 +321,70 @@ export default function SortableTable() {
 											/>
 
 											{/* Manager ID */}
-
+											<TableTextEntry 
+												classes={classes}
+												text={managerid}
+											/>
 
 											{/* Access Level */}
-
+											<TableTextEntry 
+												classes={classes}
+												text={accesslevel}
+											/>
 
 											{/* Timesheet Required */}
-
+											<TableBoolEntry
+												condition={timesheetrequired}
+												classes={classes}
+											/>
 
 											{/* Overtime Eligible */}
+											<TableBoolEntry
+												condition={overtimeeligible}
+												classes={classes}
+											/>
 
-
-											{/* Tab Navigate */}
-
+											{/* Tab Navigate OT*/}
+											<TableBoolEntry
+												condition={tabNavigateot}
+												classes={classes}
+											/>
 
 											{/* Email Expense Copy */}
-
+											<TableBoolEntry
+												condition={emailexpensecopy}
+												classes={classes}
+											/>
 
 											{/* I Enter Time Data */}
-
+											<TableBoolEntry
+												condition={ientertimedata}
+												classes={classes}
+											/>
 
 											{/* Number of Sheet Summaries */}
-
+											<TableTextEntry 
+												classes={classes}
+												text={numtimesheetsummaries}
+											/>
 
 											{/* Number of Expense Summaries */}
-
+											<TableTextEntry 
+												classes={classes}
+												text={numexpensesummaries}
+											/>
 
 											{/* Number of Default Rows */}
-
+											<TableTextEntry 
+												classes={classes}
+												text={numdefaulttimeRows}
+											/>
 
 											{/* ID */}
-
+											<TableTextEntry 
+												classes={classes}
+												text={id}
+											/>
 
 											{/* Edit User */}
 											<td className={classes}>
