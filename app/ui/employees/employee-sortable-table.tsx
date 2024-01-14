@@ -1,6 +1,9 @@
 "use client"
 import { fetchEmployees } from "@/app/lib/data";
-import { Card, CardHeader, CardBody, CardFooter, Typography, Button, Tabs, TabsHeader, Tab, Input, Avatar, Chip, Tooltip, IconButton } from "@/app/ui/employees/sortable-table-material-tailwind-components";
+import { 
+	Card, CardHeader, CardBody, CardFooter, Typography, Button, Tabs, 
+	TabsHeader, Tab, Input, Avatar, Chip, Tooltip, IconButton,
+} from "@/app/ui/employees/client-components/sortable-table-material-tailwind-components";
 import {
 	MagnifyingGlassIcon,
 	ChevronUpDownIcon,
@@ -234,9 +237,9 @@ export default function SortableTable() {
 							Array.isArray(employees) && employees.map(
 								// Skip password
 								({ id, number, username, firstname, lastname, cellphone, homephone, email, 
-									managerid, accesslevel, timesheetrequired, overtimeeligible, tabNavigateot, 
+									managerid, accesslevel, timesheetrequired, overtimeeligible, tabnavigateot, 
 									emailexpensecopy, activeemployee, ientertimedata, numtimesheetsummaries, 
-									numexpensesummaries, numdefaulttimeRows, contractor}, index) => {
+									numexpensesummaries, numdefaulttimerows, contractor}, index) => {
 									const isLast = index === employees.length - 1;
 									const classes = isLast
 										? "p-4"
@@ -346,7 +349,7 @@ export default function SortableTable() {
 
 											{/* Tab Navigate OT*/}
 											<TableBoolEntry
-												condition={tabNavigateot}
+												condition={tabnavigateot}
 												classes={classes}
 											/>
 
@@ -377,7 +380,7 @@ export default function SortableTable() {
 											{/* Number of Default Rows */}
 											<TableTextEntry 
 												classes={classes}
-												text={numdefaulttimeRows}
+												text={numdefaulttimerows} // change
 											/>
 
 											{/* ID */}

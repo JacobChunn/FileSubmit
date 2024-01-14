@@ -24,7 +24,31 @@ const FormSchema = z.object({
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
 const UpdateInvoice = FormSchema.omit({ id: true, date: true });
 
-export type State = {
+const EmployeeSchema = z.object({
+	id: z.string(),
+	number: z.number(),
+	username: z.string().max(50),
+	password: z.string().max(24),
+	firstname: z.string().max(50),
+	lastname: z.string().max(50),
+	cellphone: z.string().max(32),
+	homephone: z.string().max(32),
+	email: z.string().max(50),
+	managerid: z.number(),
+	accesslevel: z.number(),
+	timesheetrequired: z.boolean(),
+	overtimeeligible: z.boolean(),
+	tabnavigateot: z.boolean(),
+	emailexpensecopy: z.boolean(),
+	activeemployee: z.boolean(),
+	ientertimedata: z.boolean(),
+	numtimesheetsummaries: z.number(),
+	numexpensesummaries: z.number(),
+	numdefaulttimerows: z.number(),
+	contractor: z.boolean(),
+});
+
+export type InvoiceState = {
     errors?: {
       customerId?: string[];
       amount?: string[];
@@ -32,7 +56,17 @@ export type State = {
     };
     message?: string | null;
 };
-   
+
+export type EmployeeState = {
+    errors?: {
+      customerId?: string[];
+      amount?: string[];
+      status?: string[];
+    };
+    message?: string | null;
+};
+
+
 export async function authenticate(
     prevState: string | undefined,
     formData: FormData,
@@ -52,7 +86,14 @@ export async function authenticate(
     }
 }
 
-export async function createInvoice(prevState: State, formData: FormData) {
+export async function addEmployee(
+	prevState: EmployeeState,
+	formData: FormData,
+) {
+	
+}
+
+export async function createInvoice(prevState: InvoiceState, formData: FormData) {
     const validatedFields = CreateInvoice.safeParse({
       customerId: formData.get('customerId'),
       amount: formData.get('amount'),
@@ -89,7 +130,7 @@ export async function createInvoice(prevState: State, formData: FormData) {
 
 export async function updateInvoice(
     id: string,
-    prevState: State,
+    prevState: InvoiceState,
     formData: FormData
 ) {
     const validatedFields = UpdateInvoice.safeParse({

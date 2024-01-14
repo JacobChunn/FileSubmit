@@ -58,13 +58,13 @@ export type Employees = {
   accesslevel: number,
   timesheetrequired: boolean,
   overtimeeligible: boolean,
-  tabNavigateot: boolean,
+  tabnavigateot: boolean,
   emailexpensecopy: boolean,
   activeemployee: boolean,
   ientertimedata: boolean,
   numtimesheetsummaries: number,
   numexpensesummaries: number,
-  numdefaulttimeRows: number,
+  numdefaulttimerows: number,
   contractor: boolean
 }
 

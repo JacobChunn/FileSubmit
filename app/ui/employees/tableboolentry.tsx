@@ -1,4 +1,4 @@
-import { Chip } from '@/app/ui/employees/boolentry-material-tailwind-components'
+import { Chip } from '@/app/ui/employees/client-components/boolentry-material-tailwind-components'
 import { colors } from '@material-tailwind/react/types/generic'
 
 export type Props = {
