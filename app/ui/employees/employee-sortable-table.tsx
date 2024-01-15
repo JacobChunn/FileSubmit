@@ -184,9 +184,11 @@ export default function SortableTable() {
 						<Button variant="outlined" size="sm">
 							view all
 						</Button>
-						<Button className="flex items-center gap-3" size="sm">
-							<UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add member
-						</Button>
+						<a href="/dashboard/employees/add">
+							<Button className="flex items-center gap-3" size="sm">
+								<UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add member
+							</Button>
+						</a>
 					</div>
 				</div>
 				<div className="flex flex-col items-center justify-between gap-4 md:flex-row">

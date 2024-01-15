@@ -7,6 +7,8 @@ import { redirect } from 'next/navigation';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
  
+const lowercaseStringToBool = (value: string): boolean => value.toLowerCase() === 'true';
+
 const FormSchema = z.object({
   id: z.string(),
   customerId: z.string({
@@ -26,7 +28,7 @@ const UpdateInvoice = FormSchema.omit({ id: true, date: true });
 
 const EmployeeSchema = z.object({
 	id: z.string(),
-	number: z.number(),
+	number: z.coerce.number(),
 	username: z.string().max(50),
 	password: z.string().max(24),
 	firstname: z.string().max(50),
@@ -34,30 +36,50 @@ const EmployeeSchema = z.object({
 	cellphone: z.string().max(32),
 	homephone: z.string().max(32),
 	email: z.string().max(50),
-	managerid: z.number(),
-	accesslevel: z.number(),
-	timesheetrequired: z.boolean(),
-	overtimeeligible: z.boolean(),
-	tabnavigateot: z.boolean(),
-	emailexpensecopy: z.boolean(),
-	activeemployee: z.boolean(),
-	ientertimedata: z.boolean(),
-	numtimesheetsummaries: z.number(),
-	numexpensesummaries: z.number(),
-	numdefaulttimerows: z.number(),
-	contractor: z.boolean(),
+	managerid: z.coerce.number(),
+	accesslevel: z.coerce.number(),
+	timesheetrequired: z.coerce.boolean(),
+	overtimeeligible: z.coerce.boolean(),
+	tabnavigateot: z.coerce.boolean(),
+	emailexpensecopy: z.coerce.boolean(),
+	activeemployee: z.coerce.boolean(),
+	ientertimedata: z.coerce.boolean(),
+	numtimesheetsummaries: z.coerce.number(),
+	numexpensesummaries: z.coerce.number(),
+	numdefaulttimerows: z.coerce.number(),
+	contractor: z.coerce.boolean(),
 });
 
-export type InvoiceState = {
+const AddEmployee = EmployeeSchema.omit({ id: true });
+
+export type EmployeeState = {
     errors?: {
-      customerId?: string[];
-      amount?: string[];
-      status?: string[];
-    };
+      [key: string]: string[] | undefined;
+      number?: string[];
+      username?: string[];
+      password?: string[];
+      firstname?: string[];
+      lastname?: string[];
+      cellphone?: string[];
+      homephone?: string[];
+      email?: string[];
+      managerid?: string[];
+      accesslevel?: string[];
+      timesheetrequired?: string[];
+      overtimeeligible?: string[];
+      tabnavigateot?: string[];
+      emailexpensecopy?: string[];
+      activeemployee?: string[];
+      ientertimedata?: string[];
+      numtimesheetsummaries?: string[];
+      numexpensesummaries?: string[];
+      numdefaulttimerows?: string[];
+      contractor?: string[];
+    } | undefined;
     message?: string | null;
 };
 
-export type EmployeeState = {
+export type InvoiceState = {
     errors?: {
       customerId?: string[];
       amount?: string[];
@@ -90,7 +112,72 @@ export async function addEmployee(
 	prevState: EmployeeState,
 	formData: FormData,
 ) {
-	
+  const validatedFields = AddEmployee.safeParse({
+    number: formData.get('number'),
+    username: formData.get('username'),
+    password: formData.get('password'),
+    firstname: formData.get('firstname'),
+    lastname: formData.get('lastname'),
+    cellphone: formData.get('cellphone'),
+    homephone: formData.get('homephone'),
+    email: formData.get('email'),
+    managerid: formData.get('managerid'),
+    accesslevel: formData.get('accesslevel'),
+    timesheetrequired: formData.get('timesheetrequired'),
+    overtimeeligible: formData.get('overtimeeligible'),
+    tabnavigateot: formData.get('tabnavigateot'),
+    emailexpensecopy: formData.get('emailexpensecopy'),
+    activeemployee: formData.get('activeemployee'),
+    ientertimedata: formData.get('ientertimedata'),
+    numtimesheetsummaries: formData.get('numtimesheetsummaries'),
+    numexpensesummaries: formData.get('numexpensesummaries'),
+    numdefaulttimerows: formData.get('numdefaulttimerows'),
+    contractor: formData.get('contractor'),
+  });
+
+  // If form validation fails, return errors early. Otherwise, continue.
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Create Invoice.',
+    };
+  }
+
+  const {number, username, password, firstname, lastname, cellphone, homephone,
+    email, managerid, accesslevel, timesheetrequired, overtimeeligible, tabnavigateot,
+    emailexpensecopy, activeemployee, ientertimedata, numtimesheetsummaries,
+    numexpensesummaries, numdefaulttimerows, contractor
+  } = validatedFields.data;
+
+  // Prepare data for insertion into the database
+  // Noting needed as of now
+
+  try {
+    await sql`
+    INSERT INTO employees (
+      number, username, password, firstname, lastname, cellphone, homephone,
+      email, managerid, accesslevel, timesheetrequired, overtimeeligible, tabnavigateot,
+      emailexpensecopy, activeemployee, ientertimedata, numtimesheetsummaries,
+      numexpensesummaries, numdefaulttimerows, contractor
+    )
+    VALUES (
+      ${number}, ${username}, ${password}, ${firstname}, ${lastname},
+      ${cellphone}, ${homephone}, ${email}, ${managerid}, ${accesslevel},
+      ${timesheetrequired}, ${overtimeeligible}, ${tabnavigateot},
+      ${emailexpensecopy}, ${activeemployee}, ${ientertimedata},
+      ${numtimesheetsummaries}, ${numexpensesummaries}, ${numdefaulttimerows},
+      ${contractor}
+    )
+  `;
+  } catch (error) {
+    console.log(error);
+    return {
+      message: 'Database Error: Failed to Create Invoice.',
+    };
+  }
+
+  revalidatePath('/dashboard/employees');
+  redirect('/dashboard/employees');
 }
 
 export async function createInvoice(prevState: InvoiceState, formData: FormData) {
@@ -103,8 +190,8 @@ export async function createInvoice(prevState: InvoiceState, formData: FormData)
     // If form validation fails, return errors early. Otherwise, continue.
     if (!validatedFields.success) {
         return {
-        errors: validatedFields.error.flatten().fieldErrors,
-        message: 'Missing Fields. Failed to Create Invoice.',
+          errors: validatedFields.error.flatten().fieldErrors,
+          message: 'Missing Fields. Failed to Create Invoice.',
         };
     }
 
