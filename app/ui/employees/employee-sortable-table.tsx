@@ -174,21 +174,21 @@ export default function SortableTable() {
 				<div className="mb-8 flex items-center justify-between gap-8">
 					<div>
 						<Typography variant="h5" color="blue-gray">
-							Members list
+							Employee list
 						</Typography>
 						<Typography color="gray" className="mt-1 font-normal">
-							See information about all members
+							See information about all employees
 						</Typography>
 					</div>
 					<div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+						<a href="/dashboard/employees/add">
+							<Button className="flex items-center gap-3" size="sm">
+								<UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Employee
+							</Button>
+						</a>
 						<Button variant="outlined" size="sm">
 							view all
 						</Button>
-						<a href="/dashboard/employees/add">
-							<Button className="flex items-center gap-3" size="sm">
-								<UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add member
-							</Button>
-						</a>
 					</div>
 				</div>
 				<div className="flex flex-col items-center justify-between gap-4 md:flex-row">

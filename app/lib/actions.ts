@@ -1,6 +1,6 @@
 'use server';
 
-import { z } from 'zod';
+import { ZodType, z } from 'zod';
 import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -135,6 +135,8 @@ export async function addEmployee(
     contractor: formData.get('contractor'),
   });
 
+  console.log(formData.get("timesheetrequired"));
+
   // If form validation fails, return errors early. Otherwise, continue.
   if (!validatedFields.success) {
     return {
@@ -163,10 +165,10 @@ export async function addEmployee(
     VALUES (
       ${number}, ${username}, ${password}, ${firstname}, ${lastname},
       ${cellphone}, ${homephone}, ${email}, ${managerid}, ${accesslevel},
-      ${timesheetrequired}, ${overtimeeligible}, ${tabnavigateot},
-      ${emailexpensecopy}, ${activeemployee}, ${ientertimedata},
+      ${timesheetrequired ? 1 : 0}, ${overtimeeligible ? 1 : 0}, ${tabnavigateot ? 1 : 0},
+      ${emailexpensecopy ? 1 : 0}, ${activeemployee ? 1 : 0}, ${ientertimedata ? 1 : 0},
       ${numtimesheetsummaries}, ${numexpensesummaries}, ${numdefaulttimerows},
-      ${contractor}
+      ${contractor ? 1 : 0}
     )
   `;
   } catch (error) {

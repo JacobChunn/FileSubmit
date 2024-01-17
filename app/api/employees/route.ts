@@ -7,6 +7,9 @@ import { sql } from '@vercel/postgres';
 
 // TODO: ADD AUTHORIZATION
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(
   req: NextApiRequest,
   res: NextApiResponse
@@ -22,9 +25,8 @@ export async function GET(
         activeEmployee, iEnterTimeData, numTimeSheetSummaries,
         numExpenseSummaries, numDefaultTimeRows, contractor
       FROM employees
-      ORDER BY number;
     `;
-
+    console.log("Employee Fetch from route!")
     const dataRows = data.rows;
     return Response.json(dataRows);
   } catch (error) {
