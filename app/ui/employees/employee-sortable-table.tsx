@@ -88,7 +88,11 @@ const TABLE_ROWS = [
 	},
 ];
 
-export default function SortableTable() {
+export default function SortableTable({
+	employeePromise,
+}: {
+	employeePromise: Promise<Employees[]>;
+}) {
 	const [employees, setEmployees] = useState<Employees[] | undefined>(undefined);
 	const [isLoading, setLoading] = useState<boolean>(true);
 	//let employees : Employees[] | undefined = undefined;
@@ -102,6 +106,7 @@ export default function SortableTable() {
 	//TODO: FINISH CUSTOM WIDTH IMPLEMENTATION, ADD UPDATE ON DATA CHANGE
 	
 	useEffect(() => {
+		/*
 		fetch('/api/employees')
 		.then((res) => res.json())
 		.then((data : Employees[]) => {
@@ -110,17 +115,14 @@ export default function SortableTable() {
 			console.log(data); // TODO: figure out why default rows entry is empty in table
 
 			setEmployees(data);
-			//employees = data;
-
-			
-			//setLoading(false);
-
-			//console.log("After data set: ");
-			//console.log(employees);
-			//loading = false;
 		})
+		*/
+		const handleEmployeePromise = async() => {
+			const data = await employeePromise;
+			setEmployees(data);
+		}
 		
-		
+		handleEmployeePromise();
 	
 	}, []);
 
@@ -252,7 +254,7 @@ export default function SortableTable() {
 											
 											{/* PFF, Name, and Email */}
 											<td className={classes}>
-												<div className="flex items-center gap-3">
+												<div className="flex flex-grow items-center gap-3">
 													<Avatar src={TABLE_ROWS[0].img} alt={firstname} variant="rounded" />
 													<div className="flex flex-col">
 														<Typography
