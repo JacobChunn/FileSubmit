@@ -255,7 +255,7 @@ export default function SortableTable({
 											{/* PFF, Name, and Email */}
 											<td className={classes}>
 												<div className="flex flex-grow items-center gap-3">
-													<Avatar src={TABLE_ROWS[0].img} alt={firstname} variant="rounded" />
+													<Avatar src={TABLE_ROWS[0].img} alt={firstname} variant="rounded" className="max-w-none" />
 													<div className="flex flex-col">
 														<Typography
 															variant="small"
