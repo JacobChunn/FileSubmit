@@ -20,14 +20,14 @@ export default function TableDoubleTextEntry({classes, text1="", text2="", varia
                 <Typography
                     variant={variant}
                     color={color}
-                    className={"font-normal " + addonStyles1}
+                    className={"font-normal whitespace-nowrap " + addonStyles1}
                 >
                     {text1}
                 </Typography>
                 <Typography
                     variant={variant}
                     color={color}
-                    className={"font-normal " + addonStyles2}
+                    className={"font-normal whitespace-nowrap " + addonStyles2}
                 >
                     {text2}
                 </Typography>

@@ -5,12 +5,14 @@ import { LatestInvoicesSkeleton } from '@/app/ui/skeletons';
 import { sql } from '@vercel/postgres';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
+import { unstable_noStore as noStore } from 'next/cache';
 
 export const metadata: Metadata = {
   title: 'Employees',
 };
 
 export async function fetchEmployees() {
+  noStore();
   try {
     const data = await sql<Employees>`
       SELECT

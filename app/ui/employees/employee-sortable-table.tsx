@@ -1,5 +1,4 @@
 "use client"
-import { fetchEmployees } from "@/app/lib/data";
 import { 
 	Card, CardHeader, CardBody, CardFooter, Typography, Button, Tabs, 
 	TabsHeader, Tab, Input, Avatar, Chip, Tooltip, IconButton,
@@ -8,31 +7,30 @@ import {
 	MagnifyingGlassIcon,
 	ChevronUpDownIcon,
 } from "@heroicons/react/24/outline";
-import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
+import { PencilIcon, UserPlusIcon, UserMinusIcon } from "@heroicons/react/24/solid";
 import TableBoolEntry from "./tableboolentry";
 import TableTextEntry from "./tabletextentry";
 import TableDoubleTextEntry from "./tabledoubletextentry";
 import { useEffect, useState } from "react";
 import { Employees } from "@/app/lib/definitions";
-import { QueryResult } from "@vercel/postgres";
-import { employees } from "@/app/lib/placeholder-data";
-
-const axios = require('axios');
 
 const TABS = [
+	{
+		label: "Active",
+		value: "active",
+	},
+	{
+		label: "Inactive",
+		value: "inactive",
+	},
 	{
 		label: "All",
 		value: "all",
 	},
-	{
-		label: "Monitored",
-		value: "monitored",
-	},
-	{
-		label: "Unmonitored",
-		value: "unmonitored",
-	},
-];
+] as const;
+
+type TabValueType = typeof TABS[number]['value'];
+
 
 const TABLE_HEAD = [
 	"Employee", "Cell/Home", "Employee Status", "Contractor Status", "Login", "Numeric ID", "Manager ID",
@@ -40,53 +38,7 @@ const TABLE_HEAD = [
 	"I Enter Time Data", "Sheet Summaries", "Expense Summaries", "Default Rows", "ID"
 ];
 
-const TABLE_ROWS = [
-	{
-		img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-3.jpg",
-		name: "John Michael",
-		email: "john@creative-tim.com",
-		job: "Manager",
-		org: "Organization",
-		online: true,
-		date: "23/04/18",
-	},
-	{
-		img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-2.jpg",
-		name: "Alexa Liras",
-		email: "alexa@creative-tim.com",
-		job: "Programator",
-		org: "Developer",
-		online: false,
-		date: "23/04/18",
-	},
-	{
-		img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-1.jpg",
-		name: "Laurent Perrier",
-		email: "laurent@creative-tim.com",
-		job: "Executive",
-		org: "Projects",
-		online: false,
-		date: "19/09/17",
-	},
-	{
-		img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-4.jpg",
-		name: "Michael Levi",
-		email: "michael@creative-tim.com",
-		job: "Programator",
-		org: "Developer",
-		online: true,
-		date: "24/12/08",
-	},
-	{
-		img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-5.jpg",
-		name: "Richard Gran",
-		email: "richard@creative-tim.com",
-		job: "Manager",
-		org: "Executive",
-		online: false,
-		date: "04/10/21",
-	},
-];
+const demoImg = "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-3.jpg";
 
 export default function SortableTable({
 	employeePromise,
@@ -94,29 +46,21 @@ export default function SortableTable({
 	employeePromise: Promise<Employees[]>;
 }) {
 	const [employees, setEmployees] = useState<Employees[] | undefined>(undefined);
-	const [isLoading, setLoading] = useState<boolean>(true);
-	//let employees : Employees[] | undefined = undefined;
-	//let loading : boolean = true;
-	//console.log("Initial Data: " + employees)
-	//let employees : Employees[];
-
-	//const employees = await fetchEmployees2();
-
+	const [tabValue, setTabValue] = useState<TabValueType>(TABS[0]["value"]);
 	console.log("Hello from sortableTable");
-	//TODO: FINISH CUSTOM WIDTH IMPLEMENTATION, ADD UPDATE ON DATA CHANGE
 	
-	useEffect(() => {
-		/*
-		fetch('/api/employees')
-		.then((res) => res.json())
-		.then((data : Employees[]) => {
-			//console.log("After Set Data: " + JSON.stringify((data as QueryResult<Employees>).rows));
-			
-			console.log(data); // TODO: figure out why default rows entry is empty in table
+	function tabFilter(employee: Employees) {
+		switch (tabValue){
+			case "active":
+				return employee.activeemployee == true;
+			case "inactive":
+				return employee.activeemployee == false;
+			case "all":
+				return true;
+		}
+	}
 
-			setEmployees(data);
-		})
-		*/
+	useEffect(() => {
 		const handleEmployeePromise = async() => {
 			const data = await employeePromise;
 			setEmployees(data);
@@ -126,49 +70,7 @@ export default function SortableTable({
 	
 	}, []);
 
-	useEffect(() => {
-		const calculateColumnWidths = () => {
 
-
-			const table = document.getElementById('employees-table');
-			if (!table) return;
-
-			const headerCells = table.querySelectorAll('th');
-			const bodyCells = table.querySelectorAll('td');
-
-			//console.log(headerCells);
-			//console.log(bodyCells);
-
-			
-
-			//Commented out until all row entries are added, matching length of headers and columns.
-			/*
-			for (let i = 0; i < headerCells.length; i++) {
-				const headerWidth = headerCells[i].offsetWidth;
-				const bodyWidth = bodyCells[i % (headerCells.length + 1)].offsetWidth; // Plus 1 because of pencil symbol?
-
-				const columnWidth = Math.max(headerWidth, bodyWidth);
-
-				headerCells[i].style.maxWidth = `${columnWidth}px`;
-			}
-			*/
-		};
-
-		if (employees !== undefined) {
-			calculateColumnWidths();
-
-			setLoading(false);
-
-			// Recalculate on window resize
-			window.addEventListener('resize', calculateColumnWidths);
-
-			return () => {
-				window.removeEventListener('resize', calculateColumnWidths);
-			};
-		}
-	}, [employees]);
-
-	  
 
 	return (
 		<Card className="h-full w-full">
@@ -188,16 +90,13 @@ export default function SortableTable({
 								<UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Employee
 							</Button>
 						</a>
-						<Button variant="outlined" size="sm">
-							view all
-						</Button>
 					</div>
 				</div>
 				<div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-					<Tabs value="all" className="w-full md:w-max">
+					<Tabs value="active" className="w-full md:w-max">
 						<TabsHeader>
 							{TABS.map(({ label, value }) => (
-								<Tab key={value} value={value}>
+								<Tab key={value} value={value} onClick={() => {setTabValue(value); console.log(value)}}>
 									&nbsp;&nbsp;{label}&nbsp;&nbsp;
 								</Tab>
 							))}
@@ -219,26 +118,30 @@ export default function SortableTable({
 							{TABLE_HEAD.map((head, index) => (
 								<th
 									key={head + index}
-									className="cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 transition-colors hover:bg-blue-gray-50"
+									className="cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 py-4 px-2 transition-colors hover:bg-blue-gray-50 text-left"
 								>
 									<Typography
 										variant="small"
 										color="blue-gray"
-										className="flex items-center justify-between gap-2 font-normal leading-none opacity-70"
+										className="font-normal leading-none opacity-70"
 									>
-										{head}{" "}
-										{index !== TABLE_HEAD.length - 1 && (
-											<ChevronUpDownIcon strokeWidth={2} className="h-4 w-4" />
-										)}
+										{head}
+
 									</Typography>
+									{/*" "*/}{/*index !== TABLE_HEAD.length - 1 && (
+											<ChevronUpDownIcon strokeWidth={2} className="h-4 w-4" />
+									)*/}
 								</th>
 							))}
 						</tr>
 					</thead>
 					<tbody>
 						{employees !== undefined ? (
-
-							Array.isArray(employees) && employees.map(
+							Array.isArray(employees) && 
+							employees
+								.filter(tabFilter)
+								//.filter(searchFilter)
+								.map(
 								// Skip password
 								({ id, number, username, firstname, lastname, cellphone, homephone, email, 
 									managerid, accesslevel, timesheetrequired, overtimeeligible, tabnavigateot, 
@@ -246,16 +149,16 @@ export default function SortableTable({
 									numexpensesummaries, numdefaulttimerows, contractor}, index) => {
 									const isLast = index === employees.length - 1;
 									const classes = isLast
-										? "p-4"
-										: "p-4 border-b border-blue-gray-50";
+										? "p-2"
+										: "p-2 border-b border-blue-gray-50";
 
 									return (
-										<tr className={isLoading ? "hidden" : ""} key={firstname + index}>
+										<tr key={firstname + index}>
 											
 											{/* PFF, Name, and Email */}
 											<td className={classes}>
 												<div className="flex flex-grow items-center gap-3">
-													<Avatar src={TABLE_ROWS[0].img} alt={firstname} variant="rounded" className="max-w-none" />
+													<Avatar src={demoImg} alt={firstname} variant="rounded" className="max-w-none" />
 													<div className="flex flex-col">
 														<Typography
 															variant="small"
@@ -267,7 +170,7 @@ export default function SortableTable({
 														<Typography
 															variant="small"
 															color="blue-gray"
-															className="font-normal opacity-70"
+															className="font-normal opacity-70 text-xs"
 														>
 															{email}
 														</Typography>
@@ -415,7 +318,7 @@ export default function SortableTable({
 					</tbody>
 				</table>
 			</CardBody>
-			<CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
+			{/* <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
 				<Typography variant="small" color="blue-gray" className="font-normal">
 					Page 1 of 10
 				</Typography>
@@ -427,7 +330,7 @@ export default function SortableTable({
 						Next
 					</Button>
 				</div>
-			</CardFooter>
+			</CardFooter> */}
 		</Card>
 	);
 }
