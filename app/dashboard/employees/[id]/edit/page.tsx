@@ -23,13 +23,13 @@ export default async function Page({ params }: { params: { id: string } }) {
         <main>
 			<Breadcrumbs className='bg-transparent'>
 				<Link href='/dashboard/employees' className={clsx(lusitana.className,"text-2xl opacity-60")}>
-				Employees
+				    Employees
 				</Link>
-				<Link href='/dashboard/employees/add' className={clsx(lusitana.className,"text-2xl")}>
-				Add Employee
+				<Link href={`/dashboard/employees/${id}/edit`} className={clsx(lusitana.className,"text-2xl")}>
+				    Edit Employee
 				</Link>
 			</Breadcrumbs>
-			<Form />
+			<Form employee={employee}/>
         </main>
     );
 }

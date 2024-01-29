@@ -63,7 +63,7 @@ export async function fetchEmployees() {
 export async function fetchEmployeeByID(id: string) {
 	noStore();
 	try {
-	  const data = await sql<InvoiceForm>`
+	  const data = await sql<Employee>`
 		SELECT
 			id, number, username,
 			password, firstName, lastName,

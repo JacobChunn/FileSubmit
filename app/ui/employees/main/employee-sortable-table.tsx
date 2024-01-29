@@ -14,6 +14,7 @@ import TableDoubleTextEntry from "./tabledoubletextentry";
 import { useEffect, useState } from "react";
 import { Employee } from "@/app/lib/definitions";
 import TableCheckEntry from "./table-check-entry";
+import Link from "next/link";
 
 const TABS = [
 	{
@@ -300,11 +301,13 @@ export default function SortableTable({
 
 											{/* Edit User */}
 											<td className={classes}>
-												<Tooltip content="Edit User">
-													<IconButton variant="text">
-														<PencilIcon className="h-4 w-4" />
-													</IconButton>
-												</Tooltip>
+												<Link href={`/dashboard/employees/${id}/edit`}>
+													<Tooltip content="Edit User">
+														<IconButton variant="text">
+															<PencilIcon className="h-4 w-4" />
+														</IconButton>
+													</Tooltip>
+												</Link>
 											</td>
 										</tr>
 									);
