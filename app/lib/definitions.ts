@@ -44,7 +44,7 @@ export type LatestInvoiceRaw = Omit<LatestInvoice, 'amount'> & {
   amount: number;
 };
 
-export type Employees = {
+export type Employee = {
   id: string,
   number: number,
   username: string,

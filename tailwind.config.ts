@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 const withMT = require("@material-tailwind/react/utils/withMT");
+const colors = require('tailwindcss/colors');
 
 const config: Config = withMT({
   content: [
@@ -14,11 +15,18 @@ const config: Config = withMT({
         '13': 'repeat(13, minmax(0, 1fr))',
       },
       colors: {
-        blue: {
-          400: '#2589FE',
-          500: '#0070F3',
-          600: '#2F6FEB',
-        },
+		green: colors.green,
+		lime: colors.lime,
+		red: colors.red,
+		rose: colors.rose,
+		yellow: colors.yellow,
+		softYellow: '#fefaa6',
+		purple: colors.purple,
+		indigo: colors.indigo,
+		orange: colors.orange,
+		amber: colors.amber,
+		blue: colors.blue,
+		
       },
     },
     keyframes: {

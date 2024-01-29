@@ -7,12 +7,13 @@ import {
 	MagnifyingGlassIcon,
 	ChevronUpDownIcon,
 } from "@heroicons/react/24/outline";
-import { PencilIcon, UserPlusIcon, UserMinusIcon } from "@heroicons/react/24/solid";
-import TableBoolEntry from "./tableboolentry";
+import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
+import TableBoolEntry from "./table-bool-entry";
 import TableTextEntry from "./tabletextentry";
 import TableDoubleTextEntry from "./tabledoubletextentry";
 import { useEffect, useState } from "react";
-import { Employees } from "@/app/lib/definitions";
+import { Employee } from "@/app/lib/definitions";
+import TableCheckEntry from "./table-check-entry";
 
 const TABS = [
 	{
@@ -43,13 +44,13 @@ const demoImg = "https://demos.creative-tim.com/test/corporate-ui-dashboard/asse
 export default function SortableTable({
 	employeePromise,
 }: {
-	employeePromise: Promise<Employees[]>;
+	employeePromise: Promise<Employee[]>;
 }) {
-	const [employees, setEmployees] = useState<Employees[] | undefined>(undefined);
+	const [employees, setEmployees] = useState<Employee[] | undefined>(undefined);
 	const [tabValue, setTabValue] = useState<TabValueType>(TABS[0]["value"]);
 	console.log("Hello from sortableTable");
 	
-	function tabFilter(employee: Employees) {
+	function tabFilter(employee: Employee) {
 		switch (tabValue){
 			case "active":
 				return employee.activeemployee == true;
@@ -85,7 +86,8 @@ export default function SortableTable({
 						</Typography>
 					</div>
 					<div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-						<a href="/dashboard/employees/add">
+						{/* CHANGE TO NEXT.js LINK COMPONENT FOR PREFETCHING!!!!!!!!!!!!!!!!!!!!!!!!!!! */}
+						<a href="/dashboard/employees/add"> 
 							<Button className="flex items-center gap-3" size="sm">
 								<UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Employee
 							</Button>
@@ -189,19 +191,19 @@ export default function SortableTable({
 											{/* Is Active Employee */}
 											<TableBoolEntry
 												condition={activeemployee}
-												classes={classes}
-												valueTextWhenTrue="Active"
-												valueTextWhenFalse="Inactive"
+												rowStyles={classes}
+												trueText="Active"
+												falseText="Inactive"
 											/>
 
 											{/* Is Contractor */}
 											<TableBoolEntry
 												condition={contractor}
-												classes={classes}
-												valueTextWhenTrue="Contractor"
-												valueTextWhenFalse="Employee"
-												colorWhenTrue="yellow"
-												colorWhenFalse="blue"
+												rowStyles={classes}
+												trueText="Contractor"
+												falseText="Employee"
+												trueAddStyles="bg-softYellow text-yellow-800"
+												falseAddStyles="bg-blue-200 text-blue-800"
 											/>
 
 											{/* Username and Password */}
@@ -243,33 +245,33 @@ export default function SortableTable({
 											/>
 
 											{/* Timesheet Required */}
-											<TableBoolEntry
+											<TableCheckEntry
 												condition={timesheetrequired}
-												classes={classes}
+												rowStyles={classes}
 											/>
 
 											{/* Overtime Eligible */}
-											<TableBoolEntry
+											<TableCheckEntry
 												condition={overtimeeligible}
-												classes={classes}
+												rowStyles={classes}
 											/>
 
 											{/* Tab Navigate OT*/}
-											<TableBoolEntry
+											<TableCheckEntry
 												condition={tabnavigateot}
-												classes={classes}
+												rowStyles={classes}
 											/>
 
 											{/* Email Expense Copy */}
-											<TableBoolEntry
+											<TableCheckEntry
 												condition={emailexpensecopy}
-												classes={classes}
+												rowStyles={classes}
 											/>
 
 											{/* I Enter Time Data */}
-											<TableBoolEntry
+											<TableCheckEntry
 												condition={ientertimedata}
-												classes={classes}
+												rowStyles={classes}
 											/>
 
 											{/* Number of Sheet Summaries */}
@@ -311,7 +313,7 @@ export default function SortableTable({
 						) : (
 							<tr>
 								<td>
-									No data available
+									...Loading
 								</td>
 							</tr>
 						)}

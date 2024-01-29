@@ -5,8 +5,9 @@ import { Button } from '@/app/ui/button';
 import { addEmployee } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
 import FormTextEntry from './formentry';
+import { Employee } from '@/app/lib/definitions';
 
-export default function Form() {
+export default function Form({employee: Employee}) {
   const initialState = { message: null, errors: {} };
   const [state, dispatch] = useFormState(addEmployee, initialState);
 

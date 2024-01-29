@@ -1,6 +1,5 @@
-
-import { Employees } from '@/app/lib/definitions';
-import SortableTable from '@/app/ui/employees/employee-sortable-table';
+import { Employee } from '@/app/lib/definitions';
+import SortableTable from '@/app/ui/employees/main/employee-sortable-table';
 import { LatestInvoicesSkeleton } from '@/app/ui/skeletons';
 import { sql } from '@vercel/postgres';
 import { Metadata } from 'next';
@@ -14,7 +13,7 @@ export const metadata: Metadata = {
 export async function fetchEmployees() {
   noStore();
   try {
-    const data = await sql<Employees>`
+    const data = await sql<Employee>`
       SELECT
         id, number, username,
         password, firstName, lastName,

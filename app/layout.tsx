@@ -4,11 +4,11 @@ import { Metadata } from 'next';
  
 export const metadata: Metadata = {
   title: {
-    template: '%s | Acme Dashboard',
-    default: 'Acme Dashboard',
+    template: '%s | Encore Automation',
+    default: 'Encore Automation',
   },
   description: 'The official Next.js Learn Dashboard built with App Router.',
-  metadataBase: new URL('https://next-learn-dashboard.vercel.sh'),
+  metadataBase: new URL('https://file-submit-qf8y.vercel.app'),
 };
 
 export default function RootLayout({
