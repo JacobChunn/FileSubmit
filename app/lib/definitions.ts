@@ -110,3 +110,8 @@ export type InvoiceForm = {
   amount: number;
   status: 'pending' | 'paid';
 };
+
+export type TabType = {
+  label: string;
+  value: string;
+};

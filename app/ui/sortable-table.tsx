@@ -8,30 +8,15 @@ import {
 	ChevronUpDownIcon,
 } from "@heroicons/react/24/outline";
 import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
-import TableBoolEntry from "./table-bool-entry";
-import TableTextEntry from "./tabletextentry";
-import TableDoubleTextEntry from "./tabledoubletextentry";
+import TableBoolEntry from "./employees/main/table-bool-entry";
+import TableTextEntry from "./employees/main/tabletextentry";
+import TableDoubleTextEntry from "./employees/main/tabledoubletextentry";
 import { useEffect, useState } from "react";
-import { Employee } from "@/app/lib/definitions";
-import TableCheckEntry from "./table-check-entry";
+import { Employee, TabType } from "@/app/lib/definitions";
+import TableCheckEntry from "./employees/main/table-check-entry";
 import Link from "next/link";
 
-const TABS = [
-	{
-		label: "Active",
-		value: "active",
-	},
-	{
-		label: "Inactive",
-		value: "inactive",
-	},
-	{
-		label: "All",
-		value: "all",
-	},
-] as const;
 
-type TabValueType = typeof TABS[number]['value'];
 
 
 const TABLE_HEAD = [
@@ -42,25 +27,23 @@ const TABLE_HEAD = [
 
 const demoImg = "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-3.jpg";
 
-export default function SortableTable({
+export default function SortableTable<T>({
 	employeePromise,
+	TABS,
+	tabFilterUnbound,
 }: {
 	employeePromise: Promise<Employee[]>;
+	TABS: readonly TabType[];
+	tabFilterUnbound: (data: T, tabValue: typeof TABS[number]['value']) => boolean
 }) {
+	type TabValueType = typeof TABS[number]['value'];
+
+	const tabFilter = (data: T) => tabFilterUnbound(data, tabValue);
+
 	const [employees, setEmployees] = useState<Employee[] | undefined>(undefined);
 	const [tabValue, setTabValue] = useState<TabValueType>(TABS[0]["value"]);
 	console.log("Hello from sortableTable");
 	
-	function tabFilter(employee: Employee) {
-		switch (tabValue){
-			case "active":
-				return employee.activeemployee == true;
-			case "inactive":
-				return employee.activeemployee == false;
-			case "all":
-				return true;
-		}
-	}
 
 	useEffect(() => {
 		const handleEmployeePromise = async() => {
@@ -114,7 +97,7 @@ export default function SortableTable({
 					</div>
 				</div>
 			</CardHeader>
-			<CardBody className="overflow-scroll px-0">
+			<CardBody className="overflow-x-auto px-0">
 				<table id="employees-table" className="mt-4 w-full table-auto text-left">
 					<thead>
 						<tr>
@@ -323,19 +306,6 @@ export default function SortableTable({
 					</tbody>
 				</table>
 			</CardBody>
-			{/* <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-				<Typography variant="small" color="blue-gray" className="font-normal">
-					Page 1 of 10
-				</Typography>
-				<div className="flex gap-2">
-					<Button variant="outlined" size="sm">
-						Previous
-					</Button>
-					<Button variant="outlined" size="sm">
-						Next
-					</Button>
-				</div>
-			</CardFooter> */}
 		</Card>
 	);
 }

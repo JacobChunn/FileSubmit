@@ -1,5 +1,4 @@
 import { EmployeeState } from "@/app/lib/actions"
-import clsx from "clsx";
 import { ChangeEvent, SetStateAction, useEffect, useState } from "react";
 
 export type Props = {
@@ -21,10 +20,10 @@ export default function FormBoolEntry({ state, type, label, inputId, inputName, 
 
     return (
         <div className="mb-4">
-            <label htmlFor={inputId} className="mb-2 block text-sm font-medium">
+            <label htmlFor={inputId} className={`mb-2 block text-sm font-medium ${originalChecked == currentChecked ? "text-black" : "text-blue-600"}`}>
                 {label}
             </label>
-            <div className={`relative ${originalChecked === currentChecked ? "text-black" : "text-blue-600"}`}>
+            <div className={`relative`}>
                 <input
                     id={inputId}
                     name={inputName}

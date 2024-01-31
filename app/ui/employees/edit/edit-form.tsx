@@ -2,57 +2,19 @@
 
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
-import { addEmployee } from '@/app/lib/actions';
+import { editEmployee } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
 import FormTextEntry from './form-entry';
 import { Employee } from '@/app/lib/definitions';
 import FormBoolEntry from './form-bool-entry';
-import { useRef } from 'react';
 
 export default function Form({employee} : {employee: Employee}) {
   const initialState = { message: null, errors: {} };
-  const [state, dispatch] = useFormState(addEmployee, initialState);
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const isDisabled = new Array<boolean>;
-
-  function propertyOf<Employee,>(name: keyof Employee) {
-    return name;
-  }
-
-  const processEdits = () => {
-    const formElements = formRef.current?.elements
-
-    if (!formElements) {
-      console.error('Form elements not available.');
-      return;
-    }
-
-    Array.from(formElements).forEach((element: Element) => {
-      // Access individual elements
-      if (element instanceof HTMLInputElement) {
-        let property: keyof Employee = element.name as keyof Employee;
-        console.log('Element name:', element.name);
-
-        if (element.type == 'checkbox') {
-          console.log("CHECKBOX--------------\nInput is different?: " + JSON.stringify(element.checked != employee[property]))
-          
-          // console.log("Input is same?: " + JSON.stringify(element.value === employee[property]))
-          // console.log("original:")
-          // console.log(JSON.stringify(employee[property]));
-          // console.log(typeof employee[property])
-          // console.log("new:")
-          // console.log(JSON.stringify(element.value));
-          // console.log(typeof element.value)
-        } else {
-          console.log("OTHER--------------\nInput is different?: " + JSON.stringify(element.value != employee[property]))
-        }
-      }
-    });
-  };
+  const editEmployeeWithID = editEmployee.bind(null, employee.id);
+  const [state, dispatch] = useFormState(editEmployeeWithID, initialState);
 
   return (
-    <form ref={formRef} action={dispatch}>
+    <form action={dispatch}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {/* First Name */}
         <FormTextEntry
@@ -270,7 +232,7 @@ export default function Form({employee} : {employee: Employee}) {
           Cancel
         </Link>
         {/* <Button type="submit">Submit Edits</Button> */}
-        <Button type="button" onClick={processEdits}>Submit Edits</Button>
+        <Button type="submit">Submit Edits</Button>
       </div>
     </form>
   );

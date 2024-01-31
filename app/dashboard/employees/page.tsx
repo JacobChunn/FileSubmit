@@ -1,10 +1,11 @@
 import { Employee } from '@/app/lib/definitions';
-import SortableTable from '@/app/ui/employees/main/employee-sortable-table';
+import SortableTable from '@/app/ui/sortable-table';
 import { LatestInvoicesSkeleton } from '@/app/ui/skeletons';
 import { sql } from '@vercel/postgres';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { unstable_noStore as noStore } from 'next/cache';
+import EmployeeSortableTable from './employee-sortable-table';
 
 export const metadata: Metadata = {
   title: 'Employees',
@@ -39,7 +40,7 @@ export default async function Page() {
   return (
     <main>
       <Suspense >
-          <SortableTable employeePromise={employeePromise}/>
+          <EmployeeSortableTable employeePromise={employeePromise}/>
       </Suspense>
     </main>
   )

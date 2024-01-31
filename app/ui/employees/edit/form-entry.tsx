@@ -20,10 +20,10 @@ export default function FormTextEntry({ state, type, label, inputId, inputName, 
 
     return (
         <div className="mb-4">
-            <label htmlFor={inputId} className="mb-2 block text-sm font-medium">
+            <label htmlFor={inputId} className={`mb-2 block text-sm font-medium ${originalValue === currentValue ? "text-black" : "text-blue-600"}`}>
                 {label}
             </label>
-            <div className={`relative ${originalValue === currentValue ? "text-black" : "text-blue-600"}`}>
+            <div className={`relative`}>
                 <input
                     id={inputId}
                     name={inputName}
