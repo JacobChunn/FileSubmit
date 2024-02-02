@@ -19,6 +19,12 @@ export default function TableBoolEntry2<T, K extends keyof T>(
 		falseAddStyles = "bg-red-200 text-red-800",
 	} : Props<T, K>
 ) {
+    if (!data) return (
+        <td>
+            Row Not Found
+        </td>
+    )
+
     const condition = data[dataProperty]==true;
 
     return (
@@ -34,23 +40,6 @@ export default function TableBoolEntry2<T, K extends keyof T>(
 					:
 					falseText
 				}
-                {/* <Chip
-                    className='' // change?
-                    variant="ghost"
-                    size="sm"
-                    value={condition==true ? valueTextWhenTrue : valueTextWhenFalse}
-                    color={condition==true ? colorWhenTrue : colorWhenFalse}
-                    icon={
-                        condition==true ?
-                            valueTextWhenTrue === "" ? (
-                                <CheckIcon strokeWidth="2" className=''/> // change? cant affect internal div between this change and upper div inside of chip
-                            ) : null                                                    // may have to resort to making my own chip
-                            :
-                            valueTextWhenFalse == "" ? (
-                               <XMarkIcon strokeWidth="2" className=''/> 
-                            ) : null
-                        }
-                /> */}
             </div>
         </td>
     )

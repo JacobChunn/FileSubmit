@@ -1,6 +1,8 @@
+"use client"
 import { Employee } from "@/app/lib/definitions";
 import SortableTable from "@/app/ui/sortable-table";
 import TableBoolEntry2 from "./table-bool-entry2";
+import TableCheckEntry2 from "./table-check-entry2";
 
 export default function EmployeeSortableTable({
 	employeePromise,
@@ -23,7 +25,7 @@ export default function EmployeeSortableTable({
         },
     ] as const;
 
-    function tabFilter(employee: Employee, tabValue: typeof TABS[number]['value']) {
+    function tabFilter(employee: Employee, tabValue: string) {
 		switch (tabValue){
 			case "active":
 				return employee.activeemployee == true;
@@ -31,6 +33,8 @@ export default function EmployeeSortableTable({
 				return employee.activeemployee == false;
 			case "all":
 				return true;
+            default:
+                return false;
 		}
 	}
 
@@ -39,9 +43,13 @@ export default function EmployeeSortableTable({
         <SortableTable<Employee>
             dataPromise={employeePromise}
             TABS={TABS}
-            tabFilter={tabFilter}
+            tabFilterUnbound={tabFilter}
         >
-            <tr key={firstname + index}>
+            <TableBoolEntry2<Employee, keyof Employee>
+                dataProperty={'activeemployee'}
+                trueText="Active"
+                falseText="Inactive"
+            />
                 
                 {/* PFF, Name, and Email */}
                 {/* <td className={classes}>
@@ -75,11 +83,7 @@ export default function EmployeeSortableTable({
                 /> */}
 
                 {/* Is Active Employee */}
-                <TableBoolEntry2<Employee, keyof Employee>
-                    dataProperty={'activeemployee'}
-                    trueText="Active"
-                    falseText="Inactive"
-                />
+
 
                 {/* Is Contractor */}
                 {/* <TableBoolEntry
@@ -130,10 +134,9 @@ export default function EmployeeSortableTable({
                 /> */}
 
                 {/* Timesheet Required */}
-                {/* <TableCheckEntry
-                    condition={timesheetrequired}
-                    rowStyles={classes}
-                /> */}
+                <TableCheckEntry2<Employee, keyof Employee>
+                    dataProperty={'timesheetrequired'}
+                />
 
                 {/* Overtime Eligible */}
                 {/* <TableCheckEntry
@@ -193,7 +196,6 @@ export default function EmployeeSortableTable({
                         </Tooltip>
                     </Link>
                 </td> */}
-            </tr>
         </SortableTable>
     )
 

@@ -11,7 +11,7 @@ import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import TableBoolEntry from "./employees/main/table-bool-entry";
 import TableTextEntry from "./employees/main/tabletextentry";
 import TableDoubleTextEntry from "./employees/main/tabledoubletextentry";
-import { useEffect, useState, Children } from "react";
+import { useEffect, useState, Children, cloneElement } from "react";
 import { TabType } from "@/app/lib/definitions";
 import TableCheckEntry from "./employees/main/table-check-entry";
 import Link from "next/link";
@@ -134,16 +134,19 @@ export default function SortableTable<T>({
 								(rowData, index) => {
 									const isLast = index === data.length - 1;
 									const classes = isLast
-										? "p-2"
+										? "p-2 align-middle"
 										: "p-2 border-b border-blue-gray-50";
 
 									return (
 										<div>
 											{Children.map(
 												children,
-												(child) => (
-													<div>{child}</div>
-												)												
+												(child) => 
+													cloneElement(child as React.ReactElement<any>, {
+														data: rowData,
+														rowStyles: classes
+													})
+																
 											)}
 										</div>
 									);
