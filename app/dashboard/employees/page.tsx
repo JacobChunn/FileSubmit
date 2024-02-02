@@ -5,7 +5,7 @@ import { sql } from '@vercel/postgres';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { unstable_noStore as noStore } from 'next/cache';
-import EmployeeSortableTable from './employee-sortable-table';
+import EmployeeSortableTable from '../../ui/employees/main/employee-sortable-table';
 
 export const metadata: Metadata = {
   title: 'Employees',

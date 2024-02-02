@@ -11,8 +11,8 @@ import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import TableBoolEntry from "./employees/main/table-bool-entry";
 import TableTextEntry from "./employees/main/tabletextentry";
 import TableDoubleTextEntry from "./employees/main/tabledoubletextentry";
-import { useEffect, useState } from "react";
-import { Employee, TabType } from "@/app/lib/definitions";
+import { useEffect, useState, Children } from "react";
+import { TabType } from "@/app/lib/definitions";
 import TableCheckEntry from "./employees/main/table-check-entry";
 import Link from "next/link";
 
@@ -28,11 +28,13 @@ const TABLE_HEAD = [
 const demoImg = "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-3.jpg";
 
 export default function SortableTable<T>({
-	employeePromise,
+	children,
+	dataPromise,
 	TABS,
 	tabFilterUnbound,
 }: {
-	employeePromise: Promise<Employee[]>;
+	children: React.ReactNode;
+	dataPromise: Promise<T[]>;
 	TABS: readonly TabType[];
 	tabFilterUnbound: (data: T, tabValue: typeof TABS[number]['value']) => boolean
 }) {
@@ -40,18 +42,18 @@ export default function SortableTable<T>({
 
 	const tabFilter = (data: T) => tabFilterUnbound(data, tabValue);
 
-	const [employees, setEmployees] = useState<Employee[] | undefined>(undefined);
+	const [data, setData] = useState<T[] | undefined>(undefined);
 	const [tabValue, setTabValue] = useState<TabValueType>(TABS[0]["value"]);
 	console.log("Hello from sortableTable");
 	
 
 	useEffect(() => {
-		const handleEmployeePromise = async() => {
-			const data = await employeePromise;
-			setEmployees(data);
+		const handleDataPromise = async() => {
+			const returnedData = await dataPromise;
+			setData(returnedData);
 		}
 		
-		handleEmployeePromise();
+		handleDataPromise();
 	
 	}, []);
 
@@ -122,177 +124,28 @@ export default function SortableTable<T>({
 						</tr>
 					</thead>
 					<tbody>
-						{employees !== undefined ? (
-							Array.isArray(employees) && 
-							employees
+						{data !== undefined ? (
+							Array.isArray(data) && 
+							data
 								.filter(tabFilter)
 								//.filter(searchFilter)
 								.map(
 								// Skip password
-								({ id, number, username, firstname, lastname, cellphone, homephone, email, 
-									managerid, accesslevel, timesheetrequired, overtimeeligible, tabnavigateot, 
-									emailexpensecopy, activeemployee, ientertimedata, numtimesheetsummaries, 
-									numexpensesummaries, numdefaulttimerows, contractor}, index) => {
-									const isLast = index === employees.length - 1;
+								(rowData, index) => {
+									const isLast = index === data.length - 1;
 									const classes = isLast
 										? "p-2"
 										: "p-2 border-b border-blue-gray-50";
 
 									return (
-										<tr key={firstname + index}>
-											
-											{/* PFF, Name, and Email */}
-											<td className={classes}>
-												<div className="flex flex-grow items-center gap-3">
-													<Avatar src={demoImg} alt={firstname} variant="rounded" className="max-w-none" />
-													<div className="flex flex-col">
-														<Typography
-															variant="small"
-															color="blue-gray"
-															className="font-normal"
-														>
-															{firstname} {lastname}
-														</Typography>
-														<Typography
-															variant="small"
-															color="blue-gray"
-															className="font-normal opacity-70 text-xs"
-														>
-															{email}
-														</Typography>
-													</div>
-												</div>
-											</td>
-
-											{/* Cell and Home Phone Numbers */}
-											<TableDoubleTextEntry
-												classes={classes}
-												text1={cellphone}
-												text2={homephone}
-												addonStyles2="opacity-70"
-											/>
-
-											{/* Is Active Employee */}
-											<TableBoolEntry
-												condition={activeemployee}
-												rowStyles={classes}
-												trueText="Active"
-												falseText="Inactive"
-											/>
-
-											{/* Is Contractor */}
-											<TableBoolEntry
-												condition={contractor}
-												rowStyles={classes}
-												trueText="Contractor"
-												falseText="Employee"
-												trueAddStyles="bg-softYellow text-yellow-800"
-												falseAddStyles="bg-blue-200 text-blue-800"
-											/>
-
-											{/* Username and Password */}
-											<td className={classes}>
-												<div className="flex flex-col">
-													<Typography
-														variant="small"
-														color="blue-gray"
-														className="font-normal"
-													>
-														{username}
-													</Typography>
-													<Typography
-														variant="small"
-														color="blue-gray"
-														className="font-normal"
-													>
-														PASSWORD
-													</Typography>
-												</div>
-											</td>
-
-											{/* Number */}
-											<TableTextEntry 
-												classes={classes}
-												text={number}
-											/>
-
-											{/* Manager ID */}
-											<TableTextEntry 
-												classes={classes}
-												text={managerid}
-											/>
-
-											{/* Access Level */}
-											<TableTextEntry 
-												classes={classes}
-												text={accesslevel}
-											/>
-
-											{/* Timesheet Required */}
-											<TableCheckEntry
-												condition={timesheetrequired}
-												rowStyles={classes}
-											/>
-
-											{/* Overtime Eligible */}
-											<TableCheckEntry
-												condition={overtimeeligible}
-												rowStyles={classes}
-											/>
-
-											{/* Tab Navigate OT*/}
-											<TableCheckEntry
-												condition={tabnavigateot}
-												rowStyles={classes}
-											/>
-
-											{/* Email Expense Copy */}
-											<TableCheckEntry
-												condition={emailexpensecopy}
-												rowStyles={classes}
-											/>
-
-											{/* I Enter Time Data */}
-											<TableCheckEntry
-												condition={ientertimedata}
-												rowStyles={classes}
-											/>
-
-											{/* Number of Sheet Summaries */}
-											<TableTextEntry 
-												classes={classes}
-												text={numtimesheetsummaries}
-											/>
-
-											{/* Number of Expense Summaries */}
-											<TableTextEntry 
-												classes={classes}
-												text={numexpensesummaries}
-											/>
-
-											{/* Number of Default Rows */}
-											<TableTextEntry 
-												classes={classes}
-												text={numdefaulttimerows} // change
-											/>
-
-											{/* ID */}
-											<TableTextEntry 
-												classes={classes}
-												text={id}
-											/>
-
-											{/* Edit User */}
-											<td className={classes}>
-												<Link href={`/dashboard/employees/${id}/edit`}>
-													<Tooltip content="Edit User">
-														<IconButton variant="text">
-															<PencilIcon className="h-4 w-4" />
-														</IconButton>
-													</Tooltip>
-												</Link>
-											</td>
-										</tr>
+										<div>
+											{Children.map(
+												children,
+												(child) => (
+													<div>{child}</div>
+												)												
+											)}
+										</div>
 									);
 								},
 							)
