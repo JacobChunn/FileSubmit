@@ -133,12 +133,13 @@ export default function SortableTable<T>({
 								// Skip password
 								(rowData, index) => {
 									const isLast = index === data.length - 1;
+									const inAllClasses = "p-2 align-middle "
 									const classes = isLast
-										? "p-2 align-middle"
-										: "p-2 border-b border-blue-gray-50";
+										? inAllClasses
+										: inAllClasses + "border-b border-blue-gray-50";
 
 									return (
-										<div>
+										<tr>
 											{Children.map(
 												children,
 												(child) => 
@@ -148,7 +149,7 @@ export default function SortableTable<T>({
 													})
 																
 											)}
-										</div>
+										</tr>
 									);
 								},
 							)

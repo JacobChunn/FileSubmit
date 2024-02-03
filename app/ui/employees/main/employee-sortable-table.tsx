@@ -3,6 +3,8 @@ import { Employee } from "@/app/lib/definitions";
 import SortableTable from "@/app/ui/sortable-table";
 import TableBoolEntry2 from "./table-bool-entry2";
 import TableCheckEntry2 from "./table-check-entry2";
+import TableDoubleTextEntry2 from "./tabledoubletextentry2";
+import TableTextEntry2 from "./tabletextentry2";
 
 export default function EmployeeSortableTable({
 	employeePromise,
@@ -44,13 +46,7 @@ export default function EmployeeSortableTable({
             dataPromise={employeePromise}
             TABS={TABS}
             tabFilterUnbound={tabFilter}
-        >
-            <TableBoolEntry2<Employee, keyof Employee>
-                dataProperty={'activeemployee'}
-                trueText="Active"
-                falseText="Inactive"
-            />
-                
+        >                
                 {/* PFF, Name, and Email */}
                 {/* <td className={classes}>
                     <div className="flex flex-grow items-center gap-3">
@@ -75,15 +71,18 @@ export default function EmployeeSortableTable({
                 </td> */}
 
                 {/* Cell and Home Phone Numbers */}
-                {/* <TableDoubleTextEntry
-                    classes={classes}
-                    text1={cellphone}
-                    text2={homephone}
+                <TableDoubleTextEntry2<Employee, keyof Employee>
+                    dataProperty1={'cellphone'}
+                    dataProperty2={'homephone'}
                     addonStyles2="opacity-70"
-                /> */}
+                />
 
                 {/* Is Active Employee */}
-
+                <TableBoolEntry2<Employee, keyof Employee>
+                    dataProperty={'activeemployee'}
+                    trueText="Active"
+                    falseText="Inactive"
+                 />
 
                 {/* Is Contractor */}
                 {/* <TableBoolEntry
@@ -175,11 +174,9 @@ export default function EmployeeSortableTable({
                 /> */}
 
                 {/* Number of Default Rows */}
-                {/* <TableTextEntry 
-                    classes={classes}
-                    text={numdefaulttimerows} // change
-                /> */}
-
+                <TableTextEntry2<Employee, keyof Employee>
+                    dataProperty={'numdefaulttimerows'}
+                />
                 {/* ID */}
                 {/* <TableTextEntry 
                     classes={classes}

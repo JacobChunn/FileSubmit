@@ -3,19 +3,35 @@ import { Typography } from '@/app/ui/employees/client-components/textentry-mater
 import { variant } from '@material-tailwind/react/types/components/typography'
 
 
-export type Props = {
-    classes: string,
-    text1?: any,
-    text2?: any,
+export type Props<T, K extends keyof T> = {
+    data?: T,
+    dataProperty1: K,
+    dataProperty2: K,
+    rowStyles?: string,
     variant?: variant,
     color?: colors,
     addonStyles1?: string,
     addonStyles2?: string,
 }
 
-export default function TableDoubleTextEntry2({classes, text1="", text2="", variant="small", color="blue-gray", addonStyles1="", addonStyles2=""} : Props) {
-    return(
-        <td className={classes}>
+export default function TableDoubleTextEntry2<T, K extends keyof T>({
+    data,
+    dataProperty1,
+    dataProperty2,
+    rowStyles,
+    variant="small",
+    color="blue-gray",
+    addonStyles1="",
+    addonStyles2=""
+}: Props<T, K>
+) {
+    if (!data) throw Error("Data is undefined :(");
+
+    const text1 = data[dataProperty1] as string;
+    const text2 = data[dataProperty2] as string;
+
+    return(        
+        <td className={rowStyles}>
             <div className="flex flex-col">
                 <Typography
                     variant={variant}

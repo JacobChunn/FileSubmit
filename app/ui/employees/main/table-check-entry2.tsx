@@ -8,8 +8,13 @@ export type Props<T, K extends keyof T> = {
 	falseStyles?: string,
 }
 
-export default function TableCheckEntry2<T, K extends keyof T>(
-    {data, dataProperty, rowStyles, trueStyles = "", falseStyles = ""} : Props<T,K>
+export default function TableCheckEntry2<T, K extends keyof T>({
+    data,
+    dataProperty,
+    rowStyles,
+    trueStyles = "",
+    falseStyles = ""
+}: Props<T,K>
 ) {
     if (!data) throw Error("Data is undefined :(");
 
