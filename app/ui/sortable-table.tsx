@@ -8,13 +8,8 @@ import {
 	ChevronUpDownIcon,
 } from "@heroicons/react/24/outline";
 import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
-import TableBoolEntry from "./employees/main/table-bool-entry";
-import TableTextEntry from "./employees/main/tabletextentry";
-import TableDoubleTextEntry from "./employees/main/tabledoubletextentry";
 import { useEffect, useState, Children, cloneElement } from "react";
 import { TabType } from "@/app/lib/definitions";
-import TableCheckEntry from "./employees/main/table-check-entry";
-import Link from "next/link";
 
 
 

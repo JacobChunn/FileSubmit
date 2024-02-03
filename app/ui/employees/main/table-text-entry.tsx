@@ -11,7 +11,7 @@ export type Props<T, K extends keyof T> = {
     addonStyles?: string,
 }
 
-export default function TableTextEntry2<T, K extends keyof T>({
+export default function TableTextEntry<T, K extends keyof T>({
     data,
     dataProperty,
     rowStyles,

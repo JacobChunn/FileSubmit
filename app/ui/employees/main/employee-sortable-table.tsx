@@ -1,10 +1,10 @@
 "use client"
 import { Employee } from "@/app/lib/definitions";
 import SortableTable from "@/app/ui/sortable-table";
-import TableBoolEntry2 from "./table-bool-entry2";
-import TableCheckEntry2 from "./table-check-entry2";
-import TableDoubleTextEntry2 from "./tabledoubletextentry2";
-import TableTextEntry2 from "./tabletextentry2";
+import TableDoubleTextEntry from "./table-double-text-entry";
+import TableBoolEntry from "./table-bool-entry";
+import TableCheckEntry from "./table-check-entry";
+import TableTextEntry from "./table-text-entry";
 
 export default function EmployeeSortableTable({
 	employeePromise,
@@ -71,14 +71,14 @@ export default function EmployeeSortableTable({
                 </td> */}
 
                 {/* Cell and Home Phone Numbers */}
-                <TableDoubleTextEntry2<Employee, keyof Employee>
+                <TableDoubleTextEntry<Employee, keyof Employee>
                     dataProperty1={'cellphone'}
                     dataProperty2={'homephone'}
                     addonStyles2="opacity-70"
                 />
 
                 {/* Is Active Employee */}
-                <TableBoolEntry2<Employee, keyof Employee>
+                <TableBoolEntry<Employee, keyof Employee>
                     dataProperty={'activeemployee'}
                     trueText="Active"
                     falseText="Inactive"
@@ -133,7 +133,7 @@ export default function EmployeeSortableTable({
                 /> */}
 
                 {/* Timesheet Required */}
-                <TableCheckEntry2<Employee, keyof Employee>
+                <TableCheckEntry<Employee, keyof Employee>
                     dataProperty={'timesheetrequired'}
                 />
 
@@ -174,7 +174,7 @@ export default function EmployeeSortableTable({
                 /> */}
 
                 {/* Number of Default Rows */}
-                <TableTextEntry2<Employee, keyof Employee>
+                <TableTextEntry<Employee, keyof Employee>
                     dataProperty={'numdefaulttimerows'}
                 />
                 {/* ID */}
