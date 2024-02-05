@@ -26,7 +26,8 @@ const config: Config = withMT({
 		orange: colors.orange,
 		amber: colors.amber,
 		blue: colors.blue,
-    black: colors.black,
+    	black: colors.black,
+		white: colors.white,
 		
       },
     },

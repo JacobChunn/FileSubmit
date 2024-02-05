@@ -1,14 +1,21 @@
-import { EmployeeState } from "@/app/lib/actions"
+import { StateType } from "@/app/lib/definitions";
 
 export type Props = {
-    state: EmployeeState,
+    state: StateType,
     type: string,
     label: string,
     inputId: string,
     inputName: string,
 }
 
-export default function FormTextEntry({ state, type, label, inputId, inputName }: Props) {
+export default function FormTextEntry({
+	state,
+	type,
+	label,
+	inputId,
+	inputName
+}: Props
+) {
     return (
         <div className="mb-4">
             <label htmlFor={inputId} className="mb-2 block text-sm font-medium">
@@ -27,7 +34,7 @@ export default function FormTextEntry({ state, type, label, inputId, inputName }
                 />
             </div>
             <div id={`${inputId}-error`} aria-live="polite" aria-atomic="true">
-                {state.errors?.[inputName] &&
+                {state?.errors?.[inputName] &&
                     state.errors[inputName]?.map((error: string | number) => (
                         <p className="mt-2 text-sm text-red-500" key={error}>
                             {error}

@@ -44,30 +44,6 @@ export type LatestInvoiceRaw = Omit<LatestInvoice, 'amount'> & {
   amount: number;
 };
 
-export type Employee = {
-  id: string,
-  number: number,
-  username: string,
-  password: string,
-  firstname: string,
-  lastname: string,
-  cellphone: string,
-  homephone: string,
-  email: string,
-  managerid: number,
-  accesslevel: number,
-  timesheetrequired: boolean,
-  overtimeeligible: boolean,
-  tabnavigateot: boolean,
-  emailexpensecopy: boolean,
-  activeemployee: boolean,
-  ientertimedata: boolean,
-  numtimesheetsummaries: number,
-  numexpensesummaries: number,
-  numdefaulttimerows: number,
-  contractor: boolean
-}
-
 export type InvoicesTable = {
   id: string;
   customer_id: string;
@@ -111,7 +87,80 @@ export type InvoiceForm = {
   status: 'pending' | 'paid';
 };
 
+export type Employee = {
+	id: string,
+	number: number,
+	username: string,
+	password: string,
+	firstname: string,
+	lastname: string,
+	cellphone: string,
+	homephone: string,
+	email: string,
+	managerid: number,
+	accesslevel: number,
+	timesheetrequired: boolean,
+	overtimeeligible: boolean,
+	tabnavigateot: boolean,
+	emailexpensecopy: boolean,
+	activeemployee: boolean,
+	ientertimedata: boolean,
+	numtimesheetsummaries: number,
+	numexpensesummaries: number,
+	numdefaulttimerows: number,
+	contractor: boolean,
+  };
+
+export type Project = {
+	id: string,
+	number: number,
+	description: string,
+	startdate: string,
+	enddate: string,
+	shortname: string,
+	customerpo: string,
+	customercontact: string,
+	comments: string,
+	overtime: boolean,
+	sgaflag: boolean,
+};
+
 export type TabType = {
   label: string;
   value: string;
+};
+
+export type StateType = {
+	errors?: {
+		[key: string]: string[] | undefined;
+	  };
+	message?: string | null;
+};
+
+export type EmployeeState = {
+    errors?: {
+      [key: string]: string[] | undefined;
+      id?: string[];
+      number?: string[];
+      username?: string[];
+      password?: string[];
+      firstname?: string[];
+      lastname?: string[];
+      cellphone?: string[];
+      homephone?: string[];
+      email?: string[];
+      managerid?: string[];
+      accesslevel?: string[];
+      timesheetrequired?: string[];
+      overtimeeligible?: string[];
+      tabnavigateot?: string[];
+      emailexpensecopy?: string[];
+      activeemployee?: string[];
+      ientertimedata?: string[];
+      numtimesheetsummaries?: string[];
+      numexpensesummaries?: string[];
+      numdefaulttimerows?: string[];
+      contractor?: string[];
+    } | undefined;
+    message?: string | null;
 };

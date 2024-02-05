@@ -1,4 +1,4 @@
-import Form from '@/app/ui/employees/add/add-form';
+import Form from '@/app/ui/projects/add/add-form';
 import { Breadcrumbs } from '@/app/ui/material-tailwind-wrapper';
 import { lusitana } from '@/app/ui/fonts';
 import clsx from 'clsx';
@@ -13,11 +13,11 @@ export default async function Page() {
   return (
     <main>
       <Breadcrumbs className='bg-transparent'>
-        <Link href='/dashboard/employees' className={clsx(lusitana.className,"text-2xl opacity-60")}>
-          Employees
+        <Link href='/dashboard/projects' className={clsx(lusitana.className,"text-2xl opacity-60")}>
+          Projects
         </Link>
-        <Link href='/dashboard/employees/add' className={clsx(lusitana.className,"text-2xl")}>
-          Add Employee
+        <Link href='/dashboard/projects/add' className={clsx(lusitana.className,"text-2xl")}>
+          Add Project
         </Link>
       </Breadcrumbs>
       <Form/>

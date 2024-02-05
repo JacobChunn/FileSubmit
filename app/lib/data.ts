@@ -8,6 +8,7 @@ import {
   User,
   Revenue,
   Employee,
+  Project,
 } from './definitions';
 import { formatCurrency } from './utils';
 import { unstable_noStore as noStore } from 'next/cache';
@@ -37,28 +38,28 @@ export async function fetchRevenue() {
 }
 
 export async function fetchEmployees() {
-  noStore();
-  try {
-    const data = await sql<Employee>`
-      SELECT
-        id, number, username,
-        password, firstName, lastName,
-        cellPhone, homePhone, email,
-        managerID, accessLevel, timeSheetRequired,
-        overtimeEligible, TABNavigateOT, emailExpenseCopy,
-        activeEmployee, iEnterTimeData, numTimeSheetSummaries,
-        numExpenseSummaries, numDefaultTimeRows, contractor
-      FROM employees
-      ORDER BY number;
-
-    `;
-    console.log("employee fetch!");
-    return data.rows;
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch employees.');
+	noStore();
+	try {
+	  const data = await sql<Employee>`
+		SELECT
+		  id, number, username,
+		  password, firstName, lastName,
+		  cellPhone, homePhone, email,
+		  managerID, accessLevel, timeSheetRequired,
+		  overtimeEligible, TABNavigateOT, emailExpenseCopy,
+		  activeEmployee, iEnterTimeData, numTimeSheetSummaries,
+		  numExpenseSummaries, numDefaultTimeRows, contractor
+		FROM employees
+	  `;
+	  const dataRows = data.rows;
+	  return Response.json(dataRows);
+	} catch (error) {
+	  console.error('Database Error:', error);
+	  return Response.error();
+	}
   }
-}
+
+
 
 export async function fetchEmployeeByID(id: string) {
 	noStore();
@@ -85,6 +86,24 @@ export async function fetchEmployeeByID(id: string) {
 	  throw new Error('Failed to fetch invoice.');
 	}
 }
+
+export async function fetchProjects() { // Make it not error when table doesnt exist
+	noStore();
+	try {
+	  const data = await sql<Project>`
+		SELECT
+		id, number, description, startdate, enddate,
+		shortname, customerpo, customercontact,
+		comments, overtime, sgaflag,
+		FROM projects
+	  `;
+	  const dataRows = data.rows;
+	  return Response.json(dataRows);
+	} catch (error) {
+	  console.error('Database Error:', error);
+	  return Response.error();
+	}
+  }
 
 export async function fetchLatestInvoices() {
   noStore();

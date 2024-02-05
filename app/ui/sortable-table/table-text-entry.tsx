@@ -1,5 +1,5 @@
 import { colors } from '@material-tailwind/react/types/generic'
-import { Typography } from '@/app/ui/employees/client-components/textentry-material-tailwind-components'
+import { Typography } from '@/app/ui/material-tailwind-wrapper'
 import { variant } from '@material-tailwind/react/types/components/typography'
 
 export type Props<T, K extends keyof T> = {
@@ -23,7 +23,7 @@ export default function TableTextEntry<T, K extends keyof T>({
     if (!data) throw Error("Data is undefined :(");
 
     const text = data[dataProperty] as string;
-    return(
+    return (
         <td className={rowStyles}>
             <Typography
                     variant={variant}

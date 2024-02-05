@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     template: '%s | Encore Automation',
     default: 'Encore Automation',
   },
-  description: 'The official Next.js Learn Dashboard built with App Router.',
+  description: 'Encore Automation\'s Timesheet Application - made by Jake Chunn',
   metadataBase: new URL('https://file-submit-qf8y.vercel.app'),
 };
 

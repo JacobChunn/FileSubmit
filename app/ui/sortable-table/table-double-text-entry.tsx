@@ -1,5 +1,5 @@
 import { colors } from '@material-tailwind/react/types/generic'
-import { Typography } from '@/app/ui/employees/client-components/textentry-material-tailwind-components'
+import { Typography } from '@/app/ui/material-tailwind-wrapper'
 import { variant } from '@material-tailwind/react/types/components/typography'
 
 

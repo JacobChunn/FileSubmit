@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
+import { EmployeeState } from './definitions';
  
 const FormSchema = z.object({
   id: z.string(),
@@ -50,34 +51,6 @@ const EmployeeSchema = z.object({
 
 const AddEmployee = EmployeeSchema.omit({ id: true });
 const EditEmployee = EmployeeSchema.omit({ id: true });
-
-export type EmployeeState = {
-    errors?: {
-      [key: string]: string[] | undefined;
-      id?: string[];
-      number?: string[];
-      username?: string[];
-      password?: string[];
-      firstname?: string[];
-      lastname?: string[];
-      cellphone?: string[];
-      homephone?: string[];
-      email?: string[];
-      managerid?: string[];
-      accesslevel?: string[];
-      timesheetrequired?: string[];
-      overtimeeligible?: string[];
-      tabnavigateot?: string[];
-      emailexpensecopy?: string[];
-      activeemployee?: string[];
-      ientertimedata?: string[];
-      numtimesheetsummaries?: string[];
-      numexpensesummaries?: string[];
-      numdefaulttimerows?: string[];
-      contractor?: string[];
-    } | undefined;
-    message?: string | null;
-};
 
 export type InvoiceState = {
     errors?: {

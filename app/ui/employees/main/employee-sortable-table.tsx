@@ -1,17 +1,25 @@
 "use client"
 import { Employee } from "@/app/lib/definitions";
-import SortableTable from "@/app/ui/sortable-table";
-import TableDoubleTextEntry from "./table-double-text-entry";
-import TableBoolEntry from "./table-bool-entry";
-import TableCheckEntry from "./table-check-entry";
-import TableTextEntry from "./table-text-entry";
+import SortableTable from "@/app/ui/sortable-table/sortable-table";
+import TableDoubleTextEntry from "../../sortable-table/table-double-text-entry";
+import TableBoolEntry from "../../sortable-table/table-bool-entry";
+import TableCheckEntry from "../../sortable-table/table-check-entry";
+import TableTextEntry from "../../sortable-table/table-text-entry";
+import TableEditEntry from "../../sortable-table/table-edit-entry";
+import TableUserAvatarEntry from "../../sortable-table/table-user-avatar-entry";
 
 export default function EmployeeSortableTable({
 	employeePromise,
 }: {
 	employeePromise: Promise<Employee[]>;
 }) {
-    // Define tabs + logic
+    // Define table headers + tabs + logic
+	const TABLE_HEAD = [
+		"Employee", "Cell/Home", "Employee Status", "Contractor Status", "Login", "Numeric ID", "Manager ID",
+		"Access Level", "Timesheet Required", "Overtime Eligible", "Tab Navigate", "Email Expense Copy",
+		"I Enter Time Data", "Sheet Summaries", "Expense Summaries", "Default Rows", "ID"
+	] as const;
+
     const TABS = [
         {
             label: "Active",
@@ -43,156 +51,116 @@ export default function EmployeeSortableTable({
 
     return (
         <SortableTable<Employee>
+			title="Employee list"
+			description="See information about all employees"
+			addText="Add Employee"
             dataPromise={employeePromise}
+			TABLE_HEAD={TABLE_HEAD}
             TABS={TABS}
             tabFilterUnbound={tabFilter}
         >                
-                {/* PFF, Name, and Email */}
-                {/* <td className={classes}>
-                    <div className="flex flex-grow items-center gap-3">
-                        <Avatar src={demoImg} alt={firstname} variant="rounded" className="max-w-none" />
-                        <div className="flex flex-col">
-                            <Typography
-                                variant="small"
-                                color="blue-gray"
-                                className="font-normal"
-                            >
-                                {firstname} {lastname}
-                            </Typography>
-                            <Typography
-                                variant="small"
-                                color="blue-gray"
-                                className="font-normal opacity-70 text-xs"
-                            >
-                                {email}
-                            </Typography>
-                        </div>
-                    </div>
-                </td> */}
+			{/* PFF, Name, and Email */}
+			<TableUserAvatarEntry<Employee, keyof Employee>
+				firstnameDataProperty={'firstname'}
+				lastnameDataProperty={'lastname'}
+				emailDataProperty={'email'}
+			/>
 
-                {/* Cell and Home Phone Numbers */}
-                <TableDoubleTextEntry<Employee, keyof Employee>
-                    dataProperty1={'cellphone'}
-                    dataProperty2={'homephone'}
-                    addonStyles2="opacity-70"
-                />
+			{/* Cell and Home Phone Numbers */}
+			<TableDoubleTextEntry<Employee, keyof Employee>
+				dataProperty1={'cellphone'}
+				dataProperty2={'homephone'}
+				addonStyles2="opacity-70"
+			/>
 
-                {/* Is Active Employee */}
-                <TableBoolEntry<Employee, keyof Employee>
-                    dataProperty={'activeemployee'}
-                    trueText="Active"
-                    falseText="Inactive"
-                 />
+			{/* Is Active Employee */}
+			<TableBoolEntry<Employee, keyof Employee>
+				dataProperty={'activeemployee'}
+				trueText="Active"
+				falseText="Inactive"
+				/>
 
-                {/* Is Contractor */}
-                {/* <TableBoolEntry
-                    condition={contractor}
-                    rowStyles={classes}
-                    trueText="Contractor"
-                    falseText="Employee"
-                    trueAddStyles="bg-softYellow text-yellow-800"
-                    falseAddStyles="bg-blue-200 text-blue-800"
-                /> */}
+			{/* Is Contractor */}
+			<TableBoolEntry<Employee, keyof Employee>
+				dataProperty={'contractor'}
+				trueText="Contractor"
+				falseText="Employee"
+				trueAddStyles="bg-softYellow text-yellow-800"
+				falseAddStyles="bg-blue-200 text-blue-800"
+			/>
 
-                {/* Username and Password */}
-                {/* <td className={classes}>
-                    <div className="flex flex-col">
-                        <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal"
-                        >
-                            {username}
-                        </Typography>
-                        <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal"
-                        >
-                            PASSWORD
-                        </Typography>
-                    </div>
-                </td> */}
+			{/* Username and Password */}
+			<TableDoubleTextEntry<Employee, keyof Employee>
+				dataProperty1={'username'}
+				dataProperty2={'password'}
+				addonStyles2="opacity-70"
+			/>
 
-                {/* Number */}
-                {/* <TableTextEntry 
-                    classes={classes}
-                    text={number}
-                /> */}
+			{/* Number */}
+			<TableTextEntry<Employee, keyof Employee>
+				dataProperty={'number'}
+			/>
 
-                {/* Manager ID */}
-                {/* <TableTextEntry 
-                    classes={classes}
-                    text={managerid}
-                /> */}
+			{/* Manager ID */}
+			<TableTextEntry<Employee, keyof Employee>
+				dataProperty={'managerid'}
+			/>
 
-                {/* Access Level */}
-                {/* <TableTextEntry 
-                    classes={classes}
-                    text={accesslevel}
-                /> */}
+			{/* Access Level */}
+			<TableTextEntry<Employee, keyof Employee>
+				dataProperty={'accesslevel'}
+			/>
 
-                {/* Timesheet Required */}
-                <TableCheckEntry<Employee, keyof Employee>
-                    dataProperty={'timesheetrequired'}
-                />
+			{/* Timesheet Required */}
+			<TableCheckEntry<Employee, keyof Employee>
+				dataProperty={'timesheetrequired'}
+			/>
 
-                {/* Overtime Eligible */}
-                {/* <TableCheckEntry
-                    condition={overtimeeligible}
-                    rowStyles={classes}
-                /> */}
+			{/* Overtime Eligible */}
+			<TableCheckEntry<Employee, keyof Employee>
+				dataProperty={'overtimeeligible'}
+			/>
 
-                {/* Tab Navigate OT*/}
-                {/* <TableCheckEntry
-                    condition={tabnavigateot}
-                    rowStyles={classes}
-                /> */}
+			{/* Tab Navigate OT*/}
+			<TableCheckEntry<Employee, keyof Employee>
+				dataProperty={'tabnavigateot'}
+			/>
 
-                {/* Email Expense Copy */}
-                {/* <TableCheckEntry
-                    condition={emailexpensecopy}
-                    rowStyles={classes}
-                /> */}
+			{/* Email Expense Copy */}
+			<TableCheckEntry<Employee, keyof Employee>
+				dataProperty={'emailexpensecopy'}
+			/>
 
-                {/* I Enter Time Data */}
-                {/* <TableCheckEntry
-                    condition={ientertimedata}
-                    rowStyles={classes}
-                /> */}
+			{/* I Enter Time Data */}
+			<TableCheckEntry<Employee, keyof Employee>
+				dataProperty={'ientertimedata'}
+			/>
 
-                {/* Number of Sheet Summaries */}
-                {/* <TableTextEntry 
-                    classes={classes}
-                    text={numtimesheetsummaries}
-                /> */}
+			{/* Number of Sheet Summaries */}
+			<TableTextEntry<Employee, keyof Employee>
+				dataProperty={'numtimesheetsummaries'}
+			/>
 
-                {/* Number of Expense Summaries */}
-                {/* <TableTextEntry 
-                    classes={classes}
-                    text={numexpensesummaries}
-                /> */}
+			{/* Number of Expense Summaries */}
+			<TableTextEntry<Employee, keyof Employee>
+				dataProperty={'numexpensesummaries'}
+			/>
 
-                {/* Number of Default Rows */}
-                <TableTextEntry<Employee, keyof Employee>
-                    dataProperty={'numdefaulttimerows'}
-                />
-                {/* ID */}
-                {/* <TableTextEntry 
-                    classes={classes}
-                    text={id}
-                /> */}
+			{/* Number of Default Rows */}
+			<TableTextEntry<Employee, keyof Employee>
+				dataProperty={'numdefaulttimerows'}
+			/>
+			{/* ID */}
+			<TableTextEntry<Employee, keyof Employee>
+				dataProperty={'id'}
+			/>
 
-                {/* Edit User */}
-                {/* <td className={classes}>
-                    <Link href={`/dashboard/employees/${id}/edit`}>
-                        <Tooltip content="Edit User">
-                            <IconButton variant="text">
-                                <PencilIcon className="h-4 w-4" />
-                            </IconButton>
-                        </Tooltip>
-                    </Link>
-                </td> */}
+			{/* Edit User */}
+			<TableEditEntry<Employee, keyof Employee>
+				dataProperty={'id'}
+				hrefBeforeID="/dashboard/employees/"
+				hrefAfterID="/edit"
+			/>
         </SortableTable>
     )
 

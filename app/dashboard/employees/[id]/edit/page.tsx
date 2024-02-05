@@ -1,4 +1,4 @@
-import { Breadcrumbs } from '@/app/ui/client-components/breadcrumbs-material-tailwind-components';
+import { Breadcrumbs } from '@/app/ui/material-tailwind-wrapper';
 import { fetchEmployeeByID } from '@/app/lib/data';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
