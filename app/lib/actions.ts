@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
-import { EmployeeState } from './definitions';
+import { EmployeeState, ProjectState } from './definitions';
  
 const FormSchema = z.object({
   id: z.string(),
@@ -51,6 +51,22 @@ const EmployeeSchema = z.object({
 
 const AddEmployee = EmployeeSchema.omit({ id: true });
 const EditEmployee = EmployeeSchema.omit({ id: true });
+
+const ProjectSchema = z.object({
+	id: z.string(),
+	number: z.string().max(12),
+	description: z.string().max(50),
+	startdate: z.string().datetime(), // may need to change
+	enddate: z.string().datetime(), // may need to change
+	shortname: z.string().max(8),
+	customerpo: z.string().max(50),
+	customercontact: z.string().max(50),
+	comments: z.string().max(256),
+	overtime: z.coerce.boolean(),
+	sgaflag: z.coerce.boolean(),
+});
+
+const AddProject = ProjectSchema.omit({ id: true });
 
 export type InvoiceState = {
     errors?: {
@@ -112,7 +128,7 @@ export async function addEmployee(
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Create Invoice.',
+      message: 'Missing Fields. Failed to Add Employee.',
     };
   }
 
@@ -145,12 +161,75 @@ export async function addEmployee(
   } catch (error) {
     console.log(error);
     return {
-      message: 'Database Error: Failed to Create Invoice.',
+      message: 'Database Error: Failed to Add Employee.',
     };
   }
 
   revalidatePath('/dashboard/employees');
   redirect('/dashboard/employees');
+}
+
+export async function addProject( // make it not break when project table doesnt exist
+	prevState: ProjectState,
+	formData: FormData,
+) {
+  const validatedFields = AddProject.safeParse({
+    number: formData.get('number'),
+    description: formData.get('description'),
+    startdate: formData.get('startdate'),
+    enddate: formData.get('enddate'),
+    shortname: formData.get('shortname'),
+    customerpo: formData.get('customerpo'),
+    customercontact: formData.get('customercontact'),
+    comments: formData.get('comments'),
+    overtime: formData.get('overtime'),
+    sgaflag: formData.get('sgaflag'),
+  });
+
+  // If form validation fails, return errors early. Otherwise, continue.
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Create Project.',
+    };
+  }
+
+  const {
+	number,
+	description,
+	startdate,
+	enddate,
+	shortname,
+	customerpo,
+	customercontact,
+	comments,
+	overtime,
+	sgaflag
+  } = validatedFields.data;
+
+  // Prepare data for insertion into the database
+  // Noting needed as of now
+
+  try {
+    await sql`
+	INSERT INTO projects (
+		number, description, startdate, enddate, shortname, customerpo, customercontact,
+		comments, overtime, sgaflag
+	)
+	VALUES (
+		${number}, ${description}, ${startdate}, ${enddate}, ${shortname},
+		${customerpo}, ${customercontact}, ${comments}, ${overtime ? 1 : 0}, ${sgaflag ? 1 : 0}
+	)	  
+  `;
+  } catch (error) {
+    console.log(error);
+    return {
+      message: 'Database Error: Failed to Create Project.',
+    };
+  }
+
+  revalidatePath('/dashboard/projects');
+  redirect('/dashboard/projects');
 }
 
 export async function editEmployee(

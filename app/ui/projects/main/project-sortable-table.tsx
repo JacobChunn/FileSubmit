@@ -15,7 +15,7 @@ export default function ProjectSortableTable({
     // Define table headers + tabs + logic
 	const TABLE_HEAD = [
 		"Number", "Description", "Start Date", "End Date", "Short Name",
-		"CustomerPO", "Customer Contact", "Comments", "Overtime", "SGAFlag"
+		"CustomerPO", "Customer Contact", "Comments", "Overtime", "SGAFlag", "ID",
 	] as const;
 
     const TABS = [ // What do I set these as
@@ -33,7 +33,7 @@ export default function ProjectSortableTable({
         },
     ] as const;
 
-    function tabFilter(employee: Project, tabValue: string) {
+    function tabFilter(project: Project, tabValue: string) {
 		switch (tabValue){
 			default: return true;
 		}
@@ -42,6 +42,10 @@ export default function ProjectSortableTable({
 
     return (
         <SortableTable<Project>
+			title="Project list"
+			description="See information about all projects"
+			addText="Add Project"
+			addHref="/dashboard/projects/add"
             dataPromise={projectPromise}
 			TABLE_HEAD={TABLE_HEAD}
             TABS={TABS}
@@ -88,7 +92,7 @@ export default function ProjectSortableTable({
 			/>
 
 			{/* Overtime */}
-			<TableTextEntry<Project, keyof Project>
+			<TableCheckEntry<Project, keyof Project>
 				dataProperty={'overtime'}
 			/>
 

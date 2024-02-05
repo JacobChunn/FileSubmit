@@ -54,6 +54,7 @@ export default function EmployeeSortableTable({
 			title="Employee list"
 			description="See information about all employees"
 			addText="Add Employee"
+			addHref="/dashboard/employees/add"
             dataPromise={employeePromise}
 			TABLE_HEAD={TABLE_HEAD}
             TABS={TABS}

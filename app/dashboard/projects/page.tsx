@@ -3,12 +3,12 @@ import ProjectSortableTable from '@/app/ui/projects/main/project-sortable-table'
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Employees',
+  title: 'Projects',
 };
 
 
 export default async function Page() {
-  console.log("Hello from employee page");
+  console.log("Hello from project page");
   const projectPromise = (await fetchProjects()).json();
   return (
     <main>

@@ -111,33 +111,7 @@ export type Employee = {
 	contractor: boolean,
   };
 
-export type Project = {
-	id: string,
-	number: number,
-	description: string,
-	startdate: string,
-	enddate: string,
-	shortname: string,
-	customerpo: string,
-	customercontact: string,
-	comments: string,
-	overtime: boolean,
-	sgaflag: boolean,
-};
-
-export type TabType = {
-  label: string;
-  value: string;
-};
-
-export type StateType = {
-	errors?: {
-		[key: string]: string[] | undefined;
-	  };
-	message?: string | null;
-};
-
-export type EmployeeState = {
+  export type EmployeeState = {
     errors?: {
       [key: string]: string[] | undefined;
       id?: string[];
@@ -163,4 +137,48 @@ export type EmployeeState = {
       contractor?: string[];
     } | undefined;
     message?: string | null;
+};
+
+export type Project = {
+	id: string,
+	number: number,
+	description: string,
+	startdate: string,
+	enddate: string,
+	shortname: string,
+	customerpo: string,
+	customercontact: string,
+	comments: string,
+	overtime: boolean,
+	sgaflag: boolean,
+};
+
+export type ProjectState = {
+	errors?: {
+		[key: string]: string[] | undefined;
+		id?: string[];
+		number?: string[];
+		description?: string[];
+		startdate?: string[];
+		enddate?: string[];
+		shortname?: string[];
+		customerpo?: string[];
+		customercontact?: string[];
+		comments?: string[];
+		overtime?: string[];
+		sgaflag?: string[];
+	} | undefined;
+	message?: string | null;
+};
+
+export type TabType = {
+  label: string;
+  value: string;
+};
+
+export type StateType = {
+	errors?: {
+		[key: string]: string[] | undefined;
+	  };
+	message?: string | null;
 };

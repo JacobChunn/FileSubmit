@@ -16,6 +16,7 @@ export default function SortableTable<T>({ // Split into header + body component
 	children,
 	title,
 	addText, // add customizable add button icon as well
+	addHref,
 	description,
 	dataPromise,
 	TABLE_HEAD,
@@ -25,6 +26,7 @@ export default function SortableTable<T>({ // Split into header + body component
 	children: React.ReactNode;
 	title: string,
 	addText: string,
+	addHref: string,
 	description: string,
 	dataPromise: Promise<T[]>;
 	TABLE_HEAD: readonly string[],
@@ -65,7 +67,7 @@ export default function SortableTable<T>({ // Split into header + body component
 						</Typography>
 					</div>
 					<div className="sticky right-5">
-						<Link href="/dashboard/employees/add"> 
+						<Link href={addHref}> 
 							<Button className="flex items-center gap-3" size="sm">
 								<UserPlusIcon strokeWidth={2} className="h-4 w-4" /> {addText}
 							</Button>

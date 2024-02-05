@@ -94,7 +94,7 @@ export async function fetchProjects() { // Make it not error when table doesnt e
 		SELECT
 		id, number, description, startdate, enddate,
 		shortname, customerpo, customercontact,
-		comments, overtime, sgaflag,
+		comments, overtime, sgaflag
 		FROM projects
 	  `;
 	  const dataRows = data.rows;
@@ -103,7 +103,7 @@ export async function fetchProjects() { // Make it not error when table doesnt e
 	  console.error('Database Error:', error);
 	  return Response.error();
 	}
-  }
+}
 
 export async function fetchLatestInvoices() {
   noStore();
