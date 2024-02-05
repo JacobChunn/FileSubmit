@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 import { EmployeeState, ProjectState } from './definitions';
+import { start } from 'repl';
  
 const FormSchema = z.object({
   id: z.string(),
@@ -56,8 +57,8 @@ const ProjectSchema = z.object({
 	id: z.string(),
 	number: z.string().max(12),
 	description: z.string().max(50),
-	startdate: z.string().datetime(), // may need to change
-	enddate: z.string().datetime(), // may need to change
+	startdate: z.coerce.date(), // may need to change FORMAT: 2023-12-10
+	enddate: z.coerce.date(), // may need to change
 	shortname: z.string().max(8),
 	customerpo: z.string().max(50),
 	customercontact: z.string().max(50),
@@ -217,7 +218,7 @@ export async function addProject( // make it not break when project table doesnt
 		comments, overtime, sgaflag
 	)
 	VALUES (
-		${number}, ${description}, ${startdate}, ${enddate}, ${shortname},
+		${number}, ${description}, ${startdate.toLocaleDateString('en-US')}, ${enddate.toLocaleDateString('en-US')}, ${shortname},
 		${customerpo}, ${customercontact}, ${comments}, ${overtime ? 1 : 0}, ${sgaflag ? 1 : 0}
 	)	  
   `;

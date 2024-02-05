@@ -1,19 +1,24 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import NavLinks from '@/app/ui/dashboard/nav-links';
 import AcmeLogo from '@/app/ui/acme-logo';
+import Logo from '@/app/EncoreLogo.jpg'
 import { PowerIcon } from '@heroicons/react/24/outline';
 import { signOut } from '@/auth';
 
 export default function SideNav() {
   return (
-    <div className="fixed flex h-full flex-col px-3 py-4 md:px-2">
+    <div className="fixed flex h-full flex-col px-3 py-4 md:px-2 w-64">
       <Link
-        className="mb-2 flex h-20 items-end justify-start rounded-md bg-blue-600 p-4 md:h-40"
+        className="mb-2 flex items-start justify-start rounded-md bg-blue-600"
         href="/"
       >
-        <div className="w-32 text-white md:w-40">
-          <AcmeLogo />
-        </div>
+        <Image
+          src={Logo}
+          alt={'Encore Logo'}
+          style={{ borderRadius: '10px' }}
+          className=''
+        />
       </Link>
       <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
         <NavLinks />

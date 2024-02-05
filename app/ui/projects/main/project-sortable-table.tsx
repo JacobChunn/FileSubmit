@@ -15,17 +15,18 @@ export default function ProjectSortableTable({
     // Define table headers + tabs + logic
 	const TABLE_HEAD = [
 		"Number", "Description", "Start Date", "End Date", "Short Name",
-		"CustomerPO", "Customer Contact", "Comments", "Overtime", "SGAFlag", "ID",
+		"CustomerPO", "Customer Contact", "Comments", "Overtime", "SGAFlag",
+		"ID", "Edit",
 	] as const;
 
-    const TABS = [ // What do I set these as
+    const TABS = [
         {
-            label: "Active",
-            value: "active",
+            label: "Open",
+            value: "open",
         },
         {
-            label: "Inactive",
-            value: "inactive",
+            label: "Closed",
+            value: "closed",
         },
         {
             label: "All",
@@ -33,7 +34,9 @@ export default function ProjectSortableTable({
         },
     ] as const;
 
-    function tabFilter(project: Project, tabValue: string) {
+    function tabFilter(project: Project, tabValue: string) { // Implement once I know actual date format
+
+		// Get current date
 		switch (tabValue){
 			default: return true;
 		}
@@ -49,6 +52,7 @@ export default function ProjectSortableTable({
             dataPromise={projectPromise}
 			TABLE_HEAD={TABLE_HEAD}
             TABS={TABS}
+			defaultTabValue="open"
             tabFilterUnbound={tabFilter}
         >
             {/* Number */}

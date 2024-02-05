@@ -19,8 +19,6 @@ export default function TableDoubleTextEntry<T, K extends keyof T>({
     dataProperty1,
     dataProperty2,
     rowStyles,
-    variant="small",
-    color="blue-gray",
     addonStyles1="",
     addonStyles2=""
 }: Props<T, K>
@@ -33,20 +31,16 @@ export default function TableDoubleTextEntry<T, K extends keyof T>({
     return(        
         <td className={rowStyles}>
             <div className="flex flex-col">
-                <Typography
-                    variant={variant}
-                    color={color}
-                    className={"font-normal whitespace-nowrap " + addonStyles1}
+                <div
+                    className={"font-normal whitespace-nowrap text-blue-gray-900 text-xs " + addonStyles1}
                 >
                     {text1}
-                </Typography>
-                <Typography
-                    variant={variant}
-                    color={color}
-                    className={"font-normal whitespace-nowrap " + addonStyles2}
+                </div>
+                <div
+                    className={"font-normal whitespace-nowrap text-blue-gray-900 text-xs " + addonStyles2}
                 >
                     {text2}
-                </Typography>
+                </div>
             </div>
         </td>
     )

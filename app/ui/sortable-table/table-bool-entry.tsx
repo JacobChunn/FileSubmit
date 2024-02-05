@@ -25,7 +25,7 @@ export default function TableBoolEntry<T, K extends keyof T>({
     return (
         <td className={rowStyles}>
             <div
-                className={`w-fit px-2 py-1.5 rounded-xl text-sm font-sans font-normal antialiased ${condition ? trueAddStyles : falseAddStyles
+                className={`w-fit px-2 py-1.5 rounded-xl text-xs font-sans font-normal antialiased ${condition ? trueAddStyles : falseAddStyles
                     }`}
             >
 

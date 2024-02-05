@@ -21,6 +21,7 @@ export default function SortableTable<T>({ // Split into header + body component
 	dataPromise,
 	TABLE_HEAD,
 	TABS,
+	defaultTabValue,
 	tabFilterUnbound,
 }: {
 	children: React.ReactNode;
@@ -31,6 +32,7 @@ export default function SortableTable<T>({ // Split into header + body component
 	dataPromise: Promise<T[]>;
 	TABLE_HEAD: readonly string[],
 	TABS: readonly TabType[];
+	defaultTabValue: typeof TABS[number]['value'];
 	tabFilterUnbound: (data: T, tabValue: typeof TABS[number]['value']) => boolean
 }) {
 	type TabValueType = typeof TABS[number]['value'];
@@ -55,8 +57,8 @@ export default function SortableTable<T>({ // Split into header + body component
 
 
 	return (
-		<Card className="w-full relative">
-			<div  className="sticky top-0 h-fit rounded-none w-full bg-white z-50">
+		<Card className="w-full relative p-4">
+			<div  className="sticky top-0 h-fit rounded-lg w-full bg-white z-50">
 				<div className="mb-8 flex items-center justify-between gap-8">
 					<div>
 						<Typography variant="h5" color="blue-gray">
@@ -75,7 +77,7 @@ export default function SortableTable<T>({ // Split into header + body component
 					</div>
 				</div>
 				<div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-					<Tabs value="active" className="w-full md:w-max">
+					<Tabs value={defaultTabValue} className="w-full md:w-max">
 						<TabsHeader>
 							{TABS.map(({ label, value }) => (
 								<Tab key={value} value={value} onClick={() => {setTabValue(value); console.log(value)}}>
@@ -93,7 +95,7 @@ export default function SortableTable<T>({ // Split into header + body component
 					</div>
 				</div>
 			</div>
-			<div className="px-0 w-min max-w-full">
+			<div className="px-0 max-w-full">
 				<div className="overflow-x-auto">
 					<table id="employees-table" className="w-full mt-4 table-auto text-left">
 						<thead>
@@ -103,14 +105,11 @@ export default function SortableTable<T>({ // Split into header + body component
 										key={head + index}
 										className="cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 py-4 px-2 transition-colors hover:bg-blue-gray-50 text-left"
 									>
-										<Typography
-											variant="small"
-											color="blue-gray"
-											className="font-normal leading-none opacity-70"
+										<div
+											className="font-normal leading-none text-blue-gray-900 opacity-80 text-xs"
 										>
 											{head}
-
-										</Typography>
+										</div>
 										{/*" "*/}{/*index !== TABLE_HEAD.length - 1 && (
 												<ChevronUpDownIcon strokeWidth={2} className="h-4 w-4" />
 										)*/}
@@ -118,7 +117,7 @@ export default function SortableTable<T>({ // Split into header + body component
 								))}
 							</tr>
 						</thead>
-						<tbody className="">
+						<tbody className="min-w-full">
 							{data !== undefined ? (
 								Array.isArray(data) && 
 								data

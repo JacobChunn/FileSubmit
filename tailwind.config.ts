@@ -15,21 +15,24 @@ const config: Config = withMT({
         '13': 'repeat(13, minmax(0, 1fr))',
       },
       colors: {
-		green: colors.green,
-		lime: colors.lime,
-		red: colors.red,
-		rose: colors.rose,
-		yellow: colors.yellow,
-		softYellow: '#fefaa6',
-		purple: colors.purple,
-		indigo: colors.indigo,
-		orange: colors.orange,
-		amber: colors.amber,
-		blue: colors.blue,
-    	black: colors.black,
-		white: colors.white,
+        green: colors.green,
+        lime: colors.lime,
+        red: colors.red,
+        rose: colors.rose,
+        yellow: colors.yellow,
+        softYellow: '#fefaa6',
+        purple: colors.purple,
+        indigo: colors.indigo,
+        orange: colors.orange,
+        amber: colors.amber,
+        blue: colors.blue,
+        black: colors.black,
+        white: colors.white,
 		
       },
+      fontSize: {
+        xs: '0.75rem',
+      }
     },
     keyframes: {
       shimmer: {

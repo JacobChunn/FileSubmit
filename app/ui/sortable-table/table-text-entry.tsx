@@ -28,7 +28,7 @@ export default function TableTextEntry<T, K extends keyof T>({
             <Typography
                     variant={variant}
                     color={color}
-                    className={`font-normal ${addonStyles}`}
+                    className={`font-normal text-blue-gray-900 text-xs ${addonStyles}`}
                 >
                     {text}
                 </Typography>

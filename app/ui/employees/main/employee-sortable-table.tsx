@@ -17,7 +17,7 @@ export default function EmployeeSortableTable({
 	const TABLE_HEAD = [
 		"Employee", "Cell/Home", "Employee Status", "Contractor Status", "Login", "Numeric ID", "Manager ID",
 		"Access Level", "Timesheet Required", "Overtime Eligible", "Tab Navigate", "Email Expense Copy",
-		"I Enter Time Data", "Sheet Summaries", "Expense Summaries", "Default Rows", "ID"
+		"I Enter Time Data", "Sheet Summaries", "Expense Summaries", "Default Rows", "ID", "Edit"
 	] as const;
 
     const TABS = [
@@ -58,6 +58,7 @@ export default function EmployeeSortableTable({
             dataPromise={employeePromise}
 			TABLE_HEAD={TABLE_HEAD}
             TABS={TABS}
+			defaultTabValue="active"
             tabFilterUnbound={tabFilter}
         >                
 			{/* PFF, Name, and Email */}

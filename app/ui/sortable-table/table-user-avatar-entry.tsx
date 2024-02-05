@@ -35,20 +35,16 @@ export default function TableUserAvatarEntry<T, K extends keyof T>({
 			<div className="flex flex-grow items-center gap-3">
 				<Avatar src={imgURL} alt={firstname} variant="rounded" className={`max-w-none ${imgAddStyles}`} />
 				<div className="flex flex-col">
-					<Typography
-						variant="small"
-						color="blue-gray"
-						className={`font-normal ${nameAddStyles}`}
+					<div
+						className={`font-normal text-blue-gray-900 text-xs ${nameAddStyles}`}
 					>
 						{firstname} {lastname}
-					</Typography>
-					<Typography
-						variant="small"
-						color="blue-gray"
-						className={`font-normal opacity-70 text-xs ${emailAddStyles}`}
+					</div>
+					<div
+						className={`font-normal opacity-70 text-blue-gray-900 text-xs ${emailAddStyles}`}
 					>
 						{email}
-					</Typography>
+					</div>
 				</div>
 			</div>
 		</td>
