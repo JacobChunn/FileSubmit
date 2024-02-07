@@ -1,4 +1,4 @@
-import { EmployeeState } from "@/app/lib/actions"
+import { EmployeeState } from "@/app/lib/definitions";
 import { ChangeEvent, SetStateAction, useEffect, useState } from "react";
 
 export type Props = {
