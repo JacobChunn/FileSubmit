@@ -12,7 +12,7 @@ export default async function Page() {
   const employeePromise = (await fetchEmployees()).json();
   return (
     <main>
-		<EmployeeSortableTable employeePromise={employeePromise}/>
+		  <EmployeeSortableTable employeePromise={employeePromise}/>
     </main>
   )
 }

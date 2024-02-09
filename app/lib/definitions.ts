@@ -141,7 +141,7 @@ export type Employee = {
 
 export type Project = {
 	id: string,
-	number: number,
+	number: string,
 	description: string,
 	startdate: string,
 	enddate: string,

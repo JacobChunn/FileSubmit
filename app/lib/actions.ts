@@ -57,7 +57,7 @@ const ProjectSchema = z.object({
 	id: z.string(),
 	number: z.string().max(12),
 	description: z.string().max(50),
-	startdate: z.coerce.date(), // may need to change FORMAT: 2023-12-10
+	startdate: z.coerce.date(), // may need to change FORMAT: 2006-04-01 00:00:00.000
 	enddate: z.coerce.date(), // may need to change
 	shortname: z.string().max(8),
 	customerpo: z.string().max(50),
@@ -68,6 +68,7 @@ const ProjectSchema = z.object({
 });
 
 const AddProject = ProjectSchema.omit({ id: true });
+const EditProject = ProjectSchema.omit({ id: true });
 
 export type InvoiceState = {
     errors?: {
@@ -196,20 +197,23 @@ export async function addProject( // make it not break when project table doesnt
   }
 
   const {
-	number,
-	description,
-	startdate,
-	enddate,
-	shortname,
-	customerpo,
-	customercontact,
-	comments,
-	overtime,
-	sgaflag
+    number, description, startdate, enddate, shortname,
+    customerpo, customercontact, comments, overtime, sgaflag
   } = validatedFields.data;
 
   // Prepare data for insertion into the database
   // Noting needed as of now
+
+  console.log("Start Date: ")
+  console.log(startdate)
+  console.log(startdate.toISOString())
+  console.log(startdate.toUTCString())
+  console.log(startdate.toTimeString())
+  console.log(startdate.toJSON())
+  console.log(startdate.toDateString())
+  console.log(startdate.getDate())
+  console.log(startdate.getUTCDate())
+  
 
   try {
     await sql`
@@ -218,7 +222,7 @@ export async function addProject( // make it not break when project table doesnt
 		comments, overtime, sgaflag
 	)
 	VALUES (
-		${number}, ${description}, ${startdate.toLocaleDateString('en-US')}, ${enddate.toLocaleDateString('en-US')}, ${shortname},
+		${number}, ${description}, ${startdate.toLocaleDateString('en-us')}, ${enddate.toLocaleDateString('en-us')}, ${shortname},
 		${customerpo}, ${customercontact}, ${comments}, ${overtime ? 1 : 0}, ${sgaflag ? 1 : 0}
 	)	  
   `;
@@ -267,7 +271,7 @@ export async function editEmployee(
     console.log(validatedFields.error)
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Create Invoice.',
+      message: 'Missing Fields. Failed to Edit Employee.',
     };
   }
 
@@ -309,7 +313,70 @@ export async function editEmployee(
   } catch (error) {
     console.log(error);
     return {
-      message: 'Database Error: Failed to Create Invoice.',
+      message: 'Database Error: Failed to Edit Employee.',
+    };
+  }
+
+  revalidatePath('/dashboard/employees');
+  redirect('/dashboard/employees');
+}
+
+export async function editProject(
+  id: string,
+	prevState: ProjectState,
+	formData: FormData,
+) {
+  const validatedFields = EditProject.safeParse({
+    number: formData.get('number'),
+    description: formData.get('description'),
+    startdate: formData.get('startdate'),
+    enddate: formData.get('enddate'),
+    shortname: formData.get('shortname'),
+    customerpo: formData.get('customerpo'),
+    customercontact: formData.get('customercontact'),
+    comments: formData.get('comments'),
+    overtime: formData.get('overtime'),
+    sgaflag: formData.get('sgaflag'),
+  });
+
+  console.log(validatedFields);
+  // If form validation fails, return errors early. Otherwise, continue.
+  if (!validatedFields.success) {
+    console.log(validatedFields.error)
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Edit Project.',
+    };
+  }
+
+  const {
+    number, description, startdate, enddate, shortname,
+    customerpo, customercontact, comments, overtime, sgaflag
+  } = validatedFields.data;
+
+  // Prepare data for insertion into the database
+  // Noting needed as of now
+
+  try {
+    await sql`
+    UPDATE projects
+    SET
+      number = ${number},
+      description = ${description},
+      startdate = ${startdate.toLocaleDateString('en-us')},
+      enddate = ${enddate.toLocaleDateString('en-us')},
+      shortname = ${shortname},
+      customerpo = ${customerpo},
+      customercontact = ${customercontact},
+      comments = ${comments},
+      overtime = ${overtime ? 1 : 0},
+      sgaflag = ${sgaflag ? 1 : 0}
+    WHERE id = ${id};
+  `;
+  } catch (error) {
+    console.log(error);
+    return {
+      message: 'Database Error: Failed to Edit Project.',
     };
   }
 

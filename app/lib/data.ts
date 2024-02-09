@@ -105,6 +105,28 @@ export async function fetchProjects() { // Make it not error when table doesnt e
 	}
 }
 
+export async function fetchProjectByID(id: string) { // WIP
+	noStore();
+	try {
+	  const data = await sql<Project>`
+		SELECT
+		id, number, description, startdate, enddate,
+		shortname, customerpo, customercontact,
+		comments, overtime, sgaflag
+		FROM projects
+		WHERE projects.id = ${id};
+	  `;
+  
+	  const employee = data.rows;
+  
+	  console.log(employee);
+	  return employee[0]; // might be wrong?
+	} catch (error) {
+	  console.error('Database Error:', error);
+	  throw new Error('Failed to fetch invoice.');
+	}
+}
+
 export async function fetchLatestInvoices() {
   noStore();
   try {

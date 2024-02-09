@@ -4,11 +4,13 @@ import Link from 'next/link';
 import { Button } from '@/app/ui/button';
 import { editEmployee } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
-import FormTextEntry from './form-entry';
+import FormTextEntry from '../../forms/edit-form/form-entry';
 import { Employee } from '@/app/lib/definitions';
-import FormBoolEntry from './form-bool-entry';
+import FormBoolEntry from '../../forms/edit-form/form-bool-entry';
+import FormErrorHandling from '../../forms/form-error-handling';
+import FormSubmitButton from '../../forms/form-submit-button';
 
-export default function Form({employee} : {employee: Employee}) {
+export default function Form({ employee }: { employee: Employee }) {
   const initialState = { message: null, errors: {} };
   const editEmployeeWithID = editEmployee.bind(null, employee.id);
   const [state, dispatch] = useFormState(editEmployeeWithID, initialState);
@@ -21,7 +23,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='text'
           label='First name'
-          inputId='firstname'
           inputName='firstname'
           value={employee.firstname}
         />
@@ -31,7 +32,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='text'
           label='Last name'
-          inputId='lastname'
           inputName='lastname'
           value={employee.lastname}
         />
@@ -41,7 +41,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='text'
           label='Username'
-          inputId='username'
           inputName='username'
           value={employee.username}
         />
@@ -51,7 +50,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='text'
           label='Password'
-          inputId='password'
           inputName='password'
           value={employee.password}
         />
@@ -61,7 +59,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='text'
           label='Cell Phone'
-          inputId='cellphone'
           inputName='cellphone'
           value={employee.cellphone}
         />
@@ -71,7 +68,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='text'
           label='Home Phone'
-          inputId='homephone'
           inputName='homephone'
           value={employee.homephone}
         />
@@ -81,7 +77,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='text'
           label='Email'
-          inputId='email'
           inputName='email'
           value={employee.email}
         />
@@ -91,7 +86,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='number'
           label='Number'
-          inputId='number'
           inputName='number'
           value={employee.number}
         />
@@ -101,7 +95,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='number'
           label='Manager ID'
-          inputId='managerid'
           inputName='managerid'
           value={employee.managerid}
         />
@@ -111,7 +104,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='number'
           label='Access Level'
-          inputId='accesslevel'
           inputName='accesslevel'
           value={employee.accesslevel}
         />
@@ -121,7 +113,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='checkbox'
           label='Time Sheet Required'
-          inputId='timesheetrequired'
           inputName='timesheetrequired'
           value={employee.timesheetrequired}
         />
@@ -131,7 +122,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='checkbox'
           label='Overtime Eligible'
-          inputId='overtimeeligible'
           inputName='overtimeeligible'
           value={employee.overtimeeligible}
         />
@@ -141,7 +131,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='checkbox'
           label='Time Navigate OT'
-          inputId='tabnavigateot'
           inputName='tabnavigateot'
           value={employee.tabnavigateot}
         />
@@ -151,7 +140,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='checkbox'
           label='Email Expense Copy'
-          inputId='emailexpensecopy'
           inputName='emailexpensecopy'
           value={employee.emailexpensecopy}
         />
@@ -161,7 +149,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='checkbox'
           label='Active Employee'
-          inputId='activeemployee'
           inputName='activeemployee'
           value={employee.activeemployee}
         />
@@ -171,7 +158,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='checkbox'
           label='I Enter Time Data'
-          inputId='ientertimedata'
           inputName='ientertimedata'
           value={employee.ientertimedata}
         />
@@ -181,7 +167,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='number'
           label='Number of Time Sheet Summaries'
-          inputId='numtimesheetsummaries'
           inputName='numtimesheetsummaries'
           value={employee.numtimesheetsummaries}
         />
@@ -191,7 +176,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='number'
           label='Number of Expense Summaries'
-          inputId='numexpensesummaries'
           inputName='numexpensesummaries'
           value={employee.numexpensesummaries}
         />
@@ -201,7 +185,6 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='number'
           label='Number of Default Time Rows'
-          inputId='numdefaulttimerows'
           inputName='numdefaulttimerows'
           value={employee.numdefaulttimerows}
         />
@@ -211,29 +194,19 @@ export default function Form({employee} : {employee: Employee}) {
           state={state}
           type='checkbox'
           label='Contractor Status'
-          inputId='contractor'
           inputName='contractor'
           value={employee.contractor}
         />
 
-        <div id="status-error" aria-live="polite" aria-atomic="true">
-          {state.message &&
-            <p className="mt-2 text-sm text-red-500" key={state.message}>
-            {state.message}
-          </p>
-          }
-        </div>
+				{/* Error Handling */}
+				<FormErrorHandling
+					state={state}
+				/>
       </div>
-      <div className="mt-6 flex justify-end gap-4">
-        <Link
-          href="/dashboard/employees"
-          className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
-        >
-          Cancel
-        </Link>
-        {/* <Button type="submit">Submit Edits</Button> */}
-        <Button type="submit">Submit Edits</Button>
-      </div>
+      <FormSubmitButton
+				href='/dashboard/employees'
+				text='Submit Edits'
+			/>
     </form>
   );
 }

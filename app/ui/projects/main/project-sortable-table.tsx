@@ -5,6 +5,7 @@ import SortableTable from "../../sortable-table/sortable-table";
 import TableTextEntry from "../../sortable-table/table-text-entry";
 import TableCheckEntry from "../../sortable-table/table-check-entry";
 import TableEditEntry from "../../sortable-table/table-edit-entry";
+import TableDateEntry from "../../sortable-table/table-date-entry";
 
 
 export default function ProjectSortableTable({
@@ -66,12 +67,12 @@ export default function ProjectSortableTable({
 			/>
 
 			{/* StartDate */}
-			<TableTextEntry<Project, keyof Project>
+			<TableDateEntry<Project, keyof Project>
 				dataProperty={'startdate'}
 			/>
 
 			{/* EndDate */}
-			<TableTextEntry<Project, keyof Project>
+			<TableDateEntry<Project, keyof Project>
 				dataProperty={'enddate'}
 			/>
 

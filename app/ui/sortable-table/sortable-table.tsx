@@ -86,13 +86,13 @@ export default function SortableTable<T>({ // Split into header + body component
 							))}
 						</TabsHeader>
 					</Tabs>
-					<div className="sticky right-5 w-full md:w-72">
+					{/* <div className="sticky right-5 w-full md:w-72">
 						<Input
 							label="Search"
 							icon={<MagnifyingGlassIcon className="h-5 w-5" />}
 							crossOrigin="anonymous"
 						/>
-					</div>
+					</div> */}
 				</div>
 			</div>
 			<div className="px-0 max-w-full">
