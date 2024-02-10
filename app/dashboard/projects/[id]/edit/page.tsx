@@ -5,6 +5,7 @@ import Link from 'next/link';
 import clsx from 'clsx';
 import { lusitana } from '@/app/ui/fonts';
 import Form from '@/app/ui/projects/edit/edit-form';
+import { fetchProjectByID } from '@/app/lib/data';
 
 export const metadata: Metadata = {
   title: 'Edit Project',

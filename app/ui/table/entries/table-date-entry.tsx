@@ -30,7 +30,7 @@ export default function TableDateEntry<T, K extends keyof T>({
                     color={color}
                     className={`font-normal text-blue-gray-900 text-xs ${addonStyles}`}
                 >
-                    {`${date.getMonth()}/${date.getDay()}/${date.getFullYear()} ${date.getHours()}`}
+                    {`${date.getMonth()}/${date.getDay()}/${date.getFullYear()}`}
                 </Typography>
         </td>
     )

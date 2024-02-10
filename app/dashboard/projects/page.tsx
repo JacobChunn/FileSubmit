@@ -1,5 +1,5 @@
 import { fetchProjects } from '@/app/lib/data';
-import ProjectSortableTable from '@/app/ui/projects/main/project-sortable-table';
+import ProjectTable from '@/app/ui/projects/main/project-table';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -12,7 +12,7 @@ export default async function Page() {
   const projectPromise = (await fetchProjects()).json();
   return (
     <main>
-		<ProjectSortableTable projectPromise={projectPromise}/>
+		  <ProjectTable projectPromise={projectPromise}/>
     </main>
   )
 }

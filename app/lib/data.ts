@@ -80,7 +80,7 @@ export async function fetchEmployeeByID(id: string) {
 	  const employee = data.rows;
   
 	  console.log(employee);
-	  return employee[0]; // might be wrong?
+	  return employee[0];
 	} catch (error) {
 	  console.error('Database Error:', error);
 	  throw new Error('Failed to fetch invoice.');
@@ -105,7 +105,7 @@ export async function fetchProjects() { // Make it not error when table doesnt e
 	}
 }
 
-export async function fetchProjectByID(id: string) { // WIP
+export async function fetchProjectByID(id: string) {
 	noStore();
 	try {
 	  const data = await sql<Project>`
@@ -117,10 +117,10 @@ export async function fetchProjectByID(id: string) { // WIP
 		WHERE projects.id = ${id};
 	  `;
   
-	  const employee = data.rows;
+	  const project = data.rows;
   
-	  console.log(employee);
-	  return employee[0]; // might be wrong?
+	  console.log(project);
+	  return project[0];
 	} catch (error) {
 	  console.error('Database Error:', error);
 	  throw new Error('Failed to fetch invoice.');

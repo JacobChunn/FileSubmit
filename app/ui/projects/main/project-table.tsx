@@ -1,14 +1,14 @@
 "use client"
 
 import { Project } from "@/app/lib/definitions";
-import SortableTable from "../../sortable-table/sortable-table";
-import TableTextEntry from "../../sortable-table/table-text-entry";
-import TableCheckEntry from "../../sortable-table/table-check-entry";
-import TableEditEntry from "../../sortable-table/table-edit-entry";
-import TableDateEntry from "../../sortable-table/table-date-entry";
+import SortableTable from "../../table/list-table";
+import TableTextEntry from "../../table/entries/table-text-entry";
+import TableCheckEntry from "../../table/entries/table-check-entry";
+import TableEditEntry from "../../table/entries/table-edit-entry";
+import TableDateEntry from "../../table/entries/table-date-entry";
 
 
-export default function ProjectSortableTable({
+export default function ProjectTable({
 	projectPromise,
 }: {
 	projectPromise: Promise<Project[]>;

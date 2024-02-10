@@ -4,7 +4,7 @@
 import { useFormState } from 'react-dom';
 import FormErrorHandling from '../../forms/form-error-handling';
 import FormSubmitButton from '../../forms/form-submit-button';
-import { addProject } from '@/app/lib/actions';
+import { editProject } from '@/app/lib/actions';
 import { Project } from '@/app/lib/definitions';
 import FormBoolEntry from '../../forms/edit-form/form-bool-entry';
 import FormTextEntry from '../../forms/edit-form/form-entry';
@@ -113,7 +113,7 @@ export default function Form({ project }: { project: Project }) {
 				/>
 			</div>
 			<FormSubmitButton
-				href='/dashboard/projects'
+				cancelHref='/dashboard/projects'
 				text='Submit Edits'
 			/>
 		</form>

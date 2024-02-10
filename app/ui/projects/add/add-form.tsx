@@ -100,7 +100,7 @@ export default function Form() {
 				/>
 			</div>
 			<FormSubmitButton
-				href='/dashboard/projects'
+				cancelHref='/dashboard/projects'
 				text='Add Project'
 			/>
 		</form>

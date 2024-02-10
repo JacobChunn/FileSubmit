@@ -380,8 +380,8 @@ export async function editProject(
     };
   }
 
-  revalidatePath('/dashboard/employees');
-  redirect('/dashboard/employees');
+  revalidatePath('/dashboard/projects');
+  redirect('/dashboard/projects');
 }
 
 export async function createInvoice(prevState: InvoiceState, formData: FormData) {

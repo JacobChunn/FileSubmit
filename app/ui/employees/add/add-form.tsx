@@ -181,7 +181,7 @@ export default function Form() {
 				/>
 			</div>
 			<FormSubmitButton
-				href='/dashboard/employees'
+				cancelHref='/dashboard/employees'
 				text='Add Employee'
 			/>
 		</form>

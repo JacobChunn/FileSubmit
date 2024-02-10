@@ -1,14 +1,14 @@
 "use client"
 import { Employee } from "@/app/lib/definitions";
-import SortableTable from "@/app/ui/sortable-table/sortable-table";
-import TableDoubleTextEntry from "../../sortable-table/table-double-text-entry";
-import TableBoolEntry from "../../sortable-table/table-bool-entry";
-import TableCheckEntry from "../../sortable-table/table-check-entry";
-import TableTextEntry from "../../sortable-table/table-text-entry";
-import TableEditEntry from "../../sortable-table/table-edit-entry";
-import TableUserAvatarEntry from "../../sortable-table/table-user-avatar-entry";
+import SortableTable from "@/app/ui/table/list-table";
+import TableDoubleTextEntry from "../../table/entries/table-double-text-entry";
+import TableBoolEntry from "../../table/entries/table-bool-entry";
+import TableCheckEntry from "../../table/entries/table-check-entry";
+import TableTextEntry from "../../table/entries/table-text-entry";
+import TableEditEntry from "../../table/entries/table-edit-entry";
+import TableUserAvatarEntry from "../../table/entries/table-user-avatar-entry";
 
-export default function EmployeeSortableTable({
+export default function EmployeeTable({
 	employeePromise,
 }: {
 	employeePromise: Promise<Employee[]>;
