@@ -11,8 +11,11 @@ export const metadata: Metadata = {
   title: 'Edit Project',
 };
 
-export default async function Page({ params }: { params: { id: string } }) {
+export default async function Page({ params }: { params: { id: any } }) {
     const id = params.id;
+    if (typeof id !== 'number') {
+        notFound();
+    }
     const project = await fetchProjectByID(id);
 
     if (!project) {

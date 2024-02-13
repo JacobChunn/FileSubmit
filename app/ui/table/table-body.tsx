@@ -4,12 +4,12 @@ export default function TableBody<T>({
     children,
     dataPromise,
     TABLE_HEAD,
-    tabFilter,
+    filter = () => true,
 }: {
     children: React.ReactNode,
     dataPromise: Promise<T[]>,
     TABLE_HEAD: readonly string[],
-    tabFilter: (data: T)=> boolean,
+    filter?: (data: T)=> boolean,
 }) {
 
     const [data, setData] = useState<T[] | undefined>(undefined);
@@ -51,7 +51,7 @@ export default function TableBody<T>({
                         {data !== undefined ? (
                             Array.isArray(data) && 
                             data
-                                .filter(tabFilter)
+                                .filter(filter)
                                 //.filter(searchFilter)
                                 .map(
                                 // Skip password

@@ -1,7 +1,7 @@
 "use client"
 
 import { Project } from "@/app/lib/definitions";
-import SortableTable from "../../table/list-table";
+import ListTable from "../../table/list-table";
 import TableTextEntry from "../../table/entries/table-text-entry";
 import TableCheckEntry from "../../table/entries/table-check-entry";
 import TableEditEntry from "../../table/entries/table-edit-entry";
@@ -45,7 +45,7 @@ export default function ProjectTable({
 
 
     return (
-        <SortableTable<Project>
+        <ListTable<Project>
 			title="Project list"
 			description="See information about all projects"
 			addText="Add Project"
@@ -117,7 +117,7 @@ export default function ProjectTable({
 				hrefBeforeID="/dashboard/projects/"
 				hrefAfterID="/edit"
 			/>
-        </SortableTable>
+        </ListTable>
     )
 
 }

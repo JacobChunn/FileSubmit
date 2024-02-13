@@ -1,5 +1,6 @@
 "use client"
 import { Employee } from "@/app/lib/definitions";
+import SortableTable from "@/app/ui/table/list-table";
 import TableDoubleTextEntry from "../../table/entries/table-double-text-entry";
 import TableBoolEntry from "../../table/entries/table-bool-entry";
 import TableCheckEntry from "../../table/entries/table-check-entry";
@@ -7,6 +8,7 @@ import TableTextEntry from "../../table/entries/table-text-entry";
 import TableEditEntry from "../../table/entries/table-edit-entry";
 import TableUserAvatarEntry from "../../table/entries/table-user-avatar-entry";
 import ListTable from "@/app/ui/table/list-table";
+import UserTable from "../../table/user-table";
 
 export default function EmployeeTable({
 	employeePromise,
@@ -35,31 +37,12 @@ export default function EmployeeTable({
         },
     ] as const;
 
-    function tabFilter(employee: Employee, tabValue: string) {
-		switch (tabValue){
-			case "active":
-				return employee.activeemployee == true;
-			case "inactive":
-				return employee.activeemployee == false;
-			case "all":
-				return true;
-            default:
-                return false;
-		}
-	}
-
 
     return (
-        <ListTable<Employee>
+        <UserTable<Timesheet>
 			title="Employee list"
-			description="See information about all employees"
-			addText="Add Employee"
-			addHref="/dashboard/employees/add"
             dataPromise={employeePromise}
 			TABLE_HEAD={TABLE_HEAD}
-            TABS={TABS}
-			defaultTabValue="active"
-            tabFilterUnbound={tabFilter}
         >                
 			{/* PFF, Name, and Email */}
 			<TableUserAvatarEntry<Employee, keyof Employee>

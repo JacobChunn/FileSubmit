@@ -88,7 +88,7 @@ export type InvoiceForm = {
 };
 
 export type Employee = {
-	id: string,
+	id: number,
 	number: number,
 	username: string,
 	password: string,
@@ -109,7 +109,7 @@ export type Employee = {
 	numexpensesummaries: number,
 	numdefaulttimerows: number,
 	contractor: boolean,
-  };
+};
 
   export type EmployeeState = {
     errors?: {
@@ -140,7 +140,7 @@ export type Employee = {
 };
 
 export type Project = {
-	id: string,
+	id: number,
 	number: string,
 	description: string,
 	startdate: string,
@@ -170,6 +170,42 @@ export type ProjectState = {
 	} | undefined;
 	message?: string | null;
 };
+
+export type Timesheet = {
+  id: number,
+  employeeid: number,
+  weekending: string,
+  processed: boolean,
+  mgrapproved: boolean,
+  usercommitted: boolean,
+  totalreghours: number,
+  totalovertime: number,
+  approvedby: string,
+  submittedby: string,
+  processedby: string,
+  dateprocessed: string,
+  message: string,
+};
+
+export type TimesheetState = {
+  errors?: {
+		[key: string]: string[] | undefined;
+		id?: string[];
+		employeeid?: string[];
+		weekending?: string[];
+		processed?: string[];
+		mgrapproved?: string[];
+		usercommitted?: string[];
+		totalreghours?: string[];
+		totalovertime?: string[];
+		approvedby?: string[];
+		submittedby?: string[];
+		processedby?: string[];
+    dateprocessed?: string[];
+    message?: string[];
+	} | undefined;
+	message?: string | null;
+}
 
 export type TabType = {
   label: string;

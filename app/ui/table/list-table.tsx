@@ -14,7 +14,7 @@ import Link from "next/link";
 import TableBody from "./table-body";
 import TableListHeader from "./table-list-header";
 
-export default function Table<T>({
+export default function ListTable<T>({
 	children,
 	title,
 	addText, // add customizable add button icon as well
@@ -43,11 +43,7 @@ export default function Table<T>({
 	
 	const [tabValue, setTabValue] = useState<TabValueType>(TABS[0]["value"]);
 
-	console.log("Hello from " + title + " Table");
-	
-
-
-
+	console.log("Hello from " + title + " list-table");
 
 	return (
 		<Card className="w-full p-4">
@@ -64,7 +60,7 @@ export default function Table<T>({
 				children={children}
 				TABLE_HEAD={TABLE_HEAD}
 				dataPromise={dataPromise}
-				tabFilter={tabFilter}
+				filter={tabFilter}
 			/>
 		</Card>
 	);

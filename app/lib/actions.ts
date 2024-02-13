@@ -27,7 +27,7 @@ const CreateInvoice = FormSchema.omit({ id: true, date: true });
 const UpdateInvoice = FormSchema.omit({ id: true, date: true });
 
 const EmployeeSchema = z.object({
-	id: z.string(),
+	id: z.coerce.number(),
 	number: z.coerce.number(),
 	username: z.string().max(50),
 	password: z.string().max(24),
@@ -54,7 +54,7 @@ const AddEmployee = EmployeeSchema.omit({ id: true });
 const EditEmployee = EmployeeSchema.omit({ id: true });
 
 const ProjectSchema = z.object({
-	id: z.string(),
+	id: z.coerce.number(),
 	number: z.string().max(12),
 	description: z.string().max(50),
 	startdate: z.coerce.date(), // may need to change FORMAT: 2006-04-01 00:00:00.000

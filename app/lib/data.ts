@@ -61,7 +61,7 @@ export async function fetchEmployees() {
 
 
 
-export async function fetchEmployeeByID(id: string) {
+export async function fetchEmployeeByID(id: number) {
 	noStore();
 	try {
 	  const data = await sql<Employee>`
@@ -105,7 +105,7 @@ export async function fetchProjects() { // Make it not error when table doesnt e
 	}
 }
 
-export async function fetchProjectByID(id: string) {
+export async function fetchProjectByID(id: number) {
 	noStore();
 	try {
 	  const data = await sql<Project>`
