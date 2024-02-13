@@ -1,5 +1,5 @@
 "use client"
-import { Employee } from "@/app/lib/definitions";
+import { Employee, Timesheet } from "@/app/lib/definitions";
 import SortableTable from "@/app/ui/table/list-table";
 import TableDoubleTextEntry from "../../table/entries/table-double-text-entry";
 import TableBoolEntry from "../../table/entries/table-bool-entry";
@@ -10,38 +10,22 @@ import TableUserAvatarEntry from "../../table/entries/table-user-avatar-entry";
 import ListTable from "@/app/ui/table/list-table";
 import UserTable from "../../table/user-table";
 
-export default function EmployeeTable({
-	employeePromise,
+export default function TimesheetTable({
+	timesheetPromise,
 }: {
-	employeePromise: Promise<Employee[]>;
+	timesheetPromise: Promise<Timesheet[]>;
 }) {
     // Define table headers + tabs + logic
 	const TABLE_HEAD = [
-		"Employee", "Cell/Home", "Employee Status", "Contractor Status", "Login", "Numeric ID", "Manager ID",
-		"Access Level", "Timesheet Required", "Overtime Eligible", "Tab Navigate", "Email Expense Copy",
-		"I Enter Time Data", "Sheet Summaries", "Expense Summaries", "Default Rows", "ID", "Edit"
+		"id", "employeeid", "weekending", "processed", "mgrapproved", "usercommitted",
+		"totalreghours", "totalovertime", "approvedby", "submittedby", "processedby",
+		"dateprocessed", "message",
 	] as const;
-
-    const TABS = [
-        {
-            label: "Active",
-            value: "active",
-        },
-        {
-            label: "Inactive",
-            value: "inactive",
-        },
-        {
-            label: "All",
-            value: "all",
-        },
-    ] as const;
-
 
     return (
         <UserTable<Timesheet>
-			title="Employee list"
-            dataPromise={employeePromise}
+			title="Timesheets"
+            dataPromise={timesheetPromise}
 			TABLE_HEAD={TABLE_HEAD}
         >                
 			{/* PFF, Name, and Email */}
