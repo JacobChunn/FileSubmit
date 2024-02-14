@@ -10,18 +10,22 @@ import {
   CardsSkeleton } from '@/app/ui/skeletons';
 import CardWrapper from '@/app/ui/dashboard/cards';
 import { Metadata } from 'next';
+import TimesheetTable from '@/app/ui/dashboard/user-tables/timesheet-table';
 
 export const metadata: Metadata = {
   title: 'Dashboard',
 };
 
 export default async function Page() {
+  const timesheetPromise = (await fetchTimesheetsbyID()).json();
   return (
     <main>
       <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
         Dashboard
       </h1>
-
+      <div className='flex'>
+        <TimesheetTable timesheetPromise={timesheetPromise}/>
+      </div>
     </main>
   );
 }
