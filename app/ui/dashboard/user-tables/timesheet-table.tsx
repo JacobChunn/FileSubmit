@@ -9,6 +9,7 @@ import TableEditEntry from "../../table/entries/table-edit-entry";
 import TableUserAvatarEntry from "../../table/entries/table-user-avatar-entry";
 import ListTable from "@/app/ui/table/list-table";
 import UserTable from "../../table/user-table";
+import TableDateEntry from "../../table/entries/table-date-entry";
 
 export default function TimesheetTable({
 	timesheetPromise,
@@ -28,109 +29,40 @@ export default function TimesheetTable({
             dataPromise={timesheetPromise}
 			TABLE_HEAD={TABLE_HEAD}
         >                
-			{/* PFF, Name, and Email */}
-			<TableUserAvatarEntry<Employee, keyof Employee>
-				firstnameDataProperty={'firstname'}
-				lastnameDataProperty={'lastname'}
-				emailDataProperty={'email'}
+			{/* End Date */}
+			<TableDateEntry<Timesheet, keyof Timesheet>
+				dataProperty={'weekending'}
 			/>
-
-			{/* Cell and Home Phone Numbers */}
-			<TableDoubleTextEntry<Employee, keyof Employee>
-				dataProperty1={'cellphone'}
-				dataProperty2={'homephone'}
-				addonStyles2="opacity-70"
+			{/* Comment */}
+			{/* User Committed */}
+			<TableCheckEntry<Timesheet, keyof Timesheet>
+				dataProperty={'usercommitted'}
 			/>
-
-			{/* Is Active Employee */}
-			<TableBoolEntry<Employee, keyof Employee>
-				dataProperty={'activeemployee'}
-				trueText="Active"
-				falseText="Inactive"
-				/>
-
-			{/* Is Contractor */}
-			<TableBoolEntry<Employee, keyof Employee>
-				dataProperty={'contractor'}
-				trueText="Contractor"
-				falseText="Employee"
-				trueAddStyles="bg-softYellow text-yellow-800"
-				falseAddStyles="bg-blue-200 text-blue-800"
+			{/* Approved */}
+			<TableCheckEntry<Timesheet, keyof Timesheet>
+				dataProperty={'mgrapproved'}
 			/>
-
-			{/* Username and Password */}
-			<TableDoubleTextEntry<Employee, keyof Employee>
-				dataProperty1={'username'}
-				dataProperty2={'password'}
-				addonStyles2="opacity-70"
+			{/* Processed */}
+			<TableCheckEntry<Timesheet, keyof Timesheet>
+				dataProperty={'processed'}
 			/>
-
-			{/* Number */}
-			<TableTextEntry<Employee, keyof Employee>
-				dataProperty={'number'}
+			{/* Signed By */}
+			<TableTextEntry<Timesheet, keyof Timesheet>
+				dataProperty={'submittedby'}
 			/>
-
-			{/* Manager ID */}
-			<TableTextEntry<Employee, keyof Employee>
-				dataProperty={'managerid'}
+			{/* Reg */}
+			<TableTextEntry<Timesheet, keyof Timesheet>
+				dataProperty={'totalreghours'}
 			/>
-
-			{/* Access Level */}
-			<TableTextEntry<Employee, keyof Employee>
-				dataProperty={'accesslevel'}
+			{/* OT */}
+			<TableTextEntry<Timesheet, keyof Timesheet>
+				dataProperty={'totalovertime'}
 			/>
-
-			{/* Timesheet Required */}
-			<TableCheckEntry<Employee, keyof Employee>
-				dataProperty={'timesheetrequired'}
-			/>
-
-			{/* Overtime Eligible */}
-			<TableCheckEntry<Employee, keyof Employee>
-				dataProperty={'overtimeeligible'}
-			/>
-
-			{/* Tab Navigate OT*/}
-			<TableCheckEntry<Employee, keyof Employee>
-				dataProperty={'tabnavigateot'}
-			/>
-
-			{/* Email Expense Copy */}
-			<TableCheckEntry<Employee, keyof Employee>
-				dataProperty={'emailexpensecopy'}
-			/>
-
-			{/* I Enter Time Data */}
-			<TableCheckEntry<Employee, keyof Employee>
-				dataProperty={'ientertimedata'}
-			/>
-
-			{/* Number of Sheet Summaries */}
-			<TableTextEntry<Employee, keyof Employee>
-				dataProperty={'numtimesheetsummaries'}
-			/>
-
-			{/* Number of Expense Summaries */}
-			<TableTextEntry<Employee, keyof Employee>
-				dataProperty={'numexpensesummaries'}
-			/>
-
-			{/* Number of Default Rows */}
-			<TableTextEntry<Employee, keyof Employee>
-				dataProperty={'numdefaulttimerows'}
-			/>
-			{/* ID */}
-			<TableTextEntry<Employee, keyof Employee>
-				dataProperty={'id'}
-			/>
-
-			{/* Edit User */}
-			<TableEditEntry<Employee, keyof Employee>
-				dataProperty={'id'}
-				hrefBeforeID="/dashboard/employees/"
-				hrefAfterID="/edit"
-			/>
-        </ListTable>
+			{/* Total */}
+			{/* <TableTextEntry<Timesheet, keyof Timesheet>
+				dataProperty={''}
+			/> */}
+        </UserTable>
     )
 
 }
