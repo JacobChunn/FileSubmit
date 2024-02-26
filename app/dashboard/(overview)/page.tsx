@@ -17,14 +17,14 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const timesheetPromise = (await fetchTimesheetsbyID()).json();
+  //const timesheetPromise = (await fetchTimesheetsbyID()).json();
   return (
     <main>
       <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
         Dashboard
       </h1>
       <div className='flex'>
-        <TimesheetTable timesheetPromise={timesheetPromise}/>
+        {/* <TimesheetTable timesheetPromise={timesheetPromise}/> */}
       </div>
     </main>
   );

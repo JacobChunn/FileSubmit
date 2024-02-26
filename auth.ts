@@ -1,42 +1,91 @@
-import NextAuth from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
-import { authConfig } from './auth.config';
-import { z } from 'zod';
-import { sql } from '@vercel/postgres';
-import type { User } from '@/app/lib/definitions';
-import bcrypt from 'bcrypt';
- 
-async function getUser(email: string): Promise<User | undefined> {
-  try {
-    const user = await sql<User>`SELECT * FROM users WHERE email=${email}`;
-    return user.rows[0];
-  } catch (error) {
-    console.error('Failed to fetch user:', error);
-    throw new Error('Failed to fetch user.');
-  }
-}
- 
-export const { auth, signIn, signOut } = NextAuth({
-  ...authConfig,
-  providers: [
-    Credentials({
-      async authorize(credentials) {
-        const parsedCredentials = z
-          .object({ email: z.string().email(), password: z.string().min(6) })
-          .safeParse(credentials);
- 
-        if (parsedCredentials.success) {
-          const { email, password } = parsedCredentials.data;
-          const user = await getUser(email);
-          if (!user) return null;
-          const passwordsMatch = await bcrypt.compare(password, user.password);
+// This is a dynamic route handler, or a catch all route for auth, meaning /api/auth/* will have its route be defined here
 
-          if (passwordsMatch) return user;
-        }
+import { NextAuthOptions } from "next-auth";
+import NextAuth from "next-auth/next";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { getEmployeeByUsername } from "./app/lib/data";
+import bcrypt from "bcrypt";
+import { access } from "fs";
+import { Employee } from "./app/lib/definitions";
 
-        console.log('Invalid credentials');
-        return null;
+
+
+export const config = {
+    providers:[
+        CredentialsProvider({
+            // The name to display on the sign in form (e.g. 'Sign in with...')
+            name: 'Credentials',
+            // The credentials is used to generate a suitable form on the sign in page.
+            // You can specify whatever fields you are expecting to be submitted.
+            // e.g. domain, username, password, 2FA token, etc.
+            // You can pass any HTML attribute to the <input> tag through the object.
+            credentials: {
+              username: { label: "Username", type: "text", placeholder: "Enter Username:" },
+              password: { label: "Password", type: "password", placeholder: "Enter Password:" }
+            },
+            async authorize(credentials, req) {
+              // You need to provide your own logic here that takes the credentials
+              // submitted and returns either a object representing a user or value
+              // that is false/null if the credentials are invalid.
+              // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
+              // You can also use the `req` object to obtain additional parameters
+              // (i.e., the request IP address)
+              
+              // const res = await fetch("http://localhost:3000/api/login", { // Implement this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+              //   method: 'POST',
+              //   headers: { "Content-Type": "application/json" },
+              //   body: JSON.stringify({
+              //       username: credentials?.username,
+              //       password: credentials?.password,
+              //   }),
+              // })
+
+              if (!credentials) return null;
+
+              const res = await getEmployeeByUsername(credentials.username);
+
+              const foundUser: Employee = await res.json();
+              console.log(foundUser);
+
+              if ( !foundUser ) return null;
+
+              const match = await bcrypt.compare(
+                credentials.password,
+                foundUser.password
+              );
+
+              if ( match ) {
+                console.log("Found User was a match!");
+
+                return {
+                  id: foundUser.id,
+                  role: (foundUser.accesslevel < 200 ? "normalUser" : "admin"),
+                }
+
+              }
+                
+
+              // Return null if user data could not be retrieved
+              return null
+            }
+          })
+    ],
+	callbacks: {
+		async jwt({token, user}) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+      }  
+        return token;
       },
-    }),
-  ],
-});
+		async session({ session, token }) {
+			if (session?.user) {
+        session.user.id = token.id;
+        session.user.role = token.role;
+      }
+			return session;
+		},
+	}
+} satisfies NextAuthOptions
+
+export const handler = NextAuth(config);

@@ -14,6 +14,28 @@ import { formatCurrency } from './utils';
 import { unstable_noStore as noStore } from 'next/cache';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
+export async function getEmployeeByUsername(username: string) {
+  noStore();
+  try {
+    const data = await sql<Employee>`
+		SELECT
+		  id, number, username,
+		  password, firstName, lastName,
+		  cellPhone, homePhone, email,
+		  managerID, accessLevel, timeSheetRequired,
+		  overtimeEligible, TABNavigateOT, emailExpenseCopy,
+		  activeEmployee, iEnterTimeData, numTimeSheetSummaries,
+		  numExpenseSummaries, numDefaultTimeRows, contractor
+		FROM employees
+    WHERE employees.username = ${username}
+	  `;
+    return Response.json(data.rows[0]);
+  } catch (error) {
+	  console.error('Database Error:', error);
+	  return Response.error();
+	}
+}
+
 export async function fetchRevenue() {
   // Add noStore() here prevent the response from being cached.
   // This is equivalent to in fetch(..., {cache: 'no-store'}).
@@ -57,9 +79,7 @@ export async function fetchEmployees() {
 	  console.error('Database Error:', error);
 	  return Response.error();
 	}
-  }
-
-
+}
 
 export async function fetchEmployeeByID(id: number) {
 	noStore();
