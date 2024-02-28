@@ -22,9 +22,11 @@ import { CustomUser } from './app/lib/definitions';
 
     const token = await getToken({ req });
 
-    const userProtectedRoutes = ["/"];
+    const userProtectedRoutes = ["/dashboard/employees"];
 
-    const adminProtectedRoutes = ["/admin/dashboard"];
+    const adminProtectedRoutes = ["/dashboard/projects"];
+
+	console.log("Token is null?", token==null)
 
     if (
       token == null &&
@@ -42,25 +44,16 @@ import { CustomUser } from './app/lib/definitions';
   const user: CustomUser = token?.user as CustomUser;
 
   // * if user try to access admin routes
-  if (adminProtectedRoutes.includes(pathname) && user.role == "User") {
+  if (adminProtectedRoutes.includes(pathname) && user.role == "normalUser") {
     return NextResponse.redirect(
       new URL(
-        "/admin/login?error=Please login first to access this route.",
-        request.url
+        "/dashboard/denied",
+        req.url
       )
     );
   }
 
-  //   * If Admin try to access user routes
-  if (userProtectedRoutes.includes(pathname) && user.role == "Admin") {
-    return NextResponse.redirect(
-      new URL(
-        "/login?error=Please login first to access this route.",
-        request.url
-      )
-    );
-  }
-
+  return NextResponse.next();
     //console.log(req.nextauth.token?.role);
 
     // if (

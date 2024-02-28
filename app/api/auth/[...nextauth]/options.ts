@@ -5,8 +5,9 @@ import NextAuth from 'next-auth/next';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcrypt';
 import { access } from 'fs';
-import { Employee } from '@/app/lib/definitions';
+import { CustomUser, Employee } from '@/app/lib/definitions';
 import { getEmployeeByUsername } from '@/app/lib/data';
+import { JWT } from "next-auth/jwt";
 
 export const authOptions: AuthOptions = {
 	providers: [
@@ -46,6 +47,8 @@ export const authOptions: AuthOptions = {
 				//   }),
 				// })
 
+				console.log("In Authorize...")
+
 				if (!credentials) return null;
 
 				const res = await getEmployeeByUsername(credentials.username);
@@ -55,7 +58,7 @@ export const authOptions: AuthOptions = {
 					id: string
 				}
 
-				const foundUser: Employee & roleAndID = await res.json();
+				const foundUser: Employee = await res.json();
 				//console.log(foundUser);
 
 				if (!foundUser) return null;
@@ -67,15 +70,16 @@ export const authOptions: AuthOptions = {
 
 				if (match) {
 					console.log('Found User was a match!');
+					console.log("id: " + foundUser.id);
+					console.log("access level: " + (foundUser.accesslevel < 200 ? 'normalUser' : 'admin'))
+					return {
+						id: foundUser.id,
+						role: foundUser.accesslevel < 200 ? 'normalUser' : 'admin',
+					} satisfies CustomUser;
 
-					// return {
-					// 	id: foundUser.id,
-					// 	role: foundUser.accesslevel < 200 ? 'normalUser' : 'admin',
-					// };
+					//foundUser.role = 'normalUser';
 
-					foundUser.role = 'normalUser';
-
-					return foundUser;
+					//return foundUser;
 				}
 
 				console.log('Found User was NOT a match');
@@ -85,7 +89,7 @@ export const authOptions: AuthOptions = {
 		}),
 	],
 	callbacks: {
-		async jwt({ token, user }) {
+		async jwt({ token, user }: {token: JWT, user: CustomUser}) {
 		
 			if (user) {
 				token.id = user.id;

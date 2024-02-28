@@ -220,6 +220,6 @@ export type StateType = {
 };
 
 export type CustomUser = {
-  id: number | null;
-  role: string | null;
+  id: number;
+  role: "normalUser" | "admin";
 }
