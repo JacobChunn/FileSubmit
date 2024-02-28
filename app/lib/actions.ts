@@ -8,6 +8,9 @@ import { redirect } from 'next/navigation';
 //import { AuthError } from 'next-auth';
 import { EmployeeState, ProjectState } from './definitions';
 import { start } from 'repl';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../api/auth/[...nextauth]/options';
+import { fetchEmployeeByID } from './data';
  
 const FormSchema = z.object({
   id: z.string(),
@@ -69,6 +72,30 @@ const ProjectSchema = z.object({
 
 const AddProject = ProjectSchema.omit({ id: true });
 const EditProject = ProjectSchema.omit({ id: true });
+
+const TimesheetSchema = z.object({
+  id: z.coerce.number(),
+  employeeid: z.coerce.number(),
+  weekending: z.coerce.date(),
+  processed: z.coerce.boolean(),
+  mgrapproved: z.coerce.boolean(),
+  usercommitted: z.coerce.boolean(),
+  totalreghours: z.coerce.number(),
+  totalovertime: z.coerce.number(),
+  approvedby: z.string().max(32),
+  submittedby: z.string().max(32),
+  processedby: z.string().max(32),
+  dateprocessed: z.coerce.date(),
+  message: z.string().max(4096),
+});
+
+const AddTimesheet = TimesheetSchema.pick({
+  weekending: true,
+  usercommitted: true,
+  totalreghours: true,
+  totalovertime: true,
+  message: true,
+})
 
 export type InvoiceState = {
     errors?: {
@@ -217,15 +244,15 @@ export async function addProject( // make it not break when project table doesnt
 
   try {
     await sql`
-	INSERT INTO projects (
-		number, description, startdate, enddate, shortname, customerpo, customercontact,
-		comments, overtime, sgaflag
-	)
-	VALUES (
-		${number}, ${description}, ${startdate.toLocaleDateString('en-us')}, ${enddate.toLocaleDateString('en-us')}, ${shortname},
-		${customerpo}, ${customercontact}, ${comments}, ${overtime ? 1 : 0}, ${sgaflag ? 1 : 0}
-	)	  
-  `;
+    INSERT INTO projects (
+      number, description, startdate, enddate, shortname, customerpo, customercontact,
+      comments, overtime, sgaflag
+    )
+    VALUES (
+      ${number}, ${description}, ${startdate.toLocaleDateString('en-us')}, ${enddate.toLocaleDateString('en-us')}, ${shortname},
+      ${customerpo}, ${customercontact}, ${comments}, ${overtime ? 1 : 0}, ${sgaflag ? 1 : 0}
+    )	  
+    `;
   } catch (error) {
     console.log(error);
     return {
@@ -235,6 +262,75 @@ export async function addProject( // make it not break when project table doesnt
 
   revalidatePath('/dashboard/projects');
   redirect('/dashboard/projects');
+}
+
+export async function addTimesheet(
+  prevState: ProjectState,
+	formData: FormData,
+) {
+  const validatedFields = AddTimesheet.safeParse({
+    weekending: formData.get('weekending'),
+    usercommitted: formData.get('usercommitted'),
+    totalreghours: formData.get('totalreghours'),
+    totalovertime: formData.get('totalovertime'),
+    message: formData.get('message'),
+  });
+
+  // If form validation fails, return errors early. Otherwise, continue.
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Create Project.',
+    };
+  }
+
+  const {
+    weekending, usercommitted, totalreghours, totalovertime, message
+  } = validatedFields.data;
+
+  // Prepare data for insertion into the database
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    console.log("Session was unable to be retrieved!");
+    return {
+      message: 'Session was unable to be retrieved!',
+    };
+
+  }
+
+  const employeeid = Number(session.user.id);
+
+  const user = await fetchEmployeeByID(employeeid)
+
+  const processed = false;
+  const mgrapproved = false;
+  const approvedby = null;
+  const submittedby = user.username;
+  const processedby = null;
+  const dateprocessed = null;
+
+  try {
+    await sql`
+    INSERT INTO timesheets (
+      employeeid, weekending, processed, mgrapproved, usercommitted, totalreghours,
+      totalovertime, approvedby, submittedby, processedby, dateprocessed, message
+    )
+    VALUES (
+      ${employeeid}, ${weekending.toLocaleDateString('en-us')}, ${processed ? 1 : 0},
+      ${mgrapproved ? 1 : 0}, ${usercommitted ? 1 : 0}, ${totalreghours}, ${totalovertime},
+      ${approvedby}, ${submittedby}, ${processedby}, ${dateprocessed}, ${message}
+    )	  
+    `;
+  } catch (error) {
+    console.log(error);
+    return {
+      message: 'Database Error: Failed to Create Timesheet.',
+    };
+  }
+
+  revalidatePath('/dashboard');
+  redirect('/dashboard');
 }
 
 export async function editEmployee(

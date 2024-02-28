@@ -9,6 +9,7 @@ import {
   Revenue,
   Employee,
   Project,
+  Timesheet,
 } from './definitions';
 import { formatCurrency } from './utils';
 import { unstable_noStore as noStore } from 'next/cache';
@@ -31,6 +32,34 @@ export async function getEmployeeByUsername(username: string) {
 	  `;
     return Response.json(data.rows[0]);
   } catch (error) {
+	  console.error('Database Error:', error);
+	  return Response.error();
+	}
+}
+
+export async function fetchTimesheetsByEmployeeID(id: number) {
+  noStore();
+  
+  console.log(id);
+
+  if (isNaN(id)) {
+    console.error('id is not a number');
+    return Response.error();
+  }
+
+  try {
+	  const data = await sql<Timesheet>`
+		SELECT
+    id, employeeid, weekending, processed, mgrapproved,
+    usercommitted, totalreghours, totalovertime, approvedby,
+    submittedby, processedby, dateprocessed, message
+		FROM timesheets
+    WHERE timesheets.employeeid = ${id};
+	  `;
+	  const dataRows = data.rows;
+    console.log(dataRows);
+	  return Response.json(dataRows);
+	} catch (error) {
 	  console.error('Database Error:', error);
 	  return Response.error();
 	}
@@ -118,6 +147,7 @@ export async function fetchProjects() { // Make it not error when table doesnt e
 		FROM projects
 	  `;
 	  const dataRows = data.rows;
+    console.log(dataRows)
 	  return Response.json(dataRows);
 	} catch (error) {
 	  console.error('Database Error:', error);

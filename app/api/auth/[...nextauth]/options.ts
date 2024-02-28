@@ -20,14 +20,14 @@ export const authOptions: AuthOptions = {
 			// You can pass any HTML attribute to the <input> tag through the object.
 			credentials: {
 				username: {
-				label: 'Username',
-				type: 'text',
-				placeholder: 'Enter Username:',
+					label: 'Username',
+					type: 'text',
+					placeholder: 'Enter Username:',
 				},
 				password: {
-				label: 'Password',
-				type: 'password',
-				placeholder: 'Enter Password:',
+					label: 'Password',
+					type: 'password',
+					placeholder: 'Enter Password:',
 				},
 			},
 			async authorize(credentials, req) {
@@ -52,11 +52,6 @@ export const authOptions: AuthOptions = {
 				if (!credentials) return null;
 
 				const res = await getEmployeeByUsername(credentials.username);
-
-				type roleAndID = {
-					role: string,
-					id: string
-				}
 
 				const foundUser: Employee = await res.json();
 				//console.log(foundUser);
@@ -90,44 +85,43 @@ export const authOptions: AuthOptions = {
 	],
 	callbacks: {
 		async signIn({user, account, profile, email, credentials}) {
-			console.log({
-				msg: "signIn Callback Result",
-				user: user,
-				account: account,
-				profile: profile,
-				email: email,
-				credentials: credentials,
-			});
+			// console.log({
+			// 	msg: "signIn Callback Result",
+			// 	user: user,
+			// 	account: account,
+			// 	profile: profile,
+			// 	email: email,
+			// 	credentials: credentials,
+			// });
 			return true;
 		},
 		async jwt({ token, user, account, profile }) {
-		
-			// if (user) {
-			// 	if ('role' in user && 'id' in user) {
-			// 		token.id = user.id;
-			// 		token.role = user.role as "normalUser" | "admin"; // Type assertion
-			// 	}
-			// }
-			console.log({
-				msg: "JWT Callback Result",
-				token: token,
-				user: user,
-				account: account,
-				profile: profile,
-			});
+			if (user) {
+					token.id = user.id;
+					token.role = user.role;
+			}
+
+			// console.log({
+			// 	msg: "JWT Callback Result",
+			// 	token: token,
+			// 	user: user,
+			// 	account: account,
+			// 	profile: profile,
+			// });
 			return token;
 		},
 		async session({ session, user, token }) {
-			// if (session?.user) {
-			// 	session.user.id = token.id;
-			// 	session.user.role = token.role;
-			// }
-			console.log({
-				msg: "Session Callback Result",
-				session: session,
-				token: token,
-				user: user,
-			});
+			if (session?.user) {
+				session.user.id = token.id;
+				session.user.role = token.role;
+			}
+
+			// console.log({
+			// 	msg: "Session Callback Result",
+			// 	session: session,
+			// 	token: token,
+			// 	user: user,
+			// });
 			return session;
 		},
 	},

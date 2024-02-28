@@ -13,15 +13,20 @@ import { TabType } from "@/app/lib/definitions";
 import Link from "next/link";
 import TableBody from "./table-body";
 import TableListHeader from "./table-list-header";
+import TableUserHeader from "./table-user-header";
 
 export default function UserTable<T>({
 	children,
 	title,
+	addHref,
+	addText,
 	dataPromise,
 	TABLE_HEAD,
 }: {
 	children: React.ReactNode,
 	title: string,
+	addHref: string,
+	addText: string,
 	dataPromise: Promise<T[]>,
 	TABLE_HEAD: readonly string[],
 }) {
@@ -29,9 +34,11 @@ export default function UserTable<T>({
 
 	return (
 		<Card className="w-full p-4">
-            <div>
-                {title}
-            </div>
+			<TableUserHeader
+				title={title}
+				addHref={addHref}
+				addText={addText}
+			/>
 			<TableBody
 				children={children}
 				TABLE_HEAD={TABLE_HEAD}
