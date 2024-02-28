@@ -218,3 +218,8 @@ export type StateType = {
 	  };
 	message?: string | null;
 };
+
+export type CustomUser = {
+  id: number | null;
+  role: string | null;
+}

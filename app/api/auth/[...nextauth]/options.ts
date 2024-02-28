@@ -1,14 +1,14 @@
 // This is a dynamic route handler, or a catch all route for auth, meaning /api/auth/* will have its route be defined here
 
-import { NextAuthOptions } from 'next-auth';
+import { AuthOptions, NextAuthOptions } from 'next-auth';
 import NextAuth from 'next-auth/next';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { getEmployeeByUsername } from './app/lib/data';
 import bcrypt from 'bcrypt';
 import { access } from 'fs';
-import { Employee } from './app/lib/definitions';
+import { Employee } from '@/app/lib/definitions';
+import { getEmployeeByUsername } from '@/app/lib/data';
 
-export const config = {
+export const authOptions: AuthOptions = {
 	providers: [
 		CredentialsProvider({
 			// The name to display on the sign in form (e.g. 'Sign in with...')
@@ -101,6 +101,4 @@ export const config = {
 			return session;
 		},
 	},
-} satisfies NextAuthOptions;
-
-export const handler = NextAuth(config);
+}

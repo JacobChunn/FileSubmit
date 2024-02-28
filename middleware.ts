@@ -3,41 +3,81 @@
 
 import { getToken } from 'next-auth/jwt';
 import { withAuth } from 'next-auth/middleware';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { CustomUser } from './app/lib/definitions';
 
-export default withAuth(
-  async function middleware(req) {
-	//const token = await getToken({ req });
-	//console.log(!!token)
-	//console.log(token)
-    console.log(req.nextUrl.pathname);
-    console.log(req.nextauth.token?.role);
+// https://github.com/TusharVashishth/Nextjs_Authentication/blob/main/src/middleware.ts
+
+  export async function middleware(req: NextRequest) {
+
+    console.log("middleware is here");
+
+    const { pathname } = req.nextUrl;
+    console.log(pathname);
+
+    if (pathname == "/api/auth/signin") {
+      console.log("signin page!")
+      return NextResponse.next();
+    }
+
+    const token = await getToken({ req });
+
+    const userProtectedRoutes = ["/"];
+
+    const adminProtectedRoutes = ["/admin/dashboard"];
 
     if (
-      !req.nextauth.token ||
-      (req.nextUrl.pathname.startsWith('/dashboard/employees') &&
-        req.nextauth.token.role != 'admin')
+      token == null &&
+      (userProtectedRoutes.includes(pathname) ||
+        adminProtectedRoutes.includes(pathname))
     ) {
-		console.log("DENIED!!!")
-      return NextResponse.rewrite(new URL('/Denied', req.url));
+      return NextResponse.redirect(
+        new URL(
+          "/dashboard/denied", req.url
+        )
+      );
     }
-  },
-  {
-    callbacks: {
-      authorized(token) {
-		console.log("authorized?: ", !!token)
-		console.log(token.token?.role); // Maybe i need to check if the token has stuff inside? Maybe stuff isnt being put inside token?
-		  return !!token;
-	  },
-    },
-  },
-);
 
-export const config = {
-  // https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
-  // matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
-  matcher: [
-	'/dashboard/employees/',
-	'/api/:path*"'
-],
-};
+    //   * Get user from token
+  const user: CustomUser = token?.user as CustomUser;
+
+  // * if user try to access admin routes
+  if (adminProtectedRoutes.includes(pathname) && user.role == "User") {
+    return NextResponse.redirect(
+      new URL(
+        "/admin/login?error=Please login first to access this route.",
+        request.url
+      )
+    );
+  }
+
+  //   * If Admin try to access user routes
+  if (userProtectedRoutes.includes(pathname) && user.role == "Admin") {
+    return NextResponse.redirect(
+      new URL(
+        "/login?error=Please login first to access this route.",
+        request.url
+      )
+    );
+  }
+
+    //console.log(req.nextauth.token?.role);
+
+    // if (
+    //   !req.nextauth.token ||
+    //   (req.nextUrl.pathname.startsWith('/dashboard/employees') &&
+    //     req.nextauth.token.role != 'admin')
+    // ) {
+		// console.log("DENIED!!!")
+    //   return NextResponse.rewrite(new URL('/dashboard/denied', req.url));
+    // }
+  }
+
+// export const config = {
+//   // https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
+//   // matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+//   matcher: [
+// 	'/dashboard/employees/',
+// 	'/api/:path*"'
+// ],
+// };
