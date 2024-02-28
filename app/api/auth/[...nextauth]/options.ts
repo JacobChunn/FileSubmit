@@ -73,7 +73,7 @@ export const authOptions: AuthOptions = {
 					console.log("id: " + foundUser.id);
 					console.log("access level: " + (foundUser.accesslevel < 200 ? 'normalUser' : 'admin'))
 					return {
-						id: foundUser.id,
+						id: foundUser.id.toString(),
 						role: foundUser.accesslevel < 200 ? 'normalUser' : 'admin',
 					} satisfies CustomUser;
 
@@ -89,19 +89,45 @@ export const authOptions: AuthOptions = {
 		}),
 	],
 	callbacks: {
-		async jwt({ token, user }: {token: JWT, user: CustomUser}) {
+		async signIn({user, account, profile, email, credentials}) {
+			console.log({
+				msg: "signIn Callback Result",
+				user: user,
+				account: account,
+				profile: profile,
+				email: email,
+				credentials: credentials,
+			});
+			return true;
+		},
+		async jwt({ token, user, account, profile }) {
 		
-			if (user) {
-				token.id = user.id;
-				token.role = user.role;
-			}
+			// if (user) {
+			// 	if ('role' in user && 'id' in user) {
+			// 		token.id = user.id;
+			// 		token.role = user.role as "normalUser" | "admin"; // Type assertion
+			// 	}
+			// }
+			console.log({
+				msg: "JWT Callback Result",
+				token: token,
+				user: user,
+				account: account,
+				profile: profile,
+			});
 			return token;
 		},
-		async session({ session, token }) {
-			if (session?.user) {
-				session.user.id = token.id;
-				session.user.role = token.role;
-			}
+		async session({ session, user, token }) {
+			// if (session?.user) {
+			// 	session.user.id = token.id;
+			// 	session.user.role = token.role;
+			// }
+			console.log({
+				msg: "Session Callback Result",
+				session: session,
+				token: token,
+				user: user,
+			});
 			return session;
 		},
 	},

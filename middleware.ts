@@ -26,7 +26,7 @@ import { CustomUser } from './app/lib/definitions';
 
     const adminProtectedRoutes = ["/dashboard/projects"];
 
-	console.log("Token is null?", token==null)
+	//console.log("Token is null?", token==null)
 
     if (
       token == null &&
