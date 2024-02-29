@@ -96,6 +96,13 @@ const AddTimesheet = TimesheetSchema.pick({
   totalovertime: true,
   message: true,
 })
+const EditTimesheet = TimesheetSchema.pick({
+  weekending: true,
+  usercommitted: true,
+  totalreghours: true,
+  totalovertime: true,
+  message: true,
+})
 
 export type InvoiceState = {
     errors?: {
@@ -331,6 +338,90 @@ export async function addTimesheet(
 
   revalidatePath('/dashboard');
   redirect('/dashboard');
+}
+
+export async function editTimesheet( // Finish this
+  id: string,
+	prevState: EmployeeState,
+	formData: FormData,
+) {
+  const validatedFields = EditTimesheet.safeParse({
+    number: formData.get('number'),
+    username: formData.get('username'),
+    password: formData.get('password'),
+    firstname: formData.get('firstname'),
+    lastname: formData.get('lastname'),
+    cellphone: formData.get('cellphone'),
+    homephone: formData.get('homephone'),
+    email: formData.get('email'),
+    managerid: formData.get('managerid'),
+    accesslevel: formData.get('accesslevel'),
+    timesheetrequired: formData.get('timesheetrequired'),
+    overtimeeligible: formData.get('overtimeeligible'),
+    tabnavigateot: formData.get('tabnavigateot'),
+    emailexpensecopy: formData.get('emailexpensecopy'),
+    activeemployee: formData.get('activeemployee'),
+    ientertimedata: formData.get('ientertimedata'),
+    numtimesheetsummaries: formData.get('numtimesheetsummaries'),
+    numexpensesummaries: formData.get('numexpensesummaries'),
+    numdefaulttimerows: formData.get('numdefaulttimerows'),
+    contractor: formData.get('contractor'),
+  });
+
+  console.log(validatedFields);
+  // If form validation fails, return errors early. Otherwise, continue.
+  if (!validatedFields.success) {
+    console.log(validatedFields.error)
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Edit Employee.',
+    };
+  }
+
+  const {number, username, password, firstname, lastname, cellphone, homephone,
+    email, managerid, accesslevel, timesheetrequired, overtimeeligible, tabnavigateot,
+    emailexpensecopy, activeemployee, ientertimedata, numtimesheetsummaries,
+    numexpensesummaries, numdefaulttimerows, contractor
+  } = validatedFields.data;
+
+  // Prepare data for insertion into the database
+  // Noting needed as of now
+
+  try {
+    await sql`
+    UPDATE employees
+    SET
+      number = ${number},
+      username = ${username},
+      password = ${password},
+      firstname = ${firstname},
+      lastname = ${lastname},
+      cellphone = ${cellphone},
+      homephone = ${homephone},
+      email = ${email},
+      managerid = ${managerid},
+      accesslevel = ${accesslevel},
+      timesheetrequired = ${timesheetrequired ? 1 : 0},
+      overtimeeligible = ${overtimeeligible ? 1 : 0},
+      tabnavigateot = ${tabnavigateot ? 1 : 0},
+      emailexpensecopy = ${emailexpensecopy ? 1 : 0},
+      activeemployee = ${activeemployee ? 1 : 0},
+      ientertimedata = ${ientertimedata ? 1 : 0},
+      numtimesheetsummaries = ${numtimesheetsummaries},
+      numexpensesummaries = ${numexpensesummaries},
+      numdefaulttimerows = ${numdefaulttimerows},
+      contractor = ${contractor ? 1 : 0}
+    WHERE id = ${id};
+  `;
+  } catch (error) {
+    console.log(error);
+    return {
+      message: 'Database Error: Failed to Edit Employee.',
+    };
+  }
+
+  revalidatePath('/dashboard/employees');
+  redirect('/dashboard/employees');
 }
 
 export async function editEmployee(

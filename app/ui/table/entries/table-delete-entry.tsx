@@ -1,6 +1,6 @@
-import { PencilIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Tooltip, IconButton } from "@/app/ui/material-tailwind-wrapper";
+import { TrashIcon } from "@heroicons/react/24/outline";
 
 export type Props<T, K extends keyof T> = {
     data?: T,
@@ -10,7 +10,7 @@ export type Props<T, K extends keyof T> = {
     rowStyles?: string,
 }
 
-export default function TableEditEntry<T, K extends keyof T>({
+export default function TableDeleteEntry<T, K extends keyof T>({
     data,
     dataProperty,
 	hrefBeforeID = "",
@@ -25,9 +25,9 @@ export default function TableEditEntry<T, K extends keyof T>({
     return (
 		<td className={rowStyles}>
 			<Link href={hrefBeforeID + id + hrefAfterID}>
-				<Tooltip content="Edit Entry">
+				<Tooltip content="Delete Entry">
 					<IconButton variant="text">
-						<PencilIcon className="h-4 w-4" />
+						<TrashIcon className="h-4 w-4" />
 					</IconButton>
 				</Tooltip>
 			</Link>
