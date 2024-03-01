@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page({ params }: { params: { id: any } }) {
-    const id = params.id;
+    const id = Number(params.id);
     if (typeof id !== 'number') {
         notFound();
     }

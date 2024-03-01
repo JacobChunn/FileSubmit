@@ -187,6 +187,14 @@ export type Timesheet = {
   message: string,
 };
 
+export type TimesheetEditInfo = {
+  weekending: string,
+  usercommitted: boolean,
+  totalreghours: number,
+  totalovertime: number,
+  message: string,
+}
+
 export type TimesheetState = {
   errors?: {
 		[key: string]: string[] | undefined;

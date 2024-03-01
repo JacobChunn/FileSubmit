@@ -34,7 +34,7 @@ export default function TimesheetAddForm() {
 				{/* Total Regular Hours */}
 				<FormEntry
 					state={state}
-					type='text'
+					type='number'
 					label='Total Regular Hours'
 					inputName='totalreghours'
 				/>
@@ -42,7 +42,7 @@ export default function TimesheetAddForm() {
 				{/* Total Overtime */}
 				<FormEntry
 					state={state}
-					type='text'
+					type='number'
 					label='Total Overtime'
 					inputName='totalovertime'
 				/>

@@ -10,6 +10,7 @@ import {
   Employee,
   Project,
   Timesheet,
+  TimesheetEditInfo,
 } from './definitions';
 import { formatCurrency } from './utils';
 import { unstable_noStore as noStore } from 'next/cache';
@@ -59,6 +60,24 @@ export async function fetchTimesheetsByEmployeeID(id: number) {
 	  const dataRows = data.rows;
     console.log(dataRows);
 	  return Response.json(dataRows);
+	} catch (error) {
+	  console.error('Database Error:', error);
+	  return Response.error();
+	}
+}
+
+export async function fetchTimesheetEditByID(id: number) {
+  noStore();
+	try {
+	  const data = await sql<TimesheetEditInfo>`
+		SELECT
+		  weekending, usercommitted, totalreghours,
+      totalovertime, message
+		FROM timesheets
+    WHERE timesheets.id = ${id}
+	  `;
+	  const resData = data.rows[0];
+	  return Response.json(resData);
 	} catch (error) {
 	  console.error('Database Error:', error);
 	  return Response.error();

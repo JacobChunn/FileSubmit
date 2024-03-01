@@ -7,10 +7,10 @@ import { redirect } from 'next/navigation';
 //import { signIn } from '@/auth';
 //import { AuthError } from 'next-auth';
 import { EmployeeState, ProjectState } from './definitions';
-import { start } from 'repl';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../api/auth/[...nextauth]/options';
 import { fetchEmployeeByID } from './data';
+import * as bcrypt from 'bcrypt';
  
 const FormSchema = z.object({
   id: z.string(),
@@ -97,6 +97,7 @@ const AddTimesheet = TimesheetSchema.pick({
   message: true,
 })
 const EditTimesheet = TimesheetSchema.pick({
+  id: true,
   weekending: true,
   usercommitted: true,
   totalreghours: true,
@@ -168,14 +169,16 @@ export async function addEmployee(
     };
   }
 
-  const {number, username, password, firstname, lastname, cellphone, homephone,
+  const {password, ...otherFields} = validatedFields.data;
+
+  const {number, username, firstname, lastname, cellphone, homephone,
     email, managerid, accesslevel, timesheetrequired, overtimeeligible, tabnavigateot,
     emailexpensecopy, activeemployee, ientertimedata, numtimesheetsummaries,
     numexpensesummaries, numdefaulttimerows, contractor
-  } = validatedFields.data;
+  } = otherFields;
 
   // Prepare data for insertion into the database
-  // Noting needed as of now
+  const hashedPassword = await bcrypt.hash(validatedFields.data.password, 10);
 
   try {
     await sql`
@@ -186,7 +189,7 @@ export async function addEmployee(
       numexpensesummaries, numdefaulttimerows, contractor
     )
     VALUES (
-      ${number}, ${username}, ${password}, ${firstname}, ${lastname},
+      ${number}, ${username}, ${hashedPassword}, ${firstname}, ${lastname},
       ${cellphone}, ${homephone}, ${email}, ${managerid}, ${accesslevel},
       ${timesheetrequired ? 1 : 0}, ${overtimeeligible ? 1 : 0}, ${tabnavigateot ? 1 : 0},
       ${emailexpensecopy ? 1 : 0}, ${activeemployee ? 1 : 0}, ${ientertimedata ? 1 : 0},
@@ -340,78 +343,142 @@ export async function addTimesheet(
   redirect('/dashboard');
 }
 
-export async function editTimesheet( // Finish this
-  id: string,
+export async function editTimesheet( // Check if user has permissions to edit
+  timesheetid: number,
 	prevState: EmployeeState,
 	formData: FormData,
 ) {
   const validatedFields = EditTimesheet.safeParse({
-    number: formData.get('number'),
-    username: formData.get('username'),
-    password: formData.get('password'),
-    firstname: formData.get('firstname'),
-    lastname: formData.get('lastname'),
-    cellphone: formData.get('cellphone'),
-    homephone: formData.get('homephone'),
-    email: formData.get('email'),
-    managerid: formData.get('managerid'),
-    accesslevel: formData.get('accesslevel'),
-    timesheetrequired: formData.get('timesheetrequired'),
-    overtimeeligible: formData.get('overtimeeligible'),
-    tabnavigateot: formData.get('tabnavigateot'),
-    emailexpensecopy: formData.get('emailexpensecopy'),
-    activeemployee: formData.get('activeemployee'),
-    ientertimedata: formData.get('ientertimedata'),
-    numtimesheetsummaries: formData.get('numtimesheetsummaries'),
-    numexpensesummaries: formData.get('numexpensesummaries'),
-    numdefaulttimerows: formData.get('numdefaulttimerows'),
-    contractor: formData.get('contractor'),
+    id: timesheetid,
+    weekending: formData.get('weekending'),
+    usercommitted: formData.get('usercommitted'),
+    totalreghours: formData.get('totalreghours'),
+    totalovertime: formData.get('totalovertime'),
+    message: formData.get('message'),
   });
 
-  console.log(validatedFields);
   // If form validation fails, return errors early. Otherwise, continue.
   if (!validatedFields.success) {
-    console.log(validatedFields.error)
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Edit Employee.',
+      message: 'Missing Fields. Failed to Create Project.',
     };
   }
 
-  const {number, username, password, firstname, lastname, cellphone, homephone,
-    email, managerid, accesslevel, timesheetrequired, overtimeeligible, tabnavigateot,
-    emailexpensecopy, activeemployee, ientertimedata, numtimesheetsummaries,
-    numexpensesummaries, numdefaulttimerows, contractor
+  const {
+    id, weekending, usercommitted, totalreghours, totalovertime, message
   } = validatedFields.data;
 
-  // Prepare data for insertion into the database
-  // Noting needed as of now
+  // Ensure user is logged in
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    console.log("Session was unable to be retrieved!");
+    return {
+      message: 'Session was unable to be retrieved!',
+    };
+  }
+
+  // Get database data
+  const sessionEmployeeid = Number(session.user.id);
+
+  const DBtimesheetData = await sql`
+    SELECT 
+      employeeid,
+      weekending,
+      processed,
+      mgrapproved,
+      usercommitted,
+      totalreghours,
+      totalovertime,
+      approvedby,
+      submittedby,
+      processedby,
+      dateprocessed,
+      message
+    FROM timesheets
+    WHERE timesheets.id = ${id};
+  `;
+
+  if (!(DBtimesheetData && DBtimesheetData.rowCount > 0)) {
+    console.log("Timesheet of ID was not found!");
+    return {
+      message: 'Timesheet of ID was not found!',
+    };
+  }
+
+  const DBdata = DBtimesheetData.rows[0];
+
+  // Validate the user is trying to edit their own timesheet
+  const DBemployeeid = DBdata.employeeid;
+
+  if (Number(DBemployeeid) != sessionEmployeeid) {
+    console.log("Session user id did not match with associated timesheet!");
+    return {
+      message: 'Session user id did not match with associated timesheet!',
+    };
+  }
+
+  // Ensure the timesheet is not already approved or processed
+  const DBmgrapproved = DBdata.mgrapproved;
+  const DBprocessed = DBdata.processed;
+
+  if (DBmgrapproved == true || DBprocessed == true) {
+    console.log("Timesheet has already been approved or processed!");
+    return {
+      message: 'Timesheet has already been approved or processed!',
+    };
+  }
+
+  // Make sure data was actually updated
+  if (
+    weekending == DBdata.weekending &&
+    usercommitted == DBdata.usercommitted &&
+    totalreghours == DBdata.totalreghours &&
+    totalovertime == DBdata.totalovertime &&
+    message == DBdata.message
+  ) {
+    console.log("No new data was present in the edited form!");
+    return {
+      message: 'No new data was present in the edited form!',
+    };
+  }
+
+  // Get username of user
+  const usernameData = await sql`
+    SELECT username
+    FROM employees
+    WHERE employees.id = ${DBemployeeid}
+  `;
+
+  if (!(usernameData && usernameData.rowCount > 0)) {
+    console.log("Timesheet of ID was not found!");
+    return {
+      message: 'Timesheet of ID was not found!',
+    };
+  }
+
+  const username = usernameData.rows[0].username;
+
+  // Set the rest of the values to be updated
+  const processed = false;
+  const mgrapproved = false;
+  const submittedby = username;
+
 
   try {
     await sql`
-    UPDATE employees
+    UPDATE timesheets
     SET
-      number = ${number},
-      username = ${username},
-      password = ${password},
-      firstname = ${firstname},
-      lastname = ${lastname},
-      cellphone = ${cellphone},
-      homephone = ${homephone},
-      email = ${email},
-      managerid = ${managerid},
-      accesslevel = ${accesslevel},
-      timesheetrequired = ${timesheetrequired ? 1 : 0},
-      overtimeeligible = ${overtimeeligible ? 1 : 0},
-      tabnavigateot = ${tabnavigateot ? 1 : 0},
-      emailexpensecopy = ${emailexpensecopy ? 1 : 0},
-      activeemployee = ${activeemployee ? 1 : 0},
-      ientertimedata = ${ientertimedata ? 1 : 0},
-      numtimesheetsummaries = ${numtimesheetsummaries},
-      numexpensesummaries = ${numexpensesummaries},
-      numdefaulttimerows = ${numdefaulttimerows},
-      contractor = ${contractor ? 1 : 0}
-    WHERE id = ${id};
+      weekending = ${weekending.toLocaleDateString('en-us')},
+      processed = ${processed ? 1 : 0},
+      mgrapproved = ${mgrapproved ? 1 : 0},
+      usercommitted = ${usercommitted ? 1 : 0},
+      totalreghours = ${totalreghours},
+      totalovertime = ${totalovertime},
+      submittedby = ${submittedby},
+      message = ${message}
+    WHERE id = ${id}
   `;
   } catch (error) {
     console.log(error);
