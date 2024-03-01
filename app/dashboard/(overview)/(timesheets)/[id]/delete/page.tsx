@@ -5,35 +5,37 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import clsx from 'clsx';
 import { lusitana } from '@/app/ui/fonts';
-import Form from '@/app/ui/employees/edit/edit-form';
+import { Button } from '@/app/ui/button';
+import { deleteTimesheet } from '@/app/lib/actions';
+import { DeleteTimesheetButton } from '@/app/ui/dashboard/timesheets/delete/delete-button';
 
 export const metadata: Metadata = {
-  title: 'Edit Employee',
+  title: 'Delete Timesheet',
 };
 
 export default async function Page({ params }: { params: { id: any } }) {
-    const id = params.id;
+    const id = Number(params.id);
     if (typeof id !== 'number') {
         notFound();
     }
 
-    const employee = await fetchEmployeeByID(id);
-
-    if (!employee) {
-        notFound();
-    }
 
     return (
-        <main>
+        <main className='flex flex-col h-full'>
 			<Breadcrumbs className='bg-transparent'>
-				<Link href='/dashboard/employees' className={clsx(lusitana.className,"text-2xl opacity-60")}>
-				    Employees
+				<Link href='/dashboard' className={clsx(lusitana.className,"text-2xl opacity-60")}>
+				    Timesheets
 				</Link>
-				<Link href={`/dashboard/employees/${id}/edit`} className={clsx(lusitana.className,"text-2xl")}>
-				    Edit Employee
+				<Link href={`/dashboard/${id}/edit`} className={clsx(lusitana.className,"text-2xl")}>
+				    Delete Timesheet
 				</Link>
 			</Breadcrumbs>
-			<Form employee={employee}/>
+			<div className='flex flex-col flex-1 justify-center items-center'>
+                <div className='p-12'>
+                    Are you sure you want to delete?
+                </div>
+                <DeleteTimesheetButton id={id}/>
+            </div>
         </main>
     );
 }

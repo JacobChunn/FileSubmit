@@ -104,6 +104,7 @@ const EditTimesheet = TimesheetSchema.pick({
   totalovertime: true,
   message: true,
 })
+const DeleteTimesheet = TimesheetSchema.pick({ id: true })
 
 export type InvoiceState = {
     errors?: {
@@ -379,9 +380,9 @@ export async function editTimesheet( // Check if user has permissions to edit
     };
   }
 
-  // Get database data
   const sessionEmployeeid = Number(session.user.id);
 
+  // Get database data
   const DBtimesheetData = await sql`
     SELECT 
       employeeid,
@@ -636,6 +637,79 @@ export async function editProject(
 
   revalidatePath('/dashboard/projects');
   redirect('/dashboard/projects');
+}
+
+export async function deleteTimesheet(
+  timesheetid: number
+) {
+  const validatedFields = DeleteTimesheet.safeParse({
+    id: timesheetid,
+  });
+
+  // If form validation fails, return errors early. Otherwise, continue.
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Create Project.',
+    };
+  }
+
+  const { id } = validatedFields.data;
+
+  // Get the user session to ensure they are who they say they are
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    console.log("Session was unable to be retrieved!");
+    return {
+      message: 'Session was unable to be retrieved!',
+    };
+
+  }
+
+  const sessionEmployeeid = Number(session.user.id);
+
+  // Get database data
+  const DBtimesheetData = await sql`
+    SELECT 
+      employeeid
+    FROM timesheets
+    WHERE timesheets.id = ${id};
+  `;
+
+  if (!(DBtimesheetData && DBtimesheetData.rowCount > 0)) {
+    console.log("Timesheet of ID was not found!");
+    return {
+      message: 'Timesheet of ID was not found!',
+    };
+  }
+
+  const DBdata = DBtimesheetData.rows[0];
+
+  // Validate the user is trying to edit their own timesheet
+  const DBemployeeid = DBdata.employeeid;
+
+  if (Number(DBemployeeid) != sessionEmployeeid) {
+    console.log("Session user id did not match with associated timesheet!");
+    return {
+      message: 'Session user id did not match with associated timesheet!',
+    };
+  }
+
+  try {
+    await sql`
+      DELETE FROM timesheets
+      WHERE id = ${id}; 
+    `;
+  } catch (error) {
+    console.log(error);
+    return {
+      message: 'Database Error: Failed to Delete Timesheet.',
+    };
+  }
+
+  revalidatePath('/dashboard');
+  redirect('/dashboard');
 }
 
 export async function createInvoice(prevState: InvoiceState, formData: FormData) {

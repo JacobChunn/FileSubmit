@@ -15,14 +15,12 @@ export const metadata: Metadata = {
 export default async function Page({ params }: { params: { id: any } }) {
     const id = Number(params.id);
     if (typeof id !== 'number') {
-        console.log("here1")
         notFound();
     }
 
     const timesheetRes = await fetchTimesheetEditByID(id);
 
     if (!timesheetRes.ok) {
-        console.log("here2")
         notFound();
     }
 
@@ -32,11 +30,11 @@ export default async function Page({ params }: { params: { id: any } }) {
     return (
         <main>
 			<Breadcrumbs className='bg-transparent'>
-				<Link href='/dashboard/employees' className={clsx(lusitana.className,"text-2xl opacity-60")}>
+				<Link href='/dashboard' className={clsx(lusitana.className,"text-2xl opacity-60")}>
 				    Timesheets
 				</Link>
-				<Link href={`/dashboard/employees/${id}/edit`} className={clsx(lusitana.className,"text-2xl")}>
-				    Edit Timesheets
+				<Link href={`/dashboard/${id}/edit`} className={clsx(lusitana.className,"text-2xl")}>
+				    Edit Timesheet
 				</Link>
 			</Breadcrumbs>
 			<TimesheetEditForm timesheet={timesheet} id={id}/>
