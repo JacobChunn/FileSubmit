@@ -13,6 +13,8 @@ export async function middleware(req: NextRequest) {
 
 	const userProtectedRoutes = ["/dashboard/employees"];
 
+	const unprotectedRoutes = ["", "/api/auth/signin"] // Just the landing page
+
 	const adminProtectedRoutes = ["/fakeAdminPath"];
 
 	//console.log("middleware is here");
@@ -35,20 +37,29 @@ export async function middleware(req: NextRequest) {
 
 	if (token == null) {
 		if (
-			userProtectedRoutes.includes(pathname) ||
-			adminProtectedRoutes.includes(pathname)
+			!(unprotectedRoutes.includes(pathname))
 		) {
 			return NextResponse.redirect(
-				// new URL(
-				// 	"/api/auth/signin", req.url
-				// )
-				addCallbackURL("/api/auth/signin", req.url, req.url)
+				new URL(
+					"/api/auth/signin", req.url
+				)
+				//addCallbackURL("/api/auth/signin", req.url, req.url)
 			);
 		}
 		else {
 			return NextResponse.next();
 		}
 	}
+
+	if (pathname == "") {
+		return NextResponse.redirect(
+			new URL(
+				"/dashboard", req.url
+			)
+		);
+	}
+
+	if (pathname == )
 
 	//   * Get user from token
 	const user: CustomUser["role"] = token.role;

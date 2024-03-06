@@ -5,6 +5,8 @@ import styles from '@/app/ui/home.module.css';
 import { lusitana } from './ui/fonts';
 import Image from 'next/image';
 import Logo from '@/app/EncoreLogo.jpg'
+import { signIn } from 'next-auth/react';
+import LoginButton from './ui/login/login-button';
 
 export default function Page() {
 	return (
@@ -15,12 +17,7 @@ export default function Page() {
 					<p className={`${lusitana.className} text-xl text-gray-800 md:text-3xl md:leading-normal`}>
 						<strong>Welcome to Encore.</strong>
 					</p>
-					<Link
-						href="/login"
-						className="flex items-center gap-5 self-start rounded-lg bg-blue-500 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-400 md:text-base"
-					>
-						<span>Log in</span> <ArrowRightIcon className="w-5 md:w-6" />
-					</Link>
+					<LoginButton callback={'/dashboard'}/>
 				</div>
 				<div className="flex items-center justify-center p-6 bg-gray-50">
 					{/* Add Hero Images Here */}
