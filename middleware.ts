@@ -11,20 +11,28 @@ import { input } from '@material-tailwind/react';
 
 export async function middleware(req: NextRequest) {
 
-	const userProtectedRoutes = ["/dashboard/employees"];
+	const landingPageRoute = [
+		"/", // just the landing page
+	];
 
-	const unprotectedRoutes = ["", "/api/auth/signin"] // Just the landing page
+	const unprotectedBeginningRoutes = [
+		"/favicon.ico",
+		"/_next/static",
+		"/_next/image",
+		"/api/auth"
+	];
 
 	const adminProtectedRoutes = ["/fakeAdminPath"];
 
 	//console.log("middleware is here");
 
 	const { pathname } = req.nextUrl;
+	//console.log("PATHNAME: ", pathname)
 	// console.log(req.url)
 	// console.log(pathname);
 
 	if (pathname == "/api/auth/signin") {
-		console.log("signin page!")
+		//console.log("signin page!")
 		return NextResponse.next();
 	}
 
@@ -36,9 +44,12 @@ export async function middleware(req: NextRequest) {
 	// });
 
 	if (token == null) {
+		console.log("NO TOKEN!!!!!!!")
 		if (
-			!(unprotectedRoutes.includes(pathname))
+			!(landingPageRoute.includes(pathname) ||
+			pathnameBeginsWithAny(pathname, unprotectedBeginningRoutes))
 		) {
+			//console.log("NO TOKEN BLOCKED: ", pathname);
 			return NextResponse.redirect(
 				new URL(
 					"/api/auth/signin", req.url
@@ -47,19 +58,22 @@ export async function middleware(req: NextRequest) {
 			);
 		}
 		else {
+			//console.log("NO TOKEN ALLOWED: ", pathname);
 			return NextResponse.next();
 		}
 	}
 
-	if (pathname == "") {
+	// Is signed in, and trying to access landing page
+	if (
+		landingPageRoute.includes(pathname)
+	) {
+		//console.log("IN SECOND")
 		return NextResponse.redirect(
 			new URL(
 				"/dashboard", req.url
 			)
 		);
 	}
-
-	if (pathname == )
 
 	//   * Get user from token
 	const user: CustomUser["role"] = token.role;
@@ -74,6 +88,7 @@ export async function middleware(req: NextRequest) {
 		);
 	}
 
+	//console.log("END OF CHECKS!!!")
 	return NextResponse.next();
 	//console.log(req.nextauth.token?.role);
 
@@ -90,8 +105,17 @@ export async function middleware(req: NextRequest) {
 function addCallbackURL(pathname: string, base:string, callbackURL: string) {
 	const inputURL = new URL (pathname, base);
 	inputURL.searchParams.set('callbackURL', callbackURL);
-	console.log("Callback Added: ", inputURL.toString())
+	//console.log("Callback Added: ", inputURL.toString())
 	return inputURL;
+}
+
+function pathnameBeginsWithAny(pathname: string, routeBeginnings: string[]) {
+	for (let prefix of routeBeginnings) {
+		if (pathname.startsWith(prefix)) {
+			return true;
+		}
+	}
+	return false;
 }
 
 // export const config = {
