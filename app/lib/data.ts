@@ -16,6 +16,22 @@ import { formatCurrency } from './utils';
 import { unstable_noStore as noStore } from 'next/cache';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
+export async function getTest() {
+	noStore();
+	try {
+		const data = await sql<Timesheet>`
+			SELECT weekending
+			FROM timesheets
+			WHERE id = 8;		
+		  `;
+		  console.log(data.rows[0]);
+		return Response.json(data.rows[0]);
+	} catch (error) {
+		  console.error('Database Error:', error);
+		  return Response.error();
+		}
+}
+
 export async function getEmployeeByUsername(username: string) {
   noStore();
   try {
