@@ -1,5 +1,4 @@
 import AcmeLogo from '@/app/ui/acme-logo';
-import LoginForm from '@/app/ui/login-form';
 import Logo from '@/app/EncoreLogo.jpg'
 import Image from 'next/image';
 
@@ -15,7 +14,7 @@ export default function LoginPage() {
 						className='h-full w-auto '
 					/>
 				</div>
-				<LoginForm />
+				{/* <LoginForm /> */}
 			</div>
 		</main>
 	);
