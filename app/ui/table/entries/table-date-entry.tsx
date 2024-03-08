@@ -1,6 +1,7 @@
 import { colors } from '@material-tailwind/react/types/generic'
 import { Typography } from '@/app/ui/material-tailwind-wrapper'
 import { variant } from '@material-tailwind/react/types/components/typography'
+import { DateTime } from 'luxon';
 
 export type Props<T, K extends keyof T> = {
     data?: T,
@@ -22,9 +23,9 @@ export default function TableDateEntry<T, K extends keyof T>({
 ) {
     if (!data) throw Error("Data is undefined :(");
 
-    const date = new Date(data[dataProperty] as string);
+    const dt = DateTime.fromISO(data[dataProperty] as string).setZone('utc');
 
-    console.log(date);
+    console.log(dt);
 
     return (
         <td className={rowStyles}>
@@ -33,7 +34,8 @@ export default function TableDateEntry<T, K extends keyof T>({
                     color={color}
                     className={`font-normal text-blue-gray-900 text-xs ${addonStyles}`}
                 >
-                    {`${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`}
+                    {`${dt.toLocaleString()}`}
+                    {/*`${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`*/}
                 </Typography>
         </td>
     )
