@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 //import { signIn } from '@/auth';
 //import { AuthError } from 'next-auth';
-import { EmployeeState, ProjectState } from './definitions';
+import { EmployeeState, ProjectState, TimesheetDetails } from './definitions';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../api/auth/[...nextauth]/options';
 import { fetchEmployeeByID } from './data';
@@ -346,8 +346,56 @@ export async function addTimesheet(
 }
 
 // Intended to be ran as a server helper function
-async function addTimesheetDetails() {
-
+async function addTimesheetDetails({
+  timesheetid,
+  projectid = 0,
+  phase = 0,
+  costcode = 0,
+  description = null,
+  mon = 0,
+  monot = 0,
+  tues = 0,
+  tuesot = 0,
+  wed = 0,
+  wedot = 0,
+  thurs = 0,
+  thursot = 0,
+  fri = 0,
+  friot = 0,
+  sat = 0,
+  satot = 0,
+  sun = 0,
+  sunot = 0,
+}: Omit<TimesheetDetails, 'id'>) {
+  try {
+    await sql`
+    INSERT INTO timesheetdetails (
+      timesheetid, projectid, phase, costcode, description,
+      mon, monot,
+      tues, tuesot,
+      wed, wedot,
+      thurs, thursot,
+      fri, friot,
+      sat, satot,
+      sun, sunot
+    )
+    VALUES (
+      ${timesheetid}, ${projectid}, ${phase}, ${costcode}, ${description},
+      ${mon}, ${monot},
+      ${tues}, ${tuesot},
+      ${wed}, ${wedot},
+      ${thurs}, ${thursot},
+      ${fri}, ${friot},
+      ${sat}, ${satot},
+      ${sun}, ${sunot}
+    )
+    `;
+  } catch (error) {
+    console.log(error);
+    return {
+      message: 'Database Error: Failed to Create TimesheetDetails Entry.',
+    };
+  }
 }
 
 export async function editTimesheet( // Check if user has permissions to edit

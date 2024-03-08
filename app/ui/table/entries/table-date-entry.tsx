@@ -35,7 +35,6 @@ export default function TableDateEntry<T, K extends keyof T>({
                     className={`font-normal text-blue-gray-900 text-xs ${addonStyles}`}
                 >
                     {`${dt.toLocaleString()}`}
-                    {/*`${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`*/}
                 </Typography>
         </td>
     )

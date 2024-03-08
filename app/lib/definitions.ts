@@ -193,7 +193,7 @@ export type TimesheetEditInfo = {
   totalreghours: number,
   totalovertime: number,
   message: string,
-}
+};
 
 export type TimesheetState = {
   errors?: {
@@ -213,7 +213,30 @@ export type TimesheetState = {
     message?: string[];
 	} | undefined;
 	message?: string | null;
-}
+};
+
+export type TimesheetDetails = {
+  id: number;
+  timesheetid: number;
+  projectid: number;
+  phase: number;
+  costcode: number;
+  description?: string | null;
+  mon: number;
+  monot: number;
+  tues: number;
+  tuesot: number;
+  wed: number;
+  wedot: number;
+  thurs: number;
+  thursot: number;
+  fri: number;
+  friot: number;
+  sat: number;
+  satot: number;
+  sun: number;
+  sunot: number;
+};
 
 export type TabType = {
   label: string;
