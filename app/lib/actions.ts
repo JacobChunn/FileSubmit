@@ -321,6 +321,7 @@ export async function addTimesheet(
   const processedby = null;
   const dateprocessed = null;
 
+  // Add a timesheet entry
   try {
     await sql`
     INSERT INTO timesheets (
@@ -342,6 +343,11 @@ export async function addTimesheet(
 
   revalidatePath('/dashboard');
   redirect('/dashboard');
+}
+
+// Intended to be ran as a server helper function
+async function addTimesheetDetails() {
+
 }
 
 export async function editTimesheet( // Check if user has permissions to edit
@@ -484,12 +490,12 @@ export async function editTimesheet( // Check if user has permissions to edit
   } catch (error) {
     console.log(error);
     return {
-      message: 'Database Error: Failed to Edit Employee.',
+      message: 'Database Error: Failed to Edit Timesheet.',
     };
   }
 
-  revalidatePath('/dashboard/employees');
-  redirect('/dashboard/employees');
+  revalidatePath('/dashboard');
+  redirect('/dashboard');
 }
 
 export async function editEmployee(
