@@ -493,7 +493,7 @@ export async function editTimesheet( // Check if user has permissions to edit
 }
 
 export async function editEmployee(
-  id: string,
+  id: number,
 	prevState: EmployeeState,
 	formData: FormData,
 ) {
@@ -577,7 +577,7 @@ export async function editEmployee(
 }
 
 export async function editProject(
-  id: string,
+  id: number,
 	prevState: ProjectState,
 	formData: FormData,
 ) {
