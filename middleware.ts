@@ -44,7 +44,7 @@ export async function middleware(req: NextRequest) {
 	// });
 
 	if (token == null) {
-		console.log("NO TOKEN!!!!!!!")
+		//console.log("NO TOKEN!!!!!!!")
 		if (
 			!(landingPageRoute.includes(pathname) ||
 			pathnameBeginsWithAny(pathname, unprotectedBeginningRoutes))

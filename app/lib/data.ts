@@ -16,21 +16,20 @@ import { formatCurrency } from './utils';
 import { unstable_noStore as noStore } from 'next/cache';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
-export async function getTest() {
-	noStore();
-	try {
-		const data = await sql<Timesheet>`
-			SELECT weekending
-			FROM timesheets
-			WHERE id = 8;		
-		  `;
-		  console.log(data.rows[0]);
-		return Response.json(data.rows[0]);
-	} catch (error) {
-		  console.error('Database Error:', error);
-		  return Response.error();
-		}
-}
+// export async function getTest() {
+// 	noStore();
+// 	try {
+// 		const data = await sql<Timesheet>`
+// 			SELECT weekending
+// 			FROM timesheets
+// 		  `;
+// 		  console.log(data.rows);
+// 		return Response.json(data.rows[0]);
+// 	} catch (error) {
+// 		  console.error('Database Error:', error);
+// 		  return Response.error();
+// 		}
+// }
 
 export async function getEmployeeByUsername(username: string) {
   noStore();
@@ -57,7 +56,7 @@ export async function getEmployeeByUsername(username: string) {
 export async function fetchTimesheetsByEmployeeID(id: number) {
   noStore();
   
-  console.log(id);
+  //console.log(id);
 
   if (isNaN(id)) {
     console.error('id is not a number');
@@ -74,7 +73,7 @@ export async function fetchTimesheetsByEmployeeID(id: number) {
     WHERE timesheets.employeeid = ${id};
 	  `;
 	  const dataRows = data.rows;
-    console.log(dataRows);
+    //console.log(dataRows);
 	  return Response.json(dataRows);
 	} catch (error) {
 	  console.error('Database Error:', error);

@@ -23,6 +23,9 @@ export default function TableDateEntry<T, K extends keyof T>({
     if (!data) throw Error("Data is undefined :(");
 
     const date = new Date(data[dataProperty] as string);
+
+    console.log(date);
+
     return (
         <td className={rowStyles}>
             <Typography
@@ -30,7 +33,7 @@ export default function TableDateEntry<T, K extends keyof T>({
                     color={color}
                     className={`font-normal text-blue-gray-900 text-xs ${addonStyles}`}
                 >
-                    {`${date.getMonth()}/${date.getDay()}/${date.getFullYear()}`}
+                    {`${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`}
                 </Typography>
         </td>
     )
