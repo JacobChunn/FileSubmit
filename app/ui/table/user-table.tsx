@@ -40,10 +40,11 @@ export default function UserTable<T>({
 				addText={addText}
 			/>
 			<TableBody
-				children={children}
 				TABLE_HEAD={TABLE_HEAD}
 				dataPromise={dataPromise}
-			/>
+			>
+				{children}
+			</TableBody>
 		</Card>
 	);
 }

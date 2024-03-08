@@ -57,11 +57,12 @@ export default function ListTable<T>({
 				setTabValue={setTabValue}
 			/>
 			<TableBody
-				children={children}
 				TABLE_HEAD={TABLE_HEAD}
 				dataPromise={dataPromise}
 				filter={tabFilter}
-			/>
+			>
+				{children}
+			</TableBody>
 		</Card>
 	);
 }
