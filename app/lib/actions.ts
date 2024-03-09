@@ -323,7 +323,7 @@ export async function addTimesheet(
 
   // Add a timesheet entry
   try {
-    await sql`
+    const timesheetIDData = await sql`
     INSERT INTO timesheets (
       employeeid, weekending, processed, mgrapproved, usercommitted, totalreghours,
       totalovertime, approvedby, submittedby, processedby, dateprocessed, message
@@ -332,8 +332,20 @@ export async function addTimesheet(
       ${employeeid}, ${weekending.toLocaleDateString('en-us')}, ${processed ? 1 : 0},
       ${mgrapproved ? 1 : 0}, ${usercommitted ? 1 : 0}, ${totalreghours}, ${totalovertime},
       ${approvedby}, ${submittedby}, ${processedby}, ${dateprocessed}, ${message}
-    )	  
+    )
+	RETURNING id;
     `;
+	
+	const timesheetID: number = timesheetIDData.rows[0].id;
+
+	const addSuccess = await addTimesheetDetails({timesheetid: timesheetID});
+	
+	if(!addSuccess) {
+		return {
+			message: 'Database Error: Failed to Create TimesheetDetails.',
+		};
+	}
+
   } catch (error) {
     console.log(error);
     return {
@@ -352,21 +364,21 @@ async function addTimesheetDetails({
   phase = 0,
   costcode = 0,
   description = null,
-  mon = 0,
-  monot = 0,
-  tues = 0,
-  tuesot = 0,
-  wed = 0,
-  wedot = 0,
-  thurs = 0,
-  thursot = 0,
-  fri = 0,
-  friot = 0,
-  sat = 0,
-  satot = 0,
-  sun = 0,
-  sunot = 0,
-}: Omit<TimesheetDetails, 'id'>) {
+  mon = 0, monot = 0, tues = 0, tuesot = 0,
+  wed = 0, wedot = 0, thurs = 0, thursot = 0,
+  fri = 0, friot = 0, sat = 0, satot = 0,
+  sun = 0, sunot = 0,
+}: {
+    timesheetid: number,
+    projectid?: number,
+    phase?: number,
+    costcode?: number,
+    description?: string | null,
+    mon?: number, monot?: number, tues?: number, tuesot?: number,
+    wed?: number, wedot?: number, thurs?: number, thursot?: number,
+    fri?: number, friot?: number, sat?: number, satot?: number,
+    sun?: number, sunot?: number,
+}) {
   try {
     await sql`
     INSERT INTO timesheetdetails (
@@ -392,10 +404,9 @@ async function addTimesheetDetails({
     `;
   } catch (error) {
     console.log(error);
-    return {
-      message: 'Database Error: Failed to Create TimesheetDetails Entry.',
-    };
+    return false;
   }
+  return true;
 }
 
 export async function editTimesheet( // Check if user has permissions to edit
@@ -724,12 +735,19 @@ export async function deleteTimesheet(
   const sessionEmployeeid = Number(session.user.id);
 
   // Get database data
-  const DBtimesheetData = await sql`
-    SELECT 
-      employeeid
-    FROM timesheets
-    WHERE timesheets.id = ${id};
-  `;
+  var DBtimesheetData;
+  try {
+	DBtimesheetData = await sql`
+		SELECT 
+		employeeid
+		FROM timesheets
+		WHERE timesheets.id = ${id};
+	`;
+  } catch (error) {
+	return {
+		message: 'Database Error: Failed to get Timesheet Data.',
+	};
+}
 
   if (!(DBtimesheetData && DBtimesheetData.rowCount > 0)) {
     console.log("Timesheet of ID was not found!");
@@ -740,7 +758,7 @@ export async function deleteTimesheet(
 
   const DBdata = DBtimesheetData.rows[0];
 
-  // Validate the user is trying to edit their own timesheet
+  // Validate the user is trying to delete their own timesheet
   const DBemployeeid = DBdata.employeeid;
 
   if (Number(DBemployeeid) != sessionEmployeeid) {
@@ -748,6 +766,15 @@ export async function deleteTimesheet(
     return {
       message: 'Session user id did not match with associated timesheet!',
     };
+  }
+
+  try {
+	const deleteSuccess = await deleteTimesheetDetailsOfTimesheet(id);
+  } catch(error) {
+	console.log(error);
+	return {
+		message: 'Database Error: Failed to Delete TimesheetDetails.',
+	  };
   }
 
   try {
@@ -764,6 +791,18 @@ export async function deleteTimesheet(
 
   revalidatePath('/dashboard');
   redirect('/dashboard');
+}
+
+async function deleteTimesheetDetailsOfTimesheet(timesheetid: number) {
+	try {
+		await sql`
+			DELETE FROM timesheetdetails WHERE timesheetid = ${timesheetid};
+		`;
+	} catch(error) {
+		console.log(error);
+		return false;
+	}
+	return true;
 }
 
 export async function createInvoice(prevState: InvoiceState, formData: FormData) {
