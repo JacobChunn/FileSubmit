@@ -11,6 +11,7 @@ import {
   Project,
   Timesheet,
   TimesheetEditInfo,
+  TimesheetDetails,
 } from './definitions';
 import { formatCurrency } from './utils';
 import { unstable_noStore as noStore } from 'next/cache';
@@ -82,20 +83,67 @@ export async function fetchTimesheetsByEmployeeID(id: number) {
 }
 
 export async function fetchTimesheetEditByID(id: number) {
-  noStore();
+	noStore();
+
 	try {
-	  const data = await sql<TimesheetEditInfo>`
-		SELECT
-		  weekending, usercommitted, totalreghours,
-      totalovertime, message
-		FROM timesheets
-    WHERE timesheets.id = ${id}
-	  `;
-	  const resData = data.rows[0];
-	  return Response.json(resData);
+		const data = await sql<TimesheetEditInfo>`
+			SELECT
+				weekending, usercommitted, totalreghours,
+				totalovertime, message
+			FROM timesheets
+			WHERE timesheets.id = ${id}
+		`;
+		const resData = data.rows[0];
+		return Response.json(resData);
 	} catch (error) {
-	  console.error('Database Error:', error);
-	  return Response.error();
+		console.error('Database Error:', error);
+		return Response.error();
+	}
+}
+
+export async function fetchTimesheetDetailsByTimesheetID(id: number) {
+    noStore();
+    try {
+        const data = await sql<TimesheetDetails>`
+            SELECT
+                id, timesheetid, projectid,
+                phase, costcode, description,
+                mon, monot,
+                tues, tuesot,
+                wed, wedot,
+                thurs, thursot,
+                fri, friot,
+                sat, satot,
+                sun, sunot,
+				lasteditdate
+            FROM timesheetdetails
+            WHERE timesheetdetails.timesheetid = ${id}
+        `;
+        const resData = data.rows[0];
+        return Response.json(resData);
+    } catch (error) {
+        console.error('Database Error:', error);
+        return Response.error();
+    }
+}
+
+
+export async function checkTimesheetOwnership(employeeid: number, timesheetid: number) {
+	noStore();
+
+	try {
+		const data = await sql<{owns: boolean}>`
+			SELECT EXISTS (
+				SELECT 1
+				FROM timesheetdetails
+				WHERE timesheetid = ${timesheetid} AND employeeid = ${employeeid}
+			) AS owns;
+		`;
+		const resData = data.rows[0].owns;
+		return Response.json(resData);
+	} catch (error) {
+		console.error('Database Error:', error);
+		return Response.error();
 	}
 }
 

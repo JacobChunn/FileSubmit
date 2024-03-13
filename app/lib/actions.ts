@@ -6,11 +6,12 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 //import { signIn } from '@/auth';
 //import { AuthError } from 'next-auth';
-import { EmployeeState, ProjectState, TimesheetDetails } from './definitions';
+import { EmployeeState, ProjectState } from './definitions';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../api/auth/[...nextauth]/options';
 import { fetchEmployeeByID } from './data';
 import * as bcrypt from 'bcrypt';
+import { DateTime } from 'luxon';
  
 const FormSchema = z.object({
   id: z.string(),
@@ -338,7 +339,10 @@ export async function addTimesheet(
 	
 	const timesheetID: number = timesheetIDData.rows[0].id;
 
-	const addSuccess = await addTimesheetDetails({timesheetid: timesheetID});
+	const addSuccess = await addTimesheetDetails({
+		timesheetid: timesheetID,
+		employeeid: employeeid,
+	});
 	
 	if(!addSuccess) {
 		return {
@@ -360,6 +364,7 @@ export async function addTimesheet(
 // Intended to be ran as a server helper function
 async function addTimesheetDetails({
   timesheetid,
+  employeeid,
   projectid = 0,
   phase = 0,
   costcode = 0,
@@ -370,6 +375,7 @@ async function addTimesheetDetails({
   sun = 0, sunot = 0,
 }: {
     timesheetid: number,
+	employeeid: number,
     projectid?: number,
     phase?: number,
     costcode?: number,
@@ -379,27 +385,34 @@ async function addTimesheetDetails({
     fri?: number, friot?: number, sat?: number, satot?: number,
     sun?: number, sunot?: number,
 }) {
+	// Get last edit date
+	const currentDate = DateTime.now().setZone('utc').toISO();
+
   try {
     await sql`
     INSERT INTO timesheetdetails (
-      timesheetid, projectid, phase, costcode, description,
+      timesheetid, employeeid, projectid,
+	  phase, costcode, description,
       mon, monot,
       tues, tuesot,
       wed, wedot,
       thurs, thursot,
       fri, friot,
       sat, satot,
-      sun, sunot
+      sun, sunot,
+	  lasteditdate
     )
     VALUES (
-      ${timesheetid}, ${projectid}, ${phase}, ${costcode}, ${description},
+      ${timesheetid}, ${employeeid}, ${projectid},
+	  ${phase}, ${costcode}, ${description},
       ${mon}, ${monot},
       ${tues}, ${tuesot},
       ${wed}, ${wedot},
       ${thurs}, ${thursot},
       ${fri}, ${friot},
       ${sat}, ${satot},
-      ${sun}, ${sunot}
+      ${sun}, ${sunot},
+	  ${currentDate}
     )
     `;
   } catch (error) {
@@ -769,15 +782,8 @@ export async function deleteTimesheet(
   }
 
   try {
-	const deleteSuccess = await deleteTimesheetDetailsOfTimesheet(id);
-  } catch(error) {
-	console.log(error);
-	return {
-		message: 'Database Error: Failed to Delete TimesheetDetails.',
-	  };
-  }
+	await deleteTimesheetDetailsByTimesheet(id);
 
-  try {
     await sql`
       DELETE FROM timesheets
       WHERE id = ${id}; 
@@ -793,16 +799,15 @@ export async function deleteTimesheet(
   redirect('/dashboard');
 }
 
-async function deleteTimesheetDetailsOfTimesheet(timesheetid: number) {
+async function deleteTimesheetDetailsByTimesheet(timesheetid: number) {
 	try {
 		await sql`
 			DELETE FROM timesheetdetails WHERE timesheetid = ${timesheetid};
 		`;
 	} catch(error) {
 		console.log(error);
-		return false;
+		return;
 	}
-	return true;
 }
 
 export async function createInvoice(prevState: InvoiceState, formData: FormData) {

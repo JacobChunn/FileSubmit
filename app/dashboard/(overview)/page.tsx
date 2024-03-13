@@ -12,7 +12,6 @@ import CardWrapper from '@/app/ui/dashboard/cards';
 import { Metadata } from 'next';
 import TimesheetTable from '@/app/ui/dashboard/user-tables/timesheet-table';
 import { fetchTimesheetsByEmployeeID } from '@/app/lib/data';
-import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/options';

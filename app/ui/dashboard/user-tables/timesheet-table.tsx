@@ -11,6 +11,7 @@ import ListTable from "@/app/ui/table/list-table";
 import UserTable from "../../table/user-table";
 import TableDateEntry from "../../table/entries/table-date-entry";
 import TableDeleteEntry from "../../table/entries/table-delete-entry";
+import TableArgumentEntry from "../../table/entries/table-argument-entry";
 
 export default function TimesheetTable({
 	timesheetPromise,
@@ -20,7 +21,7 @@ export default function TimesheetTable({
     // Define table headers
 	const TABLE_HEAD = [
 		"ID", "Employee ID", "End Date", "Signed", "Approved", "Processed",
-		"submittedby", "Reg", "OT", "Total", "Edit", "Delete",
+		"Signed by", "Reg", "OT", "Total", "Edit", "Delete", "Edit Details",
 	] as const;
 
     return (
@@ -79,11 +80,11 @@ export default function TimesheetTable({
 			/>
 
 			{/* Total */}
-			{/* <TableTextEntry<Timesheet, keyof Timesheet>
-				dataProperty={''}
-			/> */}
+			<TableArgumentEntry
+				arg="INSERT_TOTAL"
+			/>
 
-			{/* Edit */}
+			{/* Edit Timesheet*/}
 			<TableEditEntry<Timesheet, keyof Timesheet>
 				dataProperty={'id'}
 				hrefBeforeID="/dashboard/"
@@ -96,6 +97,14 @@ export default function TimesheetTable({
 				hrefBeforeID="/dashboard/"
 				hrefAfterID="/delete"				
 			/>
+
+			{/* Edit Details */}
+			<TableEditEntry<Timesheet, keyof Timesheet>
+				dataProperty={'id'}
+				hrefBeforeID="/dashboard/"
+				hrefAfterID="/edit/details"				
+			/>
+
 
         </UserTable>
     )

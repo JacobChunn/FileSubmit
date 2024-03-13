@@ -2,27 +2,22 @@ import { colors } from '@material-tailwind/react/types/generic'
 import { Typography } from '@/app/ui/material-tailwind-wrapper'
 import { variant } from '@material-tailwind/react/types/components/typography'
 
-export type Props<T, K extends keyof T> = {
-    data?: T,
-    dataProperty: K,
+export type Props = {
+	arg: string | number,
     rowStyles?: string,
     variant?: variant,
     color?: colors,
     addonStyles?: string,
 }
 
-export default function TableTextEntry<T, K extends keyof T>({
-    data,
-    dataProperty,
+export default function TableArgumentEntry({
+	arg,
     rowStyles,
     variant="small",
     color="blue-gray",
     addonStyles
-}: Props<T, K>
+}: Props
 ) {
-    if (!data) throw Error("Data is undefined :(");
-
-    const text = data[dataProperty] as string;
     return (
         <td className={rowStyles}>
             <Typography
@@ -30,7 +25,7 @@ export default function TableTextEntry<T, K extends keyof T>({
 				color={color}
 				className={`font-normal text-blue-gray-900 text-xs ${addonStyles}`}
             >
-                {text}
+                {arg}
             </Typography>
         </td>
     )

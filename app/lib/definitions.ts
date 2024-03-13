@@ -236,6 +236,7 @@ export type TimesheetDetails = {
   satot: number;
   sun: number;
   sunot: number;
+  lasteditdate: string;
 };
 
 export type TabType = {

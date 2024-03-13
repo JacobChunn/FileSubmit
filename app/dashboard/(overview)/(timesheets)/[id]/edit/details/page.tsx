@@ -1,12 +1,12 @@
 import { Breadcrumbs } from '@/app/ui/material-tailwind-wrapper';
-import { fetchTimesheetEditByID } from '@/app/lib/data';
-import { notFound } from 'next/navigation';
+import { checkTimesheetOwnership, fetchTimesheetDetailsByTimesheetID } from '@/app/lib/data';
+import { notFound, redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import clsx from 'clsx';
 import { lusitana } from '@/app/ui/fonts';
-import TimesheetEditForm from '@/app/ui/dashboard/timesheets/edit/edit-form';
-import { TimesheetEditInfo } from '@/app/lib/definitions';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/options';
 
 export const metadata: Metadata = {
   title: 'Edit Timesheet',
@@ -17,14 +17,29 @@ export default async function Page({ params }: { params: { id: any } }) {
     if (typeof id !== 'number') {
         notFound();
     }
+	
+	const session = await getServerSession(authOptions);
+	
+	if (!session) {
+		redirect('/api/auth/signin');
+		return (
+		  <div>Denied</div>
+		)
+	}
 
-    // const timesheetRes = await fetchTimesheetEditByID(id);
+	const employeeID = Number(session.user.id);
+	const timesheetID = Number(id);
 
-    // if (!timesheetRes.ok) {
-    //     notFound();
-    // }
+	const ownershipRes = await checkTimesheetOwnership(employeeID, timesheetID);
+	if (!ownershipRes.ok) { notFound(); }
 
-    // const timesheet: TimesheetEditInfo  = await timesheetRes.json();
+	const ownership = await ownershipRes.json();
+	if (!ownership) { notFound(); }
+
+    const timesheetDetailsRes = await fetchTimesheetDetailsByTimesheetID(id);
+	if (!timesheetDetailsRes.ok) { notFound(); }
+
+
 
 
     return (
@@ -33,7 +48,7 @@ export default async function Page({ params }: { params: { id: any } }) {
 				<Link href='/dashboard' className={clsx(lusitana.className,"text-2xl opacity-60")}>
 				    Timesheets
 				</Link>
-				<Link href={`/dashboard/${id}/edit`} className={clsx(lusitana.className,"text-2xl")}>
+				<Link href={`/dashboard/${id}/edit`} className={clsx(lusitana.className,"text-2xl opacity-60")}>
 				    Edit Timesheet
 				</Link>
 				<Link href={`/dashboard/${id}/edit/details`} className={clsx(lusitana.className,"text-2xl")}>
