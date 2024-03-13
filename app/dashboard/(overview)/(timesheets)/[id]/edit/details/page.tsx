@@ -7,14 +7,15 @@ import clsx from 'clsx';
 import { lusitana } from '@/app/ui/fonts';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/options';
+import TimesheetDetailsEditForm from '@/app/ui/dashboard/timesheets/edit/details/details-edit-form';
 
 export const metadata: Metadata = {
   title: 'Edit Timesheet',
 };
 
 export default async function Page({ params }: { params: { id: any } }) {
-    const id = Number(params.id);
-    if (typeof id !== 'number') {
+    const timesheetID = Number(params.id);
+    if (typeof timesheetID !== 'number') {
         notFound();
     }
 	
@@ -28,7 +29,6 @@ export default async function Page({ params }: { params: { id: any } }) {
 	}
 
 	const employeeID = Number(session.user.id);
-	const timesheetID = Number(id);
 
 	const ownershipRes = await checkTimesheetOwnership(employeeID, timesheetID);
 	if (!ownershipRes.ok) { notFound(); }
@@ -36,9 +36,11 @@ export default async function Page({ params }: { params: { id: any } }) {
 	const ownership = await ownershipRes.json();
 	if (!ownership) { notFound(); }
 
-    const timesheetDetailsRes = await fetchTimesheetDetailsByTimesheetID(id);
+    const timesheetDetailsRes = await fetchTimesheetDetailsByTimesheetID(timesheetID);
 	if (!timesheetDetailsRes.ok) { notFound(); }
 
+	const timesheetDetails = await timesheetDetailsRes.json();
+	if (!timesheetDetails.ok) { notFound(); }
 
 
 
@@ -48,14 +50,14 @@ export default async function Page({ params }: { params: { id: any } }) {
 				<Link href='/dashboard' className={clsx(lusitana.className,"text-2xl opacity-60")}>
 				    Timesheets
 				</Link>
-				<Link href={`/dashboard/${id}/edit`} className={clsx(lusitana.className,"text-2xl opacity-60")}>
+				<Link href={`/dashboard/${timesheetID}/edit`} className={clsx(lusitana.className,"text-2xl opacity-60")}>
 				    Edit Timesheet
 				</Link>
-				<Link href={`/dashboard/${id}/edit/details`} className={clsx(lusitana.className,"text-2xl")}>
+				<Link href={`/dashboard/${timesheetID}/edit/details`} className={clsx(lusitana.className,"text-2xl")}>
 				    Edit Timesheet Details
 				</Link>
 			</Breadcrumbs>
-			{/* <TimesheetEditForm timesheet={timesheet} id={id}/> */}
+			<TimesheetDetailsEditForm timesheetDetails={timesheetDetails} timesheetID={timesheetID}/>
         </main>
     );
 }

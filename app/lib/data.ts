@@ -106,7 +106,7 @@ export async function fetchTimesheetDetailsByTimesheetID(id: number) {
     try {
         const data = await sql<TimesheetDetails>`
             SELECT
-                id, timesheetid, projectid,
+                id, timesheetid, employeeid, projectid,
                 phase, costcode, description,
                 mon, monot,
                 tues, tuesot,
@@ -119,7 +119,7 @@ export async function fetchTimesheetDetailsByTimesheetID(id: number) {
             FROM timesheetdetails
             WHERE timesheetdetails.timesheetid = ${id}
         `;
-        const resData = data.rows[0];
+        const resData = data.rows;
         return Response.json(resData);
     } catch (error) {
         console.error('Database Error:', error);

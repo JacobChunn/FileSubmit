@@ -107,6 +107,32 @@ const EditTimesheet = TimesheetSchema.pick({
 })
 const DeleteTimesheet = TimesheetSchema.pick({ id: true })
 
+const TimesheetDetailsSchema = z.object({
+  id: z.coerce.number(),
+  timesheetid: z.coerce.number(),
+  employeeid: z.coerce.number(),
+  projectid: z.coerce.number(),
+  phase: z.coerce.number(),
+  costcode: z.coerce.number(),
+  description: z.string().max(128),
+  mon: z.coerce.number().min(0.0),
+  tues: z.coerce.number().min(0.0),
+  tuesot: z.coerce.number().min(0.0),
+  wed: z.coerce.number().min(0.0),
+  wedot: z.coerce.number().min(0.0),
+  thurs: z.coerce.number().min(0.0),
+  thursot: z.coerce.number().min(0.0),
+  fri: z.coerce.number().min(0.0),
+  friot: z.coerce.number().min(0.0),
+  sat: z.coerce.number().min(0.0),
+  satot: z.coerce.number().min(0.0),
+  sun: z.coerce.number().min(0.0),
+  sunot: z.coerce.number().min(0.0),
+  lasteditdate: z.coerce.date(),
+});
+
+const EditTimesheetDetails = z.array(TimesheetDetailsSchema.omit({employeeid: true}));
+
 export type InvoiceState = {
     errors?: {
       customerId?: string[];
@@ -420,6 +446,19 @@ async function addTimesheetDetails({
     return false;
   }
   return true;
+}
+
+export async function editTimesheetDetails(
+  timesheetID: number,
+  prevState: never,
+  formData: FormData
+) {
+
+
+
+  const validatedFields = EditTimesheetDetails.safeParse({
+    id: 
+  })
 }
 
 export async function editTimesheet( // Check if user has permissions to edit
