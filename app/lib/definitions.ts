@@ -264,6 +264,50 @@ export type TimesheetDetailsEditInfo = {
   lasteditdate: string;
 };
 
+export const timesheetDetailsLabels = {
+  project: "Project",
+  phase: "Phase",
+  costcode: "Cost Code",
+  description: "Description",
+  mon: "Mon",
+  monot: "MonOT",
+  tues: "Tues",
+  tuesot: "TuesOT",
+  wed: "Wed",
+  wedot: "WedOT",
+  thurs: "Thurs",
+  thursot: "ThursOT",
+  fri: "Fri",
+  friot: "FriOT",
+  sat: "Sat",
+  satot: "SatOT",
+  sun: "Sun",
+  sunot: "SunOT",
+}
+
+export type ProjectOption = {
+  id: number,
+  number: string,
+  shortname: string,
+  description: string,
+}
+
+export type PhaseOption = {
+  id: number,
+  description: string,
+}
+
+export type CostCodeOption = {
+  id: number,
+  description: string,
+}
+
+export type Options = {
+  projects: ProjectOption[]
+  phases: PhaseOption[]
+  costcodes: CostCodeOption[]
+}
+
 export type TabType = {
   label: string;
   value: string;

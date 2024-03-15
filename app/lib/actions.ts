@@ -131,7 +131,8 @@ const TimesheetDetailsSchema = z.object({
   lasteditdate: z.coerce.date(),
 });
 
-const EditTimesheetDetails = z.array(TimesheetDetailsSchema.omit({employeeid: true}));
+//const EditTimesheetDetails = z.array(TimesheetDetailsSchema.omit({employeeid: true}));
+const EditTimesheetDetails = TimesheetDetailsSchema.omit({employeeid: true});
 
 export type InvoiceState = {
     errors?: {
@@ -454,11 +455,17 @@ export async function editTimesheetDetails(
   formData: FormData
 ) {
 
+  console.log(formData);
 
+  formData.forEach((val, name) => {
+    console.log(name, val);
+  })
 
-//   const validatedFields = EditTimesheetDetails.safeParse({
-//     id: 
-//   })
+  // const validatedFields = EditTimesheetDetails.safeParse({
+  //   id: formData.f
+  // })
+
+  // console.log(validatedFields)
 }
 
 export async function editTimesheet( // Check if user has permissions to edit
