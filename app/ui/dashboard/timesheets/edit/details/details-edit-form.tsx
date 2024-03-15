@@ -50,13 +50,14 @@ export default function TimesheetDetailsEditForm({
     const selectTagElements = document.getElementsByTagName("select");
     console.log(selectTagElements);
 
-//     const selectElement = document.getElementById('mySelect');
-
-// selectElement.addEventListener('change', function(event) {
-//   const selectedOption = event.target.selectedOptions[0];
-//   const shortenedLabel = selectedOption.getAttribute('data-shortened');
-//   selectedOption.textContent = shortenedLabel;
-// });
+    for (let element of selectTagElements) {
+        element.addEventListener('change', function(event) {
+            if (!event.target) return;
+            const selectedOption = event.target.selectedOptions[0];
+            const shortenedLabel = selectedOption.getAttribute('data-shortened');
+            selectedOption.textContent = shortenedLabel;
+            });
+    }
 
     return (
         <form action={dispatch}>
