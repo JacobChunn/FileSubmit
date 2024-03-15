@@ -450,15 +450,15 @@ async function addTimesheetDetails({
 
 export async function editTimesheetDetails(
   timesheetID: number,
-  prevState: never,
+  prevState: any,
   formData: FormData
 ) {
 
 
 
-  const validatedFields = EditTimesheetDetails.safeParse({
-    id: 
-  })
+//   const validatedFields = EditTimesheetDetails.safeParse({
+//     id: 
+//   })
 }
 
 export async function editTimesheet( // Check if user has permissions to edit

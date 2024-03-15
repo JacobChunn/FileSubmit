@@ -1,6 +1,6 @@
 'use client';
 
-import { editTimesheet } from '@/app/lib/actions';
+import { editTimesheetDetails } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
 import { TimesheetDetailsEditInfo } from '@/app/lib/definitions';
 import FormTextEntry from '@/app/ui/forms/edit-form/form-entry';
@@ -10,7 +10,8 @@ import FormSubmitButton from '@/app/ui/forms/form-submit-button';
 
 export default function TimesheetDetailsEditForm({ timesheetDetails, timesheetID }: { timesheetDetails: TimesheetDetailsEditInfo[], timesheetID: number}) {
     const initialState = { message: null, errors: {} };
-    const [state, dispatch] = useFormState(editTimesheetDetails, initialState);
+	const editTimesheetDetailsWithID = editTimesheetDetails.bind(null, timesheetID);
+    const [state, dispatch] = useFormState(editTimesheetDetailsWithID, initialState);
 
     return (
         <form action={dispatch}>
