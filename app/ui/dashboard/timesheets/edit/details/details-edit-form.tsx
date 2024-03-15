@@ -22,22 +22,41 @@ export default function TimesheetDetailsEditForm({
 	const editTimesheetDetailsWithID = editTimesheetDetails.bind(null, timesheetID);
     const [state, dispatch] = useFormState(editTimesheetDetailsWithID, initialState);
 
-    console.log("TSD ", timesheetDetails);
-
     const { 
         project, phase, costcode, description, mon, monot, 
         tues, tuesot, wed, wedot, thurs, thursot, 
         fri, friot, sat, satot, sun, sunot 
     } = timesheetDetailsLabels;
 
-    const projectOptions = () => {
-        const projects = options.projects;
+    const {projects, phases, costcodes} = options;
 
-        //FINISH THIS------------------------------------------------------------------------------------------
-        return projects.map((val, index) => (
-            <option></option>
-        ));
-    };
+    // Change the label to shortname after selected
+    const projectOptions = projects.map((val, index) => (
+        <option value={val.id} key={"key-" + val.id + "-" + index} data-shortened={val.number + ":" + val.shortname}>
+            {val.number + ":" + val.description}
+        </option>
+    ));
+
+    // Add description to label when dropdown is selected
+    const phaseOptions = phases.map((val, index) => (
+        <option value={val.id} key={"key-" + val.id + "-" + index}>{val.id}</option>
+    ));
+
+    // Add description to label when dropdown is selected
+    const costCodeOptions = costcodes.map((val, index) => (
+        <option value={val.id} key={"key-" + val.id + "-" + index}>{val.id}</option>
+    ));
+
+    const selectTagElements = document.getElementsByTagName("select");
+    console.log(selectTagElements);
+
+//     const selectElement = document.getElementById('mySelect');
+
+// selectElement.addEventListener('change', function(event) {
+//   const selectedOption = event.target.selectedOptions[0];
+//   const shortenedLabel = selectedOption.getAttribute('data-shortened');
+//   selectedOption.textContent = shortenedLabel;
+// });
 
     return (
         <form action={dispatch}>
@@ -49,18 +68,22 @@ export default function TimesheetDetailsEditForm({
                         key={project + index}
                         name={project + index}
                     >
-                        
+                        {projectOptions}
                     </select>
-                    <input
+                    <select
                         id={phase + index}
                         key={phase + index}
                         name={phase + index}
-                    />
-                    <input
+                    >
+                        {phaseOptions}
+                    </select>
+                    <select
                         id={costcode + index}
                         key={costcode + index}
                         name={costcode + index}
-                    />
+                    >
+                        {costCodeOptions}
+                    </select>
                     <input
                         id={description + index}
                         key={description + index}
