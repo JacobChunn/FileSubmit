@@ -8,6 +8,8 @@ import FormBoolEntry from '@/app/ui/forms/edit-form/form-bool-entry';
 import FormErrorHandling from '@/app/ui/forms/form-error-handling';
 import FormSubmitButton from '@/app/ui/forms/form-submit-button';
 import { getServerSession } from 'next-auth';
+import { useEffect } from 'react';
+import SelectWithDescription from '@/app/ui/forms/general-helper-components/select-w-description';
 
 export default function TimesheetDetailsEditForm({
     timesheetDetails,
@@ -47,44 +49,41 @@ export default function TimesheetDetailsEditForm({
         <option value={val.id} key={"key-" + val.id + "-" + index}>{val.id}</option>
     ));
 
-    const selectTagElements = document.getElementsByTagName("select");
-    console.log(selectTagElements);
+    // const selectTagElements = document.getElementsByTagName("select");
+    //console.log(selectTagElements);
 
-    for (let element of selectTagElements) {
-        element.addEventListener('change', function(event) {
-            if (!event.target) return;
-            const selectedOption = event.target.selectedOptions[0];
-            const shortenedLabel = selectedOption.getAttribute('data-shortened');
-            selectedOption.textContent = shortenedLabel;
-            });
-    }
+	// useEffect(() => {
+	// 	for (let element of selectTagElements) {
+	// 		element.addEventListener('change', function(event) {
+	// 			console.log("here")
+	// 			//const selectedOption = event.target.selectedOptions[0];
+	// 			const selectedOption = element.options[element.selectedIndex];
+	// 			const shortenedLabel = selectedOption.getAttribute('data-shortened');
+	// 			selectedOption.textContent = shortenedLabel;
+	// 		});
+	// 	}
+	// })
 
     return (
         <form action={dispatch}>
 
             {timesheetDetails.map((val, index) => (
                 <div key={"k-" + index}>
-                    <select
-                        id={project + index}
-                        key={project + index}
-                        name={project + index}
+                    <SelectWithDescription
+                        info={project + index}
                     >
                         {projectOptions}
-                    </select>
-                    <select
-                        id={phase + index}
-                        key={phase + index}
-                        name={phase + index}
+                    </SelectWithDescription>
+                    <SelectWithDescription
+                        info={phase + index}
                     >
                         {phaseOptions}
-                    </select>
-                    <select
-                        id={costcode + index}
-                        key={costcode + index}
-                        name={costcode + index}
+                    </SelectWithDescription>
+                    <SelectWithDescription
+                        info={costcode + index}
                     >
                         {costCodeOptions}
-                    </select>
+                    </SelectWithDescription>
                     <input
                         id={description + index}
                         key={description + index}
