@@ -9,7 +9,7 @@ import FormErrorHandling from '@/app/ui/forms/form-error-handling';
 import FormSubmitButton from '@/app/ui/forms/form-submit-button';
 import { getServerSession } from 'next-auth';
 import { useEffect } from 'react';
-import SelectWithDescription from '@/app/ui/forms/general-helper-components/select-w-description';
+import SelectWithFocusControl from '@/app/ui/forms/general-helper-components/select-w-description';
 
 export default function TimesheetDetailsEditForm({
     timesheetDetails,
@@ -32,58 +32,59 @@ export default function TimesheetDetailsEditForm({
 
     const {projects, phases, costcodes} = options;
 
-    // Change the label to shortname after selected
+    // Changes to focused version after focused
     const projectOptions = projects.map((val, index) => (
-        <option value={val.id} key={"key-" + val.id + "-" + index} data-shortened={val.number + ":" + val.shortname}>
-            {val.number + ":" + val.description}
-        </option>
+        <option
+			value={val.id}
+			key={"key-" + val.id + "-" + index}
+			unfocused-label={val.number + ":" + val.shortname}
+		>
+			{val.number + ":" + val.description}
+		</option>
     ));
 
-    // Add description to label when dropdown is selected
+    // Changes to focused version after focused
     const phaseOptions = phases.map((val, index) => (
-        <option value={val.id} key={"key-" + val.id + "-" + index}>{val.id}</option>
+        <option 
+			value={val.id}
+			key={"key-" + val.id + "-" + index}
+			unfocused-label={val.id}
+		>
+			{val.id + ": " + val.description}
+		</option>
     ));
 
-    // Add description to label when dropdown is selected
+    // Changes to focused version after focused
     const costCodeOptions = costcodes.map((val, index) => (
-        <option value={val.id} key={"key-" + val.id + "-" + index}>{val.id}</option>
+        <option
+			value={val.id}
+			key={"key-" + val.id + "-" + index}
+			unfocused-label={val.id}
+		>
+			{val.id + ": " + val.description}
+		</option>
     ));
-
-    // const selectTagElements = document.getElementsByTagName("select");
-    //console.log(selectTagElements);
-
-	// useEffect(() => {
-	// 	for (let element of selectTagElements) {
-	// 		element.addEventListener('change', function(event) {
-	// 			console.log("here")
-	// 			//const selectedOption = event.target.selectedOptions[0];
-	// 			const selectedOption = element.options[element.selectedIndex];
-	// 			const shortenedLabel = selectedOption.getAttribute('data-shortened');
-	// 			selectedOption.textContent = shortenedLabel;
-	// 		});
-	// 	}
-	// })
 
     return (
         <form action={dispatch}>
 
             {timesheetDetails.map((val, index) => (
                 <div key={"k-" + index}>
-                    <SelectWithDescription
+                    <SelectWithFocusControl
                         info={project + index}
                     >
                         {projectOptions}
-                    </SelectWithDescription>
-                    <SelectWithDescription
+                    </SelectWithFocusControl>
+                    <SelectWithFocusControl
                         info={phase + index}
                     >
                         {phaseOptions}
-                    </SelectWithDescription>
-                    <SelectWithDescription
+                    </SelectWithFocusControl>
+                    <SelectWithFocusControl
                         info={costcode + index}
                     >
                         {costCodeOptions}
-                    </SelectWithDescription>
+                    </SelectWithFocusControl>
                     <input
                         id={description + index}
                         key={description + index}
