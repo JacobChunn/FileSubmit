@@ -12,6 +12,8 @@ export default function SelectWithFocusControl({
 	children
 }: SelectWithFocusControl) {
 	const focusedInfoRef = useRef<string | null>(null);
+	const isLoadedRef = useRef<boolean>(false);
+	const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
 	const saveFocusedContent = (data: string) => {
 		focusedInfoRef.current = data;
@@ -47,6 +49,7 @@ export default function SelectWithFocusControl({
 	}
 
 	useEffect(() => {
+		console.log("here")
 		const element = document.getElementById(info) as HTMLSelectElement;
 		if (!element) return;
 
@@ -62,16 +65,23 @@ export default function SelectWithFocusControl({
 		element.addEventListener('blur', (event) => {
 			changeToUnfocusedLabel(element);
 		});
-
+		setIsLoaded(true);
 	}, []);
 
+
 	return (
-		<select
-			id={info}
-			key={info}
-			name={info}
-		>
-			{children}
-		</select>
+		<>
+			{isLoaded && (
+				<select
+					id={info}
+					key={info}
+					name={info}
+				>
+					{children}
+				</select>
+			)}
+
+			{!isLoaded && <p>Loading...</p>}
+		</>
 	)
 }
