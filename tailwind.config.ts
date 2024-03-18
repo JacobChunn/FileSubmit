@@ -28,10 +28,15 @@ const config: Config = withMT({
         blue: colors.blue,
         black: colors.black,
         white: colors.white,
+        slate: colors.slate,
+        zinc: colors.zinc
 		
       },
       fontSize: {
         xs: '0.75rem',
+      },
+      width: {
+        '1/10': '10%', // 1/16 width
       }
     },
     keyframes: {

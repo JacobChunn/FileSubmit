@@ -4,16 +4,16 @@ import { useEffect, useRef, useState } from "react";
 
 interface SelectWithFocusControl {
 	info: string;
+	className: string;
 	children: React.ReactElement<HTMLOptionElement & {"focused-label": string, "unfocused-label": string}>[];
 }
 
 export default function SelectWithFocusControl({
 	info,
-	children
+	className,
+	children,
 }: SelectWithFocusControl) {
 	const focusedInfoRef = useRef<string | null>(null);
-	const isLoadedRef = useRef<boolean>(false);
-	const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
 	const saveFocusedContent = (data: string) => {
 		focusedInfoRef.current = data;
@@ -65,23 +65,19 @@ export default function SelectWithFocusControl({
 		element.addEventListener('blur', (event) => {
 			changeToUnfocusedLabel(element);
 		});
-		setIsLoaded(true);
 	}, []);
 
 
 	return (
 		<>
-			{isLoaded && (
-				<select
-					id={info}
-					key={info}
-					name={info}
-				>
-					{children}
-				</select>
-			)}
-
-			{!isLoaded && <p>Loading...</p>}
+			<select
+				id={info}
+				key={info}
+				name={info}
+				className={className}
+			>
+				{children}
+			</select>
 		</>
 	)
 }

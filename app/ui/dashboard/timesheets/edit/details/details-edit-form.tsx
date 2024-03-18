@@ -65,101 +65,170 @@ export default function TimesheetDetailsEditForm({
 		</option>
     ));
 
+    const selectStyle = 'w-1/6';
+
+    
+    const gridStyles = 'grid grid-cols-7 grid-rows-2';
+
+    const dayStyle = 'h-6';
+    const dayRegStyle = dayStyle;
+    const dayOTStyle = dayStyle + ' bg-zinc-200';
+
     return (
-        <form action={dispatch}>
+        <form
+            action={dispatch}
+            className='rounded-xl shadow-md p-6 w-full h-full'
+        >
 
             {timesheetDetails.map((val, index) => (
-                <div key={"k-" + index}>
+                <div
+                    key={"k-" + index}
+                    className='flex rounded p-2 w-full h-full'
+                >
+                    {/* Project */}
                     <SelectWithFocusControl
                         info={project + index}
+                        className = {selectStyle}
                     >
                         {projectOptions}
                     </SelectWithFocusControl>
+
+                    {/* Phase */}
                     <SelectWithFocusControl
                         info={phase + index}
+                        className = {selectStyle}
                     >
                         {phaseOptions}
                     </SelectWithFocusControl>
+
+                    {/* Cost Code */}
                     <SelectWithFocusControl
                         info={costcode + index}
+                        className = {selectStyle}
                     >
                         {costCodeOptions}
                     </SelectWithFocusControl>
+
+                    {/* Description */}
                     <input
                         id={description + index}
                         key={description + index}
                         name={description + index}
                     />
-                    <input
-                        id={mon + index}
-                        key={mon + index}
-                        name={mon + index}
-                    />
-                    <input
-                        id={monot + index}
-                        key={monot + index}
-                        name={monot + index}
-                    />
-                    <input
-                        id={tues + index}
-                        key={tues + index}
-                        name={tues + index}
-                    />
-                    <input
-                        id={tuesot + index}
-                        key={tuesot + index}
-                        name={tuesot + index}
-                    />
-                    <input
-                        id={wed + index}
-                        key={wed + index}
-                        name={wed + index}
-                    />
-                    <input
-                        id={wedot + index}
-                        key={wedot + index}
-                        name={wedot + index}
-                    />
-                    <input
-                        id={thurs + index}
-                        key={thurs + index}
-                        name={thurs + index}
-                    />
-                    <input
-                        id={thursot + index}
-                        key={thursot + index}
-                        name={thursot + index}
-                    />
-                    <input
-                        id={fri + index}
-                        key={fri + index}
-                        name={fri + index}
-                    />
-                    <input
-                        id={friot + index}
-                        key={friot + index}
-                        name={friot + index}
-                    />
-                    <input
-                        id={sat + index}
-                        key={sat + index}
-                        name={sat + index}
-                    />
-                    <input
-                        id={satot + index}
-                        key={satot + index}
-                        name={satot + index}
-                    />
-                    <input
-                        id={sun + index}
-                        key={sun + index}
-                        name={sun + index}
-                    />
-                    <input
-                        id={sunot + index}
-                        key={sunot + index}
-                        name={sunot + index}
-                    />
+                    
+                    <div className={gridStyles}>
+                        {/* Monday */}
+                        <input
+                            id={mon + index}
+                            key={mon + index}
+                            name={mon + index}
+                            className={dayRegStyle}
+                        />
+
+                        {/* Tuesday */}
+                        <input
+                            id={tues + index}
+                            key={tues + index}
+                            name={tues + index}
+                            className={dayRegStyle}
+                        />
+
+                        {/* Wednesday */}
+                        <input
+                            id={wed + index}
+                            key={wed + index}
+                            name={wed + index}
+                            className={dayRegStyle}
+                        />
+
+                        {/* Thursday */}
+                        <input
+                            id={thurs + index}
+                            key={thurs + index}
+                            name={thurs + index}
+                            className={dayRegStyle}
+                        />
+
+                        {/* Friday */}
+                        <input
+                            id={fri + index}
+                            key={fri + index}
+                            name={fri + index}
+                            className={dayRegStyle}
+                        />
+
+                        {/* Saturday */}
+                        <input
+                            id={sat + index}
+                            key={sat + index}
+                            name={sat + index}
+                            className={dayRegStyle}
+                        />
+
+                        {/* Sunday */}
+                        <input
+                            id={sun + index}
+                            key={sun + index}
+                            name={sun + index}
+                            className={dayRegStyle}
+                        />
+
+                        {/* Monday OT */}
+                        <input
+                            id={monot + index}
+                            key={monot + index}
+                            name={monot + index}
+                            className={dayOTStyle}
+                        />
+
+                        {/* Tuesday OT */}
+                        <input
+                            id={tuesot + index}
+                            key={tuesot + index}
+                            name={tuesot + index}
+                            className={dayOTStyle}
+                        />
+
+                        {/* Wednesday OT */}
+                        <input
+                            id={wedot + index}
+                            key={wedot + index}
+                            name={wedot + index}
+                            className={dayOTStyle}
+                        />
+
+                        {/* Thursday OT */}
+                        <input
+                            id={thursot + index}
+                            key={thursot + index}
+                            name={thursot + index}
+                            className={dayOTStyle}
+                        />
+
+                        {/* Friday OT */}
+                        <input
+                            id={friot + index}
+                            key={friot + index}
+                            name={friot + index}
+                            className={dayOTStyle}
+                        />
+
+                        {/* Saturday OT */}
+                        <input
+                            id={satot + index}
+                            key={satot + index}
+                            name={satot + index}
+                            className={dayOTStyle}
+                        />
+
+                        {/* Sunday OT */}
+                        <input
+                            id={sunot + index}
+                            key={sunot + index}
+                            name={sunot + index}
+                            className={dayOTStyle}
+                        />
+                    </div>
                 </div>
             ))}
             <FormSubmitButton
