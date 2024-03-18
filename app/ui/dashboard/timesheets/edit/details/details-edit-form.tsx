@@ -64,9 +64,6 @@ export default function TimesheetDetailsEditForm({
 			{val.id + ": " + val.description}
 		</option>
     ));
-
-    const selectStyle = 'w-1/6';
-
     
     const gridStyles = 'grid grid-cols-7 grid-rows-2';
 
@@ -88,7 +85,7 @@ export default function TimesheetDetailsEditForm({
                     {/* Project */}
                     <SelectWithFocusControl
                         info={project + index}
-                        className = {selectStyle}
+                        className = 'w-1/6'
                     >
                         {projectOptions}
                     </SelectWithFocusControl>
@@ -96,7 +93,7 @@ export default function TimesheetDetailsEditForm({
                     {/* Phase */}
                     <SelectWithFocusControl
                         info={phase + index}
-                        className = {selectStyle}
+                        className = 'w-1/12'
                     >
                         {phaseOptions}
                     </SelectWithFocusControl>
@@ -104,7 +101,7 @@ export default function TimesheetDetailsEditForm({
                     {/* Cost Code */}
                     <SelectWithFocusControl
                         info={costcode + index}
-                        className = {selectStyle}
+                        className = 'w-1/12'
                     >
                         {costCodeOptions}
                     </SelectWithFocusControl>
