@@ -10,6 +10,7 @@ import FormSubmitButton from '@/app/ui/forms/form-submit-button';
 import { getServerSession } from 'next-auth';
 import { useEffect } from 'react';
 import SelectWithFocusControl from '@/app/ui/forms/general-helper-components/select-w-description';
+import Input from '@/app/ui/forms/general-helper-components/input';
 
 export default function TimesheetDetailsEditForm({
     timesheetDetails,
@@ -24,7 +25,7 @@ export default function TimesheetDetailsEditForm({
 	const editTimesheetDetailsWithID = editTimesheetDetails.bind(null, timesheetID);
     const [state, dispatch] = useFormState(editTimesheetDetailsWithID, initialState);
 
-    const { 
+    const {
         project, phase, costcode, description, mon, monot, 
         tues, tuesot, wed, wedot, thurs, thursot, 
         fri, friot, sat, satot, sun, sunot 
@@ -84,7 +85,7 @@ export default function TimesheetDetailsEditForm({
                 >
                     {/* Project */}
                     <SelectWithFocusControl
-                        info={project + index}
+                        info={"TSD" + index + "[" + project + "]"}
                         className = 'w-1/6'
                     >
                         {projectOptions}
@@ -92,7 +93,7 @@ export default function TimesheetDetailsEditForm({
 
                     {/* Phase */}
                     <SelectWithFocusControl
-                        info={phase + index}
+                        info={"TSD" + index + "[" + phase + "]"}
                         className = 'w-1/12'
                     >
                         {phaseOptions}
@@ -100,129 +101,99 @@ export default function TimesheetDetailsEditForm({
 
                     {/* Cost Code */}
                     <SelectWithFocusControl
-                        info={costcode + index}
+                        info={"TSD" + index + "[" + costcode + "]"}
                         className = 'w-1/12'
                     >
                         {costCodeOptions}
                     </SelectWithFocusControl>
 
                     {/* Description */}
-                    <input
-                        id={description + index}
-                        key={description + index}
-                        name={description + index}
+                    <Input
+                        info={"TSD" + index + "[" + description + "]"}
                     />
                     
                     <div className={gridStyles}>
                         {/* Monday */}
-                        <input
-                            id={mon + index}
-                            key={mon + index}
-                            name={mon + index}
+                        <Input
+                            info={"TSD" + index + "[" + mon + "]"}
                             className={dayRegStyle}
                         />
 
                         {/* Tuesday */}
-                        <input
-                            id={tues + index}
-                            key={tues + index}
-                            name={tues + index}
+                        <Input
+                            info={"TSD" + index + "[" + tues + "]"}
                             className={dayRegStyle}
                         />
 
                         {/* Wednesday */}
-                        <input
-                            id={wed + index}
-                            key={wed + index}
-                            name={wed + index}
+                        <Input
+                            info={"TSD" + index + "[" + wed + "]"}
                             className={dayRegStyle}
                         />
 
                         {/* Thursday */}
-                        <input
-                            id={thurs + index}
-                            key={thurs + index}
-                            name={thurs + index}
+                        <Input
+                            info={"TSD" + index + "[" + thurs + "]"}
                             className={dayRegStyle}
                         />
 
                         {/* Friday */}
-                        <input
-                            id={fri + index}
-                            key={fri + index}
-                            name={fri + index}
+                        <Input
+                            info={"TSD" + index + "[" + fri + "]"}
                             className={dayRegStyle}
                         />
 
                         {/* Saturday */}
-                        <input
-                            id={sat + index}
-                            key={sat + index}
-                            name={sat + index}
+                        <Input
+                            info={"TSD" + index + "[" + sat + "]"}
                             className={dayRegStyle}
                         />
 
                         {/* Sunday */}
-                        <input
-                            id={sun + index}
-                            key={sun + index}
-                            name={sun + index}
+                        <Input
+                            info={"TSD" + index + "[" + sun + "]"}
                             className={dayRegStyle}
                         />
 
                         {/* Monday OT */}
-                        <input
-                            id={monot + index}
-                            key={monot + index}
-                            name={monot + index}
+                        <Input
+                            info={"TSD" + index + "[" + monot + "]"}
                             className={dayOTStyle}
                         />
 
                         {/* Tuesday OT */}
-                        <input
-                            id={tuesot + index}
-                            key={tuesot + index}
-                            name={tuesot + index}
+                        <Input
+                            info={"TSD" + index + "[" + tuesot + "]"}
                             className={dayOTStyle}
                         />
 
                         {/* Wednesday OT */}
-                        <input
-                            id={wedot + index}
-                            key={wedot + index}
-                            name={wedot + index}
+                        <Input
+                            info={"TSD" + index + "[" + wedot + "]"}
                             className={dayOTStyle}
                         />
 
                         {/* Thursday OT */}
-                        <input
-                            id={thursot + index}
-                            key={thursot + index}
-                            name={thursot + index}
+                        <Input
+                            info={"TSD" + index + "[" + thursot + "]"}
                             className={dayOTStyle}
                         />
 
                         {/* Friday OT */}
-                        <input
-                            id={friot + index}
-                            key={friot + index}
-                            name={friot + index}
+                        <Input
+                            info={"TSD" + index + "[" + friot + "]"}
                             className={dayOTStyle}
                         />
 
                         {/* Saturday OT */}
-                        <input
-                            id={satot + index}
-                            key={satot + index}
-                            name={satot + index}
+                        <Input
+                            info={"TSD" + index + "[" + satot + "]"}
                             className={dayOTStyle}
                         />
 
                         {/* Sunday OT */}
-                        <input
-                            id={sunot + index}
-                            key={sunot + index}
-                            name={sunot + index}
+                        <Input
+                            info={"TSD" + index + "[" + sunot + "]"}
                             className={dayOTStyle}
                         />
                     </div>

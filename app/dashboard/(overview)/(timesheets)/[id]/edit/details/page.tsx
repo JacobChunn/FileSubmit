@@ -32,15 +32,15 @@ export default async function Page({ params }: { params: { id: any } }) {
 	const employeeID = Number(session.user.id);
 
 	const ownershipRes = await checkTimesheetOwnership(employeeID, timesheetID);
-	if (!ownershipRes.ok) { console.log('here2'); notFound(); }
+	if (!ownershipRes.ok) { notFound(); }
 
 	const ownership = await ownershipRes.json();
-	if (!ownership) { console.log('here3'); notFound(); }
+	if (!ownership) { notFound(); }
     const timesheetDetailsRes = await fetchTimesheetDetailsByTimesheetID(timesheetID);
-	if (!timesheetDetailsRes.ok) { console.log('here4'); notFound(); }
+	if (!timesheetDetailsRes.ok) { notFound(); }
 
 	const timesheetDetails = await timesheetDetailsRes.json();
-	if (timesheetDetails.length === 0) { console.log('here5'); notFound(); }
+	if (timesheetDetails.length === 0) { notFound(); }
 
 	const options = await fetchOptions();
 
