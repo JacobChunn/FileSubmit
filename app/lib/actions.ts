@@ -457,15 +457,51 @@ export async function editTimesheetDetails(
 
   console.log(formData);
 
-  formData.forEach((val, name) => {
-    console.log(name, val);
-  })
+  const separateTSDs = separateFormData(formData);
+
+  for (const tsdkey in separateTSDs) {
+    console.log(separateTSDs[tsdkey])
+    for (const propertykey in separateTSDs[tsdkey]) {
+      console.log(separateTSDs[tsdkey][propertykey])
+    }
+  }
+
+
+  // formData.forEach((val, name) => {
+  //   console.log(name, val);
+  // })
 
   // const validatedFields = EditTimesheetDetails.safeParse({
   //   id: formData.f
   // })
 
   // console.log(validatedFields)
+}
+
+interface SeparatedFormData {
+  [key: string]: {
+      [key: string]: string;
+  };
+}
+
+function separateFormData(formData: FormData): SeparatedFormData {
+  const result: SeparatedFormData = {};
+  
+  formData.forEach((value, name) => {
+      const matches = name.match(/^TSD(\d+)\[([^]+)\]$/);
+      
+      if (matches) {
+          const [, index, key] = matches;
+          if (!result[`TSD${index}`]) {
+              result[`TSD${index}`] = {};
+          }
+          if (typeof value === 'string') {
+              result[`TSD${index}`][key] = value;
+          }
+      }
+  });
+  
+  return result;
 }
 
 export async function editTimesheet( // Check if user has permissions to edit
