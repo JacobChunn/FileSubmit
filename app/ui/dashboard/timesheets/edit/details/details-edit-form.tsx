@@ -1,6 +1,6 @@
 'use client';
 
-import { editTimesheetDetails } from '@/app/lib/actions';
+import { deleteTimesheetDetails, editTimesheetDetails } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
 import { Options, TimesheetDetailsEditInfo, timesheetDetailsLabels } from '@/app/lib/definitions';
 import FormTextEntry from '@/app/ui/forms/edit-form/form-entry';
@@ -11,6 +11,7 @@ import { getServerSession } from 'next-auth';
 import { useEffect } from 'react';
 import SelectWithFocusControl from '@/app/ui/forms/general-helper-components/select-w-description';
 import Input from '@/app/ui/forms/general-helper-components/input';
+import { TrashIcon } from '@heroicons/react/24/outline';
 
 export default function TimesheetDetailsEditForm({
     timesheetDetails,
@@ -19,7 +20,7 @@ export default function TimesheetDetailsEditForm({
 }: {
     timesheetDetails: TimesheetDetailsEditInfo[],
     timesheetID: number,
-    options: Options
+    options: Options,
 }) {
     const initialState = { message: null, errors: {} };
 	const editTimesheetDetailsWithID = editTimesheetDetails.bind(null, timesheetID);
@@ -31,7 +32,14 @@ export default function TimesheetDetailsEditForm({
         fri, friot, sat, satot, sun, sunot 
     } = timesheetDetailsLabels;
 
+	const tableHeaders = [
+		"Project", "Phase", "Cost Code", "Description",
+		"Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun",
+	];
+
     const {projects, phases, costcodes} = options;
+
+	const oneTSDExists = timesheetDetails.length == 1;
 
     // Changes to focused version after focused
     const projectOptions = projects.map((val, index) => (
@@ -81,14 +89,25 @@ export default function TimesheetDetailsEditForm({
     return (
         <form
             action={dispatch}
-            className='rounded-xl shadow-md p-6 w-full h-full'
+            className='w-full h-full'
         >
 			<table className='w-full'>
+				<thead>
+					<tr>
+						{tableHeaders.map((val, index) => (
+							<th
+								key={"header"+index}
+							>
+								{val}
+							</th>
+						))}
+					</tr>
+				</thead>
 				<tbody className='w-full'>
 				{timesheetDetails.map((val, index) => (
 					<tr
 						key={"k-" + index}
-						className='flex rounded p-2 w-full h-full'
+						className='w-full h-full'
 					>
 						<td className={selectRowStyle}>
 							{/* Hidden TSD id */}
@@ -235,6 +254,21 @@ export default function TimesheetDetailsEditForm({
 								className={dayOTStyle}
 								value={val.sunot}
 							/>
+						</td>
+
+						{/* Delete TSD */}
+						<td className='h-auto w-1/32 relative'>
+							{!oneTSDExists ? 
+								<button
+									type='button'
+									onClick={() => deleteTimesheetDetails(val.id)}
+									className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center p-3"
+								>
+									<TrashIcon className='h-full' />
+								</button>
+							:
+							null
+						}
 						</td>
 					</tr>
 				))}

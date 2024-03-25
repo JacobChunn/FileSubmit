@@ -375,7 +375,7 @@ export async function addTimesheet(
 	
 	const timesheetID: number = timesheetIDData.rows[0].id;
 
-	const addSuccess = await addTimesheetDetails({
+	const addSuccess = await addTimesheetDetailsHelper({
 		timesheetid: timesheetID,
 		employeeid: employeeid,
 	});
@@ -398,7 +398,7 @@ export async function addTimesheet(
 }
 
 // Intended to be ran as a server helper function
-async function addTimesheetDetails({
+async function addTimesheetDetailsHelper({
   timesheetid,
   employeeid,
   projectid = 0,
@@ -458,13 +458,57 @@ async function addTimesheetDetails({
   return true;
 }
 
+export async function addTimesheetDetails(timesheetID: number) {
+
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		console.log("Session was unable to be retrieved!");
+		return {
+			message: 'Session was unable to be retrieved!',
+		};
+
+	}
+
+	const employeeID = Number(session.user.id);
+
+	// Ensure timesheetID belongs to employee
+	const validOwnership = await employeeOwnsTimesheet(employeeID, timesheetID);
+	if (!validOwnership) {
+		console.log("Employee does not own provided timesheet!");
+		return {
+			message: 'Employee does not own provided timesheet!',
+		};
+	}
+
+	try{
+		const addSuccess = await addTimesheetDetailsHelper({
+			timesheetid: timesheetID,
+			employeeid: employeeID,
+		});
+	
+		if(!addSuccess) {
+			return {
+				message: 'Failed to Create TimesheetDetails.',
+			};
+		}
+
+	} catch(error) {
+		console.error(error);
+			return {
+				message: 'Failed to Create TimesheetDetails.',
+		};
+	}
+	revalidatePath(`/dashboard/${timesheetID}/edit/details`);
+	redirect(`/dashboard/${timesheetID}/edit/details`);
+}
+
 export async function editTimesheetDetails(
 	timesheetID: number,
 	prevState: any,
 	formData: FormData
 ) {
-
-	console.log(formData);
+	//console.log(formData);
 	//console.log(timesheetID);
 
 	// Validate timesheetID
@@ -634,8 +678,88 @@ function separateFormData(formData: FormData): SeparatedFormData {
   return result;
 }
 
+export async function deleteTimesheetDetails(
+	timesheetDetailsID: number,
+) {
+	const validatedTSDID = z.number().safeParse(timesheetDetailsID);
+
+	if (!validatedTSDID.success) {
+		return {
+			errors: validatedTSDID.error.flatten().fieldErrors,
+			message: 'Failed to Validate TSD.',
+		};
+	}
+
+	// Ensure user is logged in
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		console.log("Session was unable to be retrieved!");
+		return {
+			message: 'Session was unable to be retrieved!',
+		};
+	}
+	
+	const employeeid = Number(session.user.id);
+	const TSDID = validatedTSDID.data;
+	let timesheetid = null;
+
+	try {
+		const timesheetData = await sql`
+			SELECT timesheetid
+			FROM timesheetdetails
+			WHERE id = ${TSDID};
+		`;
+		if (timesheetData.rows.length < 1) {
+			const error = "Timesheet was not found!"
+			console.error(error);
+			return {
+				message: error,
+			};
+		}
+		timesheetid = timesheetData.rows[0].timesheetid;
+	} catch(error) {
+		console.error(error);
+		return {
+			message: 'Failed to retrieve timesheet!',
+		};
+	}
+
+	try {
+		await sql`
+		DELETE FROM timesheetdetails
+		WHERE id = ${TSDID}
+		  AND employeeid = ${employeeid}
+		  AND EXISTS (
+			SELECT 1
+			FROM timesheetdetails
+			WHERE timesheetid = (
+				SELECT timesheetid
+				FROM timesheetdetails
+				WHERE id = ${TSDID}
+			  )
+			AND id != ${TSDID}
+		  );
+		`;
+	} catch(error) {
+		console.error(error);
+		return {
+			message: 'Failed to delete timesheet details!',
+		};
+	}
+
+	if (timesheetid == null){
+		return {
+			message: 'Failed to delete timesheet details!',
+		};
+	}
+
+	revalidatePath(`/dashboard/${timesheetid}/edit/details`);
+	redirect(`/dashboard/${timesheetid}/edit/details`);
+}
+
 export async function editTimesheet( // Check if user has permissions to edit
-  timesheetid: number,
+	timesheetid: number,
 	prevState: EmployeeState,
 	formData: FormData,
 ) {

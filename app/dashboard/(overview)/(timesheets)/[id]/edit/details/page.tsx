@@ -8,6 +8,8 @@ import { lusitana } from '@/app/ui/fonts';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/options';
 import TimesheetDetailsEditForm from '@/app/ui/dashboard/timesheets/edit/details/details-edit-form';
+import TimesheetDetailsWrapper from '@/app/ui/dashboard/timesheets/edit/details/details-wrapper';
+import TimesheetDetailsHeader from '@/app/ui/dashboard/timesheets/edit/details/details-header';
 
 export const metadata: Metadata = {
   title: 'Edit Timesheet',
@@ -57,7 +59,16 @@ export default async function Page({ params }: { params: { id: any } }) {
 				    Edit Timesheet Details
 				</Link>
 			</Breadcrumbs>
-			<TimesheetDetailsEditForm timesheetDetails={timesheetDetails} timesheetID={timesheetID} options={options}/>
+			<TimesheetDetailsWrapper>
+				<TimesheetDetailsHeader
+					timesheetID={timesheetID}
+				/>
+				<TimesheetDetailsEditForm
+					timesheetDetails={timesheetDetails}
+					timesheetID={timesheetID}
+					options={options}
+				/>
+			</TimesheetDetailsWrapper>
         </main>
     );
 }
