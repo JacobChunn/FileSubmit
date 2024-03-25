@@ -112,6 +112,9 @@ export default function TimesheetDetailsEditForm({
 						<td className={selectRowStyle}>
 							{/* Hidden TSD id */}
 							<input
+								id={"TSD" + index + "[" + id + "]"}
+								key={"TSD" + index + "[" + id + "]"}
+								name={"TSD" + index + "[" + id + "]"}
 								value={val.id}
 								readOnly
 								hidden

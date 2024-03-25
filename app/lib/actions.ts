@@ -117,6 +117,7 @@ const TimesheetDetailsSchema = z.object({
   costcode: z.coerce.number(),
   description: z.string().max(128),
   mon: z.coerce.number().min(0.0),
+  monot: z.coerce.number().min(0.0),
   tues: z.coerce.number().min(0.0),
   tuesot: z.coerce.number().min(0.0),
   wed: z.coerce.number().min(0.0),
@@ -134,7 +135,7 @@ const TimesheetDetailsSchema = z.object({
 
 //const EditTimesheetDetails = z.array(TimesheetDetailsSchema.omit({employeeid: true}));
 const EditTimesheetDetails = TimesheetDetailsSchema.omit({
-	timesheetdetailsid: true,
+	timesheetid: true,
 	employeeid: true,
 	lasteditdate: true,
 });
@@ -509,19 +510,20 @@ export async function editTimesheetDetails(
 	formData: FormData
 ) {
 	//console.log(formData);
-	//console.log(timesheetID);
 
-	// Validate timesheetID
-	const validatedTimesheetID = SingleTimesheetID.safeParse({
-		timesheetid: Number(timesheetID)
-	})
+	// // Validate timesheetID
+	// const validatedTimesheetID = SingleTimesheetID.safeParse({
+	// 	timesheetid: Number(timesheetID)
+	// })
+
+
+	const validatedTimesheetID = z.number().safeParse(timesheetID);
 
 	// If form validation fails, return errors early. Otherwise, continue.
 	if (!validatedTimesheetID.success) {
-		console.log(validatedTimesheetID);
 		return {
 			errors: validatedTimesheetID.error.flatten().fieldErrors,
-			message: 'Incorrect or Missing Fields. Failed to Validate timesheetID.',
+			message: 'Failed to Validate timesheetID.',
 		};
 	}
 
@@ -553,6 +555,7 @@ export async function editTimesheetDetails(
 	// Validate each TSD and add it to array
 
   	type validatedTSDType = {
+		id: number;
 		project: number;
 		phase: number;
 		costcode: number;
@@ -577,12 +580,12 @@ export async function editTimesheetDetails(
 
  	for (const tsdkey in separateTSDs) {
 		//console.log(separateTSDs[tsdkey])
-		for (const propertykey in separateTSDs[tsdkey]) {
-			console.log(propertykey)
-			console.log(separateTSDs[tsdkey][propertykey])
-		}
+		// for (const propertykey in separateTSDs[tsdkey]) {
+		// 	console.log(propertykey)
+		// 	console.log(separateTSDs[tsdkey][propertykey])
+		// }
 		const validatedTSD = EditTimesheetDetails.safeParse({
-			//id: 
+			id: Number(separateTSDs[tsdkey]['id']),
 			project: Number(separateTSDs[tsdkey]['project']),
 			phase: Number(separateTSDs[tsdkey]['phase']),
 			costcode: Number(separateTSDs[tsdkey]['costcode']),
@@ -614,12 +617,55 @@ export async function editTimesheetDetails(
 		
 		// Ensure validatedTSD's id field is linked to the timesheet
 
-		const {id, ...otherFields} = validatedTSD.data;
+		const TSDBelongsToTimesheet = await timesheetDetailsBelongsToTimesheet(validatedTSD.data.id, timesheetID);
 
+		if (!TSDBelongsToTimesheet) {
+			const error = 'Timesheet Details does not belong to Timesheet';
+			console.error(error)
+			return {
+				message: error,
+			}
+		}
 
+		validatedTSDs.push(validatedTSD.data)
 
-		//validatedTSDs.push(otherFields)
+	}
 
+	//console.log(validatedTSDs);
+
+	for (const TSD of validatedTSDs) {
+		const {id, project, phase, costcode, description,
+			mon, tues, wed, thurs, fri, sat, sun,
+			monot, tuesot, wedot, thursot, friot, satot, sunot} = TSD;
+
+		try{
+			await sql`
+			UPDATE timesheetdetails
+			SET 
+				projectid = ${project},
+				phase = ${phase},
+				costcode = ${costcode},
+				description = ${description},
+				mon = ${mon},
+				monot = ${monot},
+				tues = ${tues},
+				tuesot = ${tuesot},
+				wed = ${wed},
+				wedot = ${wedot},
+				thurs = ${thurs},
+				thursot = ${thursot},
+				fri = ${fri},
+				friot = ${friot},
+				sat = ${sat},
+				satot = ${satot},
+				sun = ${sun},
+				sunot = ${sunot}
+			WHERE id = ${id};
+			`;
+		} catch(error) {
+			console.error(error);
+			throw error;
+		}
 	}
 
 
@@ -632,6 +678,23 @@ export async function editTimesheetDetails(
   // })
 
   // console.log(validatedFields)
+}
+
+async function timesheetDetailsBelongsToTimesheet(timesheetDetailsID: number, timesheetID: number) {
+	try{
+		const belongsData = await sql`
+			SELECT EXISTS (
+				SELECT 1
+				FROM timesheetdetails
+				WHERE id = ${timesheetDetailsID} AND timesheetid = ${timesheetID}
+			) AS belongs;
+		`;
+		
+		return belongsData.rows[0].belongs;
+	} catch(error) {
+		console.error(error);
+		throw error;
+	}
 }
 
 async function employeeOwnsTimesheet(employeeID: number, timesheetID: number) {
