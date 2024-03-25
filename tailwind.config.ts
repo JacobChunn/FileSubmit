@@ -36,7 +36,8 @@ const config: Config = withMT({
         xs: '0.75rem',
       },
       width: {
-        '1/10': '10%', // 1/16 width
+        '1/10': '10%',
+		'1/32': '3.125%'
       }
     },
     keyframes: {

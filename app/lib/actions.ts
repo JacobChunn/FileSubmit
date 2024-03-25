@@ -12,6 +12,7 @@ import { authOptions } from '../api/auth/[...nextauth]/options';
 import { fetchEmployeeByID } from './data';
 import * as bcrypt from 'bcrypt';
 import { DateTime } from 'luxon';
+import { time } from 'console';
  
 const FormSchema = z.object({
   id: z.string(),
@@ -111,7 +112,7 @@ const TimesheetDetailsSchema = z.object({
   id: z.coerce.number(),
   timesheetid: z.coerce.number(),
   employeeid: z.coerce.number(),
-  projectid: z.coerce.number(),
+  project: z.coerce.number(),
   phase: z.coerce.number(),
   costcode: z.coerce.number(),
   description: z.string().max(128),
@@ -132,7 +133,15 @@ const TimesheetDetailsSchema = z.object({
 });
 
 //const EditTimesheetDetails = z.array(TimesheetDetailsSchema.omit({employeeid: true}));
-const EditTimesheetDetails = TimesheetDetailsSchema.omit({employeeid: true});
+const EditTimesheetDetails = TimesheetDetailsSchema.omit({
+	timesheetdetailsid: true,
+	employeeid: true,
+	lasteditdate: true,
+});
+
+const SingleTimesheetID = z.object({
+	timesheetid: z.coerce.number()
+})
 
 export type InvoiceState = {
     errors?: {
@@ -450,21 +459,124 @@ async function addTimesheetDetails({
 }
 
 export async function editTimesheetDetails(
-  timesheetID: number,
-  prevState: any,
-  formData: FormData
+	timesheetID: number,
+	prevState: any,
+	formData: FormData
 ) {
 
-  console.log(formData);
+	console.log(formData);
+	//console.log(timesheetID);
 
-  const separateTSDs = separateFormData(formData);
+	// Validate timesheetID
+	const validatedTimesheetID = SingleTimesheetID.safeParse({
+		timesheetid: Number(timesheetID)
+	})
 
-  for (const tsdkey in separateTSDs) {
-    console.log(separateTSDs[tsdkey])
-    for (const propertykey in separateTSDs[tsdkey]) {
-      console.log(separateTSDs[tsdkey][propertykey])
-    }
-  }
+	// If form validation fails, return errors early. Otherwise, continue.
+	if (!validatedTimesheetID.success) {
+		console.log(validatedTimesheetID);
+		return {
+			errors: validatedTimesheetID.error.flatten().fieldErrors,
+			message: 'Incorrect or Missing Fields. Failed to Validate timesheetID.',
+		};
+	}
+
+	// Get user session and id
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		console.log("Session was unable to be retrieved!");
+		return {
+			message: 'Session was unable to be retrieved!',
+		};
+
+	}
+
+	const employeeID = Number(session.user.id);
+
+	// Ensure timesheetID belongs to employee
+	const validOwnership = await employeeOwnsTimesheet(employeeID, timesheetID);
+	if (!validOwnership) {
+		console.log("Employee does not own provided timesheet!");
+		return {
+			message: 'Employee does not own provided timesheet!',
+		};
+	}
+
+	// Separate TDSs from formData
+	const separateTSDs = separateFormData(formData);
+
+	// Validate each TSD and add it to array
+
+  	type validatedTSDType = {
+		project: number;
+		phase: number;
+		costcode: number;
+		description: string;
+		mon: number;
+		tues: number;
+		wed: number;
+		thurs: number;
+		fri: number;
+		sat: number;
+		sun: number;
+		monot: number;
+		tuesot: number;
+		wedot: number;
+		thursot: number;
+		friot: number;
+		satot: number;
+		sunot: number;
+	};
+
+	const validatedTSDs: validatedTSDType[] = [];
+
+ 	for (const tsdkey in separateTSDs) {
+		//console.log(separateTSDs[tsdkey])
+		for (const propertykey in separateTSDs[tsdkey]) {
+			console.log(propertykey)
+			console.log(separateTSDs[tsdkey][propertykey])
+		}
+		const validatedTSD = EditTimesheetDetails.safeParse({
+			//id: 
+			project: Number(separateTSDs[tsdkey]['project']),
+			phase: Number(separateTSDs[tsdkey]['phase']),
+			costcode: Number(separateTSDs[tsdkey]['costcode']),
+			description: separateTSDs[tsdkey]['description'],
+			mon: Number(separateTSDs[tsdkey]['mon']),
+			tues: Number(separateTSDs[tsdkey]['tues']),
+			wed: Number(separateTSDs[tsdkey]['wed']),
+			thurs: Number(separateTSDs[tsdkey]['thurs']),
+			fri: Number(separateTSDs[tsdkey]['fri']),
+			sat: Number(separateTSDs[tsdkey]['sat']),
+			sun: Number(separateTSDs[tsdkey]['sun']),
+			monot: Number(separateTSDs[tsdkey]['monOT']),
+			tuesot: Number(separateTSDs[tsdkey]['tuesOT']),
+			wedot: Number(separateTSDs[tsdkey]['wedOT']),
+			thursot: Number(separateTSDs[tsdkey]['thursOT']),
+			friot: Number(separateTSDs[tsdkey]['friOT']),
+			satot: Number(separateTSDs[tsdkey]['satOT']),
+			sunot: Number(separateTSDs[tsdkey]['sunOT'])
+		});
+
+
+		if (!validatedTSD.success) {
+			console.error(validatedTSD.error);
+			return {
+				errors: validatedTSD.error.flatten().fieldErrors,
+				message: 'Incorrect or Missing Fields. Failed to Validate timesheetID.',
+			};
+		}
+		
+		// Ensure validatedTSD's id field is linked to the timesheet
+
+		const {id, ...otherFields} = validatedTSD.data;
+
+
+
+		//validatedTSDs.push(otherFields)
+
+	}
 
 
   // formData.forEach((val, name) => {
@@ -476,6 +588,24 @@ export async function editTimesheetDetails(
   // })
 
   // console.log(validatedFields)
+}
+
+async function employeeOwnsTimesheet(employeeID: number, timesheetID: number) {
+	try{
+		const validOwnership = await sql`
+		SELECT EXISTS (
+			SELECT 1
+			FROM timesheets
+			WHERE id = ${timesheetID}
+			AND (employeeid = ${employeeID} OR id IS NULL)
+		) AS timesheet_exists;	
+		`;
+
+		return validOwnership.rows[0].timesheet_exists;
+	} catch(error) {
+		console.error(error);
+		throw error;
+	}
 }
 
 interface SeparatedFormData {

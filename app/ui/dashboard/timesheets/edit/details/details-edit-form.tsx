@@ -26,7 +26,7 @@ export default function TimesheetDetailsEditForm({
     const [state, dispatch] = useFormState(editTimesheetDetailsWithID, initialState);
 
     const {
-        project, phase, costcode, description, mon, monot, 
+        id, project, phase, costcode, description, mon, monot, 
         tues, tuesot, wed, wedot, thurs, thursot, 
         fri, friot, sat, satot, sun, sunot 
     } = timesheetDetailsLabels;
@@ -65,140 +65,181 @@ export default function TimesheetDetailsEditForm({
 			{val.id + ": " + val.description}
 		</option>
     ));
-    
-    const gridStyles = 'grid grid-cols-7 grid-rows-2';
 
-    const dayStyle = 'h-6';
+    const dayStyle = 'h-1/2 w-full p-0';
     const dayRegStyle = dayStyle;
     const dayOTStyle = dayStyle + ' bg-zinc-200';
+
+	const selectStyle = 'h-12 w-full';
+	const descStyle = 'h-12 w-full';
+
+	const dayRowStyle = 'w-1/32'
+	const selectRowStyle = 'w-1/10'
+	const descRowStyle = 'w-1/6'
+
 
     return (
         <form
             action={dispatch}
             className='rounded-xl shadow-md p-6 w-full h-full'
         >
+			<table className='w-full'>
+				<tbody className='w-full'>
+				{timesheetDetails.map((val, index) => (
+					<tr
+						key={"k-" + index}
+						className='flex rounded p-2 w-full h-full'
+					>
+						<td className={selectRowStyle}>
+							{/* Hidden TSD id */}
+							<input
+								value={val.id}
+								readOnly
+								hidden
+							/>
 
-            {timesheetDetails.map((val, index) => (
-                <div
-                    key={"k-" + index}
-                    className='flex rounded p-2 w-full h-full'
-                >
-                    {/* Project */}
-                    <SelectWithFocusControl
-                        info={"TSD" + index + "[" + project + "]"}
-                        className = 'w-1/6'
-                    >
-                        {projectOptions}
-                    </SelectWithFocusControl>
+							{/* Project */}
+							<SelectWithFocusControl
+								info={"TSD" + index + "[" + project + "]"}
+								value={val.projectid}
+								className = {selectStyle}
+							>
+								{projectOptions}
+							</SelectWithFocusControl>
+						</td>
 
-                    {/* Phase */}
-                    <SelectWithFocusControl
-                        info={"TSD" + index + "[" + phase + "]"}
-                        className = 'w-1/12'
-                    >
-                        {phaseOptions}
-                    </SelectWithFocusControl>
+						<td className={selectRowStyle}>
+							{/* Phase */}
+							<SelectWithFocusControl
+								info={"TSD" + index + "[" + phase + "]"}
+								value={val.phase}
+								className = {selectStyle}
+							>
+								{phaseOptions}
+							</SelectWithFocusControl>
+						</td>
+						<td className={selectRowStyle}>
+							{/* Cost Code */}
+							<SelectWithFocusControl
+								info={"TSD" + index + "[" + costcode + "]"}
+								value={val.costcode}
+								className = {selectStyle}
+							>
+								{costCodeOptions}
+							</SelectWithFocusControl>
+						</td>
 
-                    {/* Cost Code */}
-                    <SelectWithFocusControl
-                        info={"TSD" + index + "[" + costcode + "]"}
-                        className = 'w-1/12'
-                    >
-                        {costCodeOptions}
-                    </SelectWithFocusControl>
+						{/* Description */}
+						<td className={descRowStyle}>
+							
+							<Input
+								info={"TSD" + index + "[" + description + "]"}
+								className={descStyle}
+								value={val.description}
+							/>
+						</td>
+						
+						{/* Monday */}
+						<td className={dayRowStyle}>
+							<Input
+								info={"TSD" + index + "[" + mon + "]"}
+								className={dayRegStyle}
+								value={val.mon}
+							/>
+							<Input
+								info={"TSD" + index + "[" + monot + "]"}
+								className={dayOTStyle}
+								value={val.monot}
+							/>
+						</td>
 
-                    {/* Description */}
-                    <Input
-                        info={"TSD" + index + "[" + description + "]"}
-                    />
-                    
-                    <div className={gridStyles}>
-                        {/* Monday */}
-                        <Input
-                            info={"TSD" + index + "[" + mon + "]"}
-                            className={dayRegStyle}
-                        />
+						{/* Tuesday */}
+						<td className={dayRowStyle}>
+							<Input
+								info={"TSD" + index + "[" + tues + "]"}
+								className={dayRegStyle}
+								value={val.tues}
+							/>
+							<Input
+								info={"TSD" + index + "[" + tuesot + "]"}
+								className={dayOTStyle}
+								value={val.tuesot}
+							/>
+						</td>
 
-                        {/* Tuesday */}
-                        <Input
-                            info={"TSD" + index + "[" + tues + "]"}
-                            className={dayRegStyle}
-                        />
+						{/* Wednesday */}
+						<td className={dayRowStyle}>
+							<Input
+								info={"TSD" + index + "[" + wed + "]"}
+								className={dayRegStyle}
+								value={val.wed}
+							/>
+							<Input
+								info={"TSD" + index + "[" + wedot + "]"}
+								className={dayOTStyle}
+								value={val.wedot}
+							/>
+						</td>
 
-                        {/* Wednesday */}
-                        <Input
-                            info={"TSD" + index + "[" + wed + "]"}
-                            className={dayRegStyle}
-                        />
+						{/* Thursday */}
+						<td className={dayRowStyle}>
+							<Input
+								info={"TSD" + index + "[" + thurs + "]"}
+								className={dayRegStyle}
+								value={val.thurs}
+							/>
+							<Input
+								info={"TSD" + index + "[" + thursot + "]"}
+								className={dayOTStyle}
+								value={val.thursot}
+							/>
+						</td>
 
-                        {/* Thursday */}
-                        <Input
-                            info={"TSD" + index + "[" + thurs + "]"}
-                            className={dayRegStyle}
-                        />
+						{/* Friday */}
+						<td className={dayRowStyle}>
+							<Input
+								info={"TSD" + index + "[" + fri + "]"}
+								className={dayRegStyle}
+								value={val.fri}
+							/>
+							<Input
+								info={"TSD" + index + "[" + friot + "]"}
+								className={dayOTStyle}
+								value={val.friot}
+							/>
+						</td>
 
-                        {/* Friday */}
-                        <Input
-                            info={"TSD" + index + "[" + fri + "]"}
-                            className={dayRegStyle}
-                        />
+						{/* Saturday */}
+						<td className={dayRowStyle}>
+							<Input
+								info={"TSD" + index + "[" + sat + "]"}
+								className={dayRegStyle}
+								value={val.sat}
+							/>
+							<Input
+								info={"TSD" + index + "[" + satot + "]"}
+								className={dayOTStyle}
+								value={val.satot}
+							/>
+						</td>
 
-                        {/* Saturday */}
-                        <Input
-                            info={"TSD" + index + "[" + sat + "]"}
-                            className={dayRegStyle}
-                        />
-
-                        {/* Sunday */}
-                        <Input
-                            info={"TSD" + index + "[" + sun + "]"}
-                            className={dayRegStyle}
-                        />
-
-                        {/* Monday OT */}
-                        <Input
-                            info={"TSD" + index + "[" + monot + "]"}
-                            className={dayOTStyle}
-                        />
-
-                        {/* Tuesday OT */}
-                        <Input
-                            info={"TSD" + index + "[" + tuesot + "]"}
-                            className={dayOTStyle}
-                        />
-
-                        {/* Wednesday OT */}
-                        <Input
-                            info={"TSD" + index + "[" + wedot + "]"}
-                            className={dayOTStyle}
-                        />
-
-                        {/* Thursday OT */}
-                        <Input
-                            info={"TSD" + index + "[" + thursot + "]"}
-                            className={dayOTStyle}
-                        />
-
-                        {/* Friday OT */}
-                        <Input
-                            info={"TSD" + index + "[" + friot + "]"}
-                            className={dayOTStyle}
-                        />
-
-                        {/* Saturday OT */}
-                        <Input
-                            info={"TSD" + index + "[" + satot + "]"}
-                            className={dayOTStyle}
-                        />
-
-                        {/* Sunday OT */}
-                        <Input
-                            info={"TSD" + index + "[" + sunot + "]"}
-                            className={dayOTStyle}
-                        />
-                    </div>
-                </div>
-            ))}
+						{/* Sunday */}
+						<td className={dayRowStyle}>
+							<Input
+								info={"TSD" + index + "[" + sun + "]"}
+								className={dayRegStyle}
+								value={val.sun}
+							/>
+							<Input
+								info={"TSD" + index + "[" + sunot + "]"}
+								className={dayOTStyle}
+								value={val.sunot}
+							/>
+						</td>
+					</tr>
+				))}
+				</tbody>
+			</table>
             <FormSubmitButton
                 cancelHref='/dashboard'
                 text='Submit Edits'

@@ -1,19 +1,22 @@
 'use client'
 
-import { useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 interface SelectWithFocusControl {
 	info: string;
 	className: string;
+	value: string | number,
 	children: React.ReactElement<HTMLOptionElement & {"focused-label": string, "unfocused-label": string}>[];
 }
 
 export default function SelectWithFocusControl({
 	info,
 	className,
+	value,
 	children,
 }: SelectWithFocusControl) {
 	const focusedInfoRef = useRef<string | null>(null);
+
 
 	const saveFocusedContent = (data: string) => {
 		focusedInfoRef.current = data;
@@ -66,18 +69,15 @@ export default function SelectWithFocusControl({
 			changeToUnfocusedLabel(element);
 		});
 	}, []);
-
-
 	return (
-		<>
-			<select
-				id={info}
-				key={info}
-				name={info}
-				className={className}
-			>
-				{children}
-			</select>
-		</>
+		<select
+			id={info}
+			key={info}
+			name={info}
+			className={className}
+			defaultValue={value}
+		>
+			{children}
+		</select>
 	)
 }

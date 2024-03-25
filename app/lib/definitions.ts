@@ -88,131 +88,137 @@ export type InvoiceForm = {
 };
 
 export type Employee = {
-	id: number,
-	number: number,
-	username: string,
-	password: string,
-	firstname: string,
-	lastname: string,
-	cellphone: string,
-	homephone: string,
-	email: string,
-	managerid: number,
-	accesslevel: number,
-	timesheetrequired: boolean,
-	overtimeeligible: boolean,
-	tabnavigateot: boolean,
-	emailexpensecopy: boolean,
-	activeemployee: boolean,
-	ientertimedata: boolean,
-	numtimesheetsummaries: number,
-	numexpensesummaries: number,
-	numdefaulttimerows: number,
-	contractor: boolean,
+  id: number;
+  number: number;
+  username: string;
+  password: string;
+  firstname: string;
+  lastname: string;
+  cellphone: string;
+  homephone: string;
+  email: string;
+  managerid: number;
+  accesslevel: number;
+  timesheetrequired: boolean;
+  overtimeeligible: boolean;
+  tabnavigateot: boolean;
+  emailexpensecopy: boolean;
+  activeemployee: boolean;
+  ientertimedata: boolean;
+  numtimesheetsummaries: number;
+  numexpensesummaries: number;
+  numdefaulttimerows: number;
+  contractor: boolean;
 };
 
-  export type EmployeeState = {
-    errors?: {
-      [key: string]: string[] | undefined;
-      id?: string[];
-      number?: string[];
-      username?: string[];
-      password?: string[];
-      firstname?: string[];
-      lastname?: string[];
-      cellphone?: string[];
-      homephone?: string[];
-      email?: string[];
-      managerid?: string[];
-      accesslevel?: string[];
-      timesheetrequired?: string[];
-      overtimeeligible?: string[];
-      tabnavigateot?: string[];
-      emailexpensecopy?: string[];
-      activeemployee?: string[];
-      ientertimedata?: string[];
-      numtimesheetsummaries?: string[];
-      numexpensesummaries?: string[];
-      numdefaulttimerows?: string[];
-      contractor?: string[];
-    } | undefined;
-    message?: string | null;
+export type EmployeeState = {
+  errors?:
+    | {
+        [key: string]: string[] | undefined;
+        id?: string[];
+        number?: string[];
+        username?: string[];
+        password?: string[];
+        firstname?: string[];
+        lastname?: string[];
+        cellphone?: string[];
+        homephone?: string[];
+        email?: string[];
+        managerid?: string[];
+        accesslevel?: string[];
+        timesheetrequired?: string[];
+        overtimeeligible?: string[];
+        tabnavigateot?: string[];
+        emailexpensecopy?: string[];
+        activeemployee?: string[];
+        ientertimedata?: string[];
+        numtimesheetsummaries?: string[];
+        numexpensesummaries?: string[];
+        numdefaulttimerows?: string[];
+        contractor?: string[];
+      }
+    | undefined;
+  message?: string | null;
 };
 
 export type Project = {
-	id: number,
-	number: string,
-	description: string,
-	startdate: string,
-	enddate: string,
-	shortname: string,
-	customerpo: string,
-	customercontact: string,
-	comments: string,
-	overtime: boolean,
-	sgaflag: boolean,
+  id: number;
+  number: string;
+  description: string;
+  startdate: string;
+  enddate: string;
+  shortname: string;
+  customerpo: string;
+  customercontact: string;
+  comments: string;
+  overtime: boolean;
+  sgaflag: boolean;
 };
 
 export type ProjectState = {
-	errors?: {
-		[key: string]: string[] | undefined;
-		id?: string[];
-		number?: string[];
-		description?: string[];
-		startdate?: string[];
-		enddate?: string[];
-		shortname?: string[];
-		customerpo?: string[];
-		customercontact?: string[];
-		comments?: string[];
-		overtime?: string[];
-		sgaflag?: string[];
-	} | undefined;
-	message?: string | null;
+  errors?:
+    | {
+        [key: string]: string[] | undefined;
+        id?: string[];
+        number?: string[];
+        description?: string[];
+        startdate?: string[];
+        enddate?: string[];
+        shortname?: string[];
+        customerpo?: string[];
+        customercontact?: string[];
+        comments?: string[];
+        overtime?: string[];
+        sgaflag?: string[];
+      }
+    | undefined;
+  message?: string | null;
 };
 
 export type Timesheet = {
-  id: number,
-  employeeid: number,
-  weekending: string,
-  processed: boolean,
-  mgrapproved: boolean,
-  usercommitted: boolean,
-  totalreghours: number,
-  totalovertime: number,
-  approvedby: string,
-  submittedby: string,
-  processedby: string,
-  dateprocessed: string,
-  message: string,
+  id: number;
+  employeeid: number;
+  weekending: string;
+  processed: boolean;
+  mgrapproved: boolean;
+  usercommitted: boolean;
+  totalreghours: number;
+  totalovertime: number;
+  approvedby: string;
+  submittedby: string;
+  processedby: string;
+  dateprocessed: string;
+  message: string;
 };
 
 export type TimesheetEditInfo = {
-  weekending: string,
-  usercommitted: boolean,
-  totalreghours: number,
-  totalovertime: number,
-  message: string,
+  weekending: string;
+  usercommitted: boolean;
+  totalreghours: number;
+  totalovertime: number;
+  message: string;
 };
 
 export type TimesheetState = {
-  errors?: {
-		[key: string]: string[] | undefined;
-		id?: string[];
-		employeeid?: string[];
-		weekending?: string[];
-		processed?: string[];
-		mgrapproved?: string[];
-		usercommitted?: string[];
-		totalreghours?: string[];
-		totalovertime?: string[];
-		approvedby?: string[];
-		submittedby?: string[];
-		processedby?: string[];
-    dateprocessed?: string[];
-    message?: string[];
-	} | undefined;
-	message?: string | null;
+  errors?:
+    | {
+        [key: string]: string[] | undefined;
+        id?: string[];
+        employeeid?: string[];
+        weekending?: string[];
+        processed?: string[];
+        mgrapproved?: string[];
+        usercommitted?: string[];
+        totalreghours?: string[];
+        totalovertime?: string[];
+        approvedby?: string[];
+        submittedby?: string[];
+        processedby?: string[];
+        dateprocessed?: string[];
+        message?: string[];
+      }
+    | undefined;
+  message?: string | null;
 };
 
 export type TimesheetDetails = {
@@ -241,12 +247,13 @@ export type TimesheetDetails = {
 };
 
 export type TimesheetDetailsEditInfo = {
+  id: number;
   timesheetid: number;
   employeeid: number;
   projectid: number;
   phase: number;
   costcode: number;
-  description?: string | null;
+  description: string | null ;
   mon: number;
   monot: number;
   tues: number;
@@ -265,48 +272,49 @@ export type TimesheetDetailsEditInfo = {
 };
 
 export const timesheetDetailsLabels = {
-  project: "project",
-  phase: "phase",
-  costcode: "costcode",
-  description: "description",
-  mon: "mon",
-  monot: "monOT",
-  tues: "tues",
-  tuesot: "tuesOT",
-  wed: "wed",
-  wedot: "wedOT",
-  thurs: "thurs",
-  thursot: "thursOT",
-  fri: "fri",
-  friot: "friOT",
-  sat: "sat",
-  satot: "satOT",
-  sun: "sun",
-  sunot: "sunOT",
-}
+	id: "id",
+	project: 'project',
+	phase: 'phase',
+	costcode: 'costcode',
+	description: 'description',
+	mon: 'mon',
+	monot: 'monOT',
+	tues: 'tues',
+	tuesot: 'tuesOT',
+	wed: 'wed',
+	wedot: 'wedOT',
+	thurs: 'thurs',
+	thursot: 'thursOT',
+	fri: 'fri',
+	friot: 'friOT',
+	sat: 'sat',
+	satot: 'satOT',
+	sun: 'sun',
+	sunot: 'sunOT',
+};
 
 export type ProjectOption = {
-  id: number,
-  number: string,
-  shortname: string,
-  description: string,
-}
+  id: number;
+  number: string;
+  shortname: string;
+  description: string;
+};
 
 export type PhaseOption = {
-  id: number,
-  description: string,
-}
+  id: number;
+  description: string;
+};
 
 export type CostCodeOption = {
-  id: number,
-  description: string,
-}
+  id: number;
+  description: string;
+};
 
 export type Options = {
-  projects: ProjectOption[]
-  phases: PhaseOption[]
-  costcodes: CostCodeOption[]
-}
+  projects: ProjectOption[];
+  phases: PhaseOption[];
+  costcodes: CostCodeOption[];
+};
 
 export type TabType = {
   label: string;
@@ -314,13 +322,13 @@ export type TabType = {
 };
 
 export type StateType = {
-	errors?: {
-		[key: string]: string[] | undefined;
-	  };
-	message?: string | null;
+  errors?: {
+    [key: string]: string[] | undefined;
+  };
+  message?: string | null;
 };
 
 export type CustomUser = {
   id: string;
-  role: "normalUser" | "admin";
-}
+  role: 'normalUser' | 'admin';
+};
