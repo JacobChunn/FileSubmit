@@ -2,11 +2,11 @@
 
 import { z } from 'zod';
 import { sql } from '@vercel/postgres';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, unstable_noStore } from 'next/cache';
 import { redirect } from 'next/navigation';
 //import { signIn } from '@/auth';
 //import { AuthError } from 'next-auth';
-import { EmployeeState, ProjectState } from './definitions';
+import { CostCodeOption, EmployeeState, Options, PhaseOption, ProjectOption, ProjectState, TimesheetDetails } from './definitions';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../api/auth/[...nextauth]/options';
 import { fetchEmployeeByID } from './data';
@@ -412,7 +412,7 @@ async function addTimesheetDetailsHelper({
   sun = 0, sunot = 0,
 }: {
     timesheetid: number,
-	employeeid: number,
+    employeeid: number,
     projectid?: number,
     phase?: number,
     costcode?: number,
@@ -461,6 +461,17 @@ async function addTimesheetDetailsHelper({
 
 export async function addTimesheetDetails(timesheetID: number) {
 
+  const validatedTimesheet = z.number().safeParse(timesheetID);
+
+	if (!validatedTimesheet.success) {
+		return {
+			errors: validatedTimesheet.error.flatten().fieldErrors,
+			message: 'Failed to Validate TimesheetID.',
+		};
+	}
+
+  const validatedTimesheetID = validatedTimesheet.data;
+
 	const session = await getServerSession(authOptions);
 
 	if (!session) {
@@ -474,7 +485,7 @@ export async function addTimesheetDetails(timesheetID: number) {
 	const employeeID = Number(session.user.id);
 
 	// Ensure timesheetID belongs to employee
-	const validOwnership = await employeeOwnsTimesheet(employeeID, timesheetID);
+	const validOwnership = await employeeOwnsTimesheet(employeeID, validatedTimesheetID);
 	if (!validOwnership) {
 		console.log("Employee does not own provided timesheet!");
 		return {
@@ -484,7 +495,7 @@ export async function addTimesheetDetails(timesheetID: number) {
 
 	try{
 		const addSuccess = await addTimesheetDetailsHelper({
-			timesheetid: timesheetID,
+			timesheetid: validatedTimesheetID,
 			employeeid: employeeID,
 		});
 	
@@ -500,8 +511,8 @@ export async function addTimesheetDetails(timesheetID: number) {
 				message: 'Failed to Create TimesheetDetails.',
 		};
 	}
-	revalidatePath(`/dashboard/${timesheetID}/edit/details`);
-	redirect(`/dashboard/${timesheetID}/edit/details`);
+	revalidatePath(`/dashboard/${validatedTimesheetID}/edit/details`);
+	redirect(`/dashboard/${validatedTimesheetID}/edit/details`);
 }
 
 export async function editTimesheetDetails(
@@ -517,15 +528,17 @@ export async function editTimesheetDetails(
 	// })
 
 
-	const validatedTimesheetID = z.number().safeParse(timesheetID);
+	const validatedTimesheet = z.number().safeParse(timesheetID);
 
 	// If form validation fails, return errors early. Otherwise, continue.
-	if (!validatedTimesheetID.success) {
+	if (!validatedTimesheet.success) {
 		return {
-			errors: validatedTimesheetID.error.flatten().fieldErrors,
+			errors: validatedTimesheet.error.flatten().fieldErrors,
 			message: 'Failed to Validate timesheetID.',
 		};
 	}
+
+  const validatedTimesheetID = validatedTimesheet.data;
 
 	// Get user session and id
 	const session = await getServerSession(authOptions);
@@ -541,7 +554,7 @@ export async function editTimesheetDetails(
 	const employeeID = Number(session.user.id);
 
 	// Ensure timesheetID belongs to employee
-	const validOwnership = await employeeOwnsTimesheet(employeeID, timesheetID);
+	const validOwnership = await employeeOwnsTimesheet(employeeID, validatedTimesheetID);
 	if (!validOwnership) {
 		console.log("Employee does not own provided timesheet!");
 		return {
@@ -617,7 +630,7 @@ export async function editTimesheetDetails(
 		
 		// Ensure validatedTSD's id field is linked to the timesheet
 
-		const TSDBelongsToTimesheet = await timesheetDetailsBelongsToTimesheet(validatedTSD.data.id, timesheetID);
+		const TSDBelongsToTimesheet = await timesheetDetailsBelongsToTimesheet(validatedTSD.data.id, validatedTimesheetID);
 
 		if (!TSDBelongsToTimesheet) {
 			const error = 'Timesheet Details does not belong to Timesheet';
@@ -741,6 +754,83 @@ function separateFormData(formData: FormData): SeparatedFormData {
   return result;
 }
 
+export async function fetchTimesheetDetailsEditFormData(
+  timesheetID: number
+) {
+  unstable_noStore();
+
+  const validatedTimesheet = z.number().safeParse(timesheetID);
+
+	if (!validatedTimesheet.success) {
+    console.error(validatedTimesheet.error.flatten().fieldErrors);
+    throw new Error('Failed to Validate TimesheetID.')
+	}
+
+	// Ensure user is logged in
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		throw new Error('Failed to Validate TimesheetID.');
+	}
+	
+	const employeeID = Number(session.user.id);
+	const validatedTimesheetID = validatedTimesheet.data;
+
+  // Ensure timesheetID belongs to employee
+	const validOwnership = await employeeOwnsTimesheet(employeeID, validatedTimesheetID);
+	if (!validOwnership) {
+    throw new Error("Employee does not own provided timesheet!")
+	}
+
+  try {
+    const TSDData = await sql<TimesheetDetails>`
+        SELECT
+            id, timesheetid, employeeid, projectid,
+            phase, costcode, description,
+            mon, monot,
+            tues, tuesot,
+            wed, wedot,
+            thurs, thursot,
+            fri, friot,
+            sat, satot,
+            sun, sunot,
+            lasteditdate
+        FROM timesheetdetails
+        WHERE timesheetdetails.timesheetid = ${validatedTimesheetID}
+    `;
+    const timesheetDetails = TSDData.rows;
+
+    const projectsData = await sql<ProjectOption>`
+      SELECT id, number, shortname, description FROM projects;
+	  `;
+  
+	  const phasesData = await sql<PhaseOption>`
+      SELECT id, description FROM phases;
+	  `;
+
+    const costCodesData = await sql<CostCodeOption>`
+      SELECT id, description FROM costcodes;
+	  `;
+
+	  const projects = projectsData.rows;
+    const phases = phasesData.rows;
+    const costcodes = costCodesData.rows;
+
+    const options: Options = {
+      projects,
+      phases,
+      costcodes,
+    }
+	  
+    return {options, timesheetDetails};
+
+} catch (error) {
+    console.error('Database Error:', error);
+    throw error;
+}
+
+}
+
 export async function deleteTimesheetDetails(
 	timesheetDetailsID: number,
 ) {
@@ -766,6 +856,8 @@ export async function deleteTimesheetDetails(
 	const employeeid = Number(session.user.id);
 	const TSDID = validatedTSDID.data;
 	let timesheetid = null;
+
+  console.log(TSDID)
 
 	try {
 		const timesheetData = await sql`
@@ -817,8 +909,10 @@ export async function deleteTimesheetDetails(
 		};
 	}
 
-	revalidatePath(`/dashboard/${timesheetid}/edit/details`);
-	redirect(`/dashboard/${timesheetid}/edit/details`);
+  console.log(timesheetid)
+
+	revalidatePath('/dashboard/' + timesheetid + '/edit/details');
+	redirect('/dashboard/' + timesheetid + '/edit/details');
 }
 
 export async function editTimesheet( // Check if user has permissions to edit

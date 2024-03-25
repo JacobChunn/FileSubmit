@@ -3,15 +3,26 @@
 interface InputProps {
 	info: string;
 	className?: string;
-	value: string | number | null,
+	value: string | number | null | undefined,
+	type?: string,
 }
 
 export default function Input({
 	info,
 	className='',
 	value,
+	type='number'
 }: InputProps) {
-	const defaultValue = value !== null ? value : '';
+	let defaultValue;
+
+	if (type == 'number') {
+		defaultValue = value !== null && value !== undefined ? value : 0;
+	}
+
+	if (type == 'text') {
+		defaultValue = value !== null && value !== undefined ? value : '';
+	}
+	
 
 	return (
 		<input

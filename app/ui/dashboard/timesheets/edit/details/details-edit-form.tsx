@@ -1,27 +1,73 @@
 'use client';
 
-import { deleteTimesheetDetails, editTimesheetDetails } from '@/app/lib/actions';
+import { deleteTimesheetDetails, editTimesheetDetails, fetchTimesheetDetailsEditFormData } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
-import { Options, TimesheetDetailsEditInfo, timesheetDetailsLabels } from '@/app/lib/definitions';
+import { Options, TimesheetDetails, TimesheetDetailsEditInfo, timesheetDetailsLabels } from '@/app/lib/definitions';
 import FormTextEntry from '@/app/ui/forms/edit-form/form-entry';
 import FormBoolEntry from '@/app/ui/forms/edit-form/form-bool-entry';
 import FormErrorHandling from '@/app/ui/forms/form-error-handling';
 import FormSubmitButton from '@/app/ui/forms/form-submit-button';
 import { getServerSession } from 'next-auth';
-import { useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import SelectWithFocusControl from '@/app/ui/forms/general-helper-components/select-w-description';
 import Input from '@/app/ui/forms/general-helper-components/input';
 import { TrashIcon } from '@heroicons/react/24/outline';
+import { notFound } from 'next/navigation';
+import { TimesheetContext } from '../../timesheet-wrapper';
 
-export default function TimesheetDetailsEditForm({
-    timesheetDetails,
-    timesheetID,
-    options,
+export default async function TimesheetDetailsEditForm({
+
 }: {
-    timesheetDetails: TimesheetDetailsEditInfo[],
-    timesheetID: number,
-    options: Options,
+
 }) {
+	const context = useContext(TimesheetContext);
+
+	if (context == null) {
+		throw new Error(
+			"context has to be used within <TimesheetContext.Provider>"
+		);
+	}
+
+	const timesheetID = context.selectedTimesheet;
+
+	if (timesheetID == null) {
+		throw new Error(
+			"selectedTimesheet of TimesheetContext has not been set!"
+		);
+	}
+
+	const [TSDData, setTSDData] = useState<{options: Options, timesheetDetails: TimesheetDetails[]} | null>(null);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const TSDDataReturn = await fetchTimesheetDetailsEditFormData(timesheetID);
+				setTSDData(TSDDataReturn);
+			} catch (error) {
+				console.error(error);
+				notFound();
+			}
+			if (!TSDData) {
+				notFound();
+			}
+		}
+
+		fetchData();
+	}, []);
+
+	if (!TSDData) {
+		notFound();
+	}
+
+	const {options, timesheetDetails} = TSDData
+		
+	if (timesheetDetails == null) {
+		notFound();
+	}
+
+
+
+
     const initialState = { message: null, errors: {} };
 	const editTimesheetDetailsWithID = editTimesheetDetails.bind(null, timesheetID);
     const [state, dispatch] = useFormState(editTimesheetDetailsWithID, initialState);
@@ -158,6 +204,7 @@ export default function TimesheetDetailsEditForm({
 								info={"TSD" + index + "[" + description + "]"}
 								className={descStyle}
 								value={val.description}
+								type='text'
 							/>
 						</td>
 						

@@ -1,23 +1,30 @@
 "use client"
-import { Employee, Timesheet } from "@/app/lib/definitions";
-import SortableTable from "@/app/ui/table/list-table";
-import TableDoubleTextEntry from "../../table/entries/table-double-text-entry";
-import TableBoolEntry from "../../table/entries/table-bool-entry";
+import { Timesheet } from "@/app/lib/definitions";
 import TableCheckEntry from "../../table/entries/table-check-entry";
 import TableTextEntry from "../../table/entries/table-text-entry";
 import TableEditEntry from "../../table/entries/table-edit-entry";
-import TableUserAvatarEntry from "../../table/entries/table-user-avatar-entry";
-import ListTable from "@/app/ui/table/list-table";
 import UserTable from "../../table/user-table";
 import TableDateEntry from "../../table/entries/table-date-entry";
 import TableDeleteEntry from "../../table/entries/table-delete-entry";
 import TableArgumentEntry from "../../table/entries/table-argument-entry";
+import { useContext } from "react";
+import { TimesheetContext } from "../timesheets/timesheet-wrapper";
+import { IconButton, Tooltip } from "../../material-tailwind-wrapper";
+import { PencilIcon } from "@heroicons/react/24/outline";
 
 export default function TimesheetTable({
 	timesheetPromise,
 }: {
 	timesheetPromise: Promise<Timesheet[]>;
 }) {
+	const context = useContext(TimesheetContext);
+
+	if (context == null) {
+		throw new Error(
+			"context has to be used within <TimesheetContext.Provider>"
+		);
+	}
+
     // Define table headers
 	const TABLE_HEAD = [
 		"ID", "Employee ID", "End Date", "Signed", "Approved", "Processed",
@@ -99,11 +106,20 @@ export default function TimesheetTable({
 			/>
 
 			{/* Edit Details */}
-			<TableEditEntry<Timesheet, keyof Timesheet>
+			{/* <TableEditEntry<Timesheet, keyof Timesheet>
 				dataProperty={'id'}
 				hrefBeforeID="/dashboard/"
 				hrefAfterID="/edit/details"				
-			/>
+			/> */}
+			<button
+			// 	onClick={() => context.setSelectedTimesheet()}
+			>
+				<Tooltip content="Edit Entry">
+					<IconButton variant="text">
+						<PencilIcon className="h-4 w-4"/>
+					</IconButton>
+				</Tooltip>
+			</button>
 
 
         </UserTable>

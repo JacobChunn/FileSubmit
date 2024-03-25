@@ -60,14 +60,8 @@ export default async function Page({ params }: { params: { id: any } }) {
 				</Link>
 			</Breadcrumbs>
 			<TimesheetDetailsWrapper>
-				<TimesheetDetailsHeader
-					timesheetID={timesheetID}
-				/>
-				<TimesheetDetailsEditForm
-					timesheetDetails={timesheetDetails}
-					timesheetID={timesheetID}
-					options={options}
-				/>
+				<TimesheetDetailsHeader/>
+				<TimesheetDetailsEditForm/>
 			</TimesheetDetailsWrapper>
         </main>
     );
