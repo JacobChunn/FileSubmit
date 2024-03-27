@@ -5,7 +5,7 @@ import { TimesheetContext } from "../timesheets/timesheet-wrapper";
 import { IconButton, Tooltip } from "../../material-tailwind-wrapper";
 import { PencilIcon } from "@heroicons/react/24/outline";
 
-export default function TimesheetTable({
+export default function TimesheetTableWrapper({
 	timesheetPromise,
 }: {
 	timesheetPromise: Promise<Timesheet[]>;
@@ -58,13 +58,22 @@ export default function TimesheetTable({
 					))}
 				</tr>
 			</thead>
+				<tbody>
 				{data !== undefined ?
-					<tbody>
-						
-					</tbody>
+					<tr>
+						<td>
+							Done Loading!
+						</td>
+					</tr>
 					:
-					<div>Loading...</div>
+					<tr>
+						<td>
+							Loading...
+						</td>
+					</tr>
 				}
+				</tbody>
+
 
 		</table>
 	)

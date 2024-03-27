@@ -1,6 +1,5 @@
 import { lusitana } from '@/app/ui/fonts';
 import { Metadata } from 'next';
-import TimesheetTable from '@/app/ui/dashboard/user-tables/timesheet-table';
 import { fetchTimesheetsByEmployeeID } from '@/app/lib/data';
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
@@ -9,6 +8,7 @@ import TimesheetDetailsEditForm from '@/app/ui/dashboard/timesheets/edit/details
 import TimesheetDetailsWrapper from '@/app/ui/dashboard/timesheets/edit/details/details-wrapper';
 import TimesheetDetailsHeader from '@/app/ui/dashboard/timesheets/edit/details/details-header';
 import TimesheetWrapper from '@/app/ui/dashboard/timesheets/timesheet-wrapper';
+import TimesheetTableWrapper from '@/app/ui/dashboard/user-tables/timesheet-table-wrapper';
 
 export const metadata: Metadata = {
 	title: 'Dashboard',
@@ -37,7 +37,7 @@ export default async function Page() {
 			</h1>
 			<div className='flex'>
 				<TimesheetWrapper>
-					<TimesheetTable timesheetPromise={timesheetPromise}/>
+					<TimesheetTableWrapper timesheetPromise={timesheetPromise}/>
 					<TimesheetDetailsWrapper>
 						<TimesheetDetailsHeader/>
 						<TimesheetDetailsEditForm/>
