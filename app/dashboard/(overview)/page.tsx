@@ -4,11 +4,13 @@ import { fetchTimesheetsByEmployeeID } from '@/app/lib/data';
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/options';
-import TimesheetDetailsEditForm from '@/app/ui/dashboard/timesheets/edit/details/details-edit-form';
-import TimesheetDetailsWrapper from '@/app/ui/dashboard/timesheets/edit/details/details-wrapper';
-import TimesheetDetailsHeader from '@/app/ui/dashboard/timesheets/edit/details/details-header';
-import TimesheetWrapper from '@/app/ui/dashboard/timesheets/timesheet-wrapper';
-import TimesheetTableWrapper from '@/app/ui/dashboard/user-tables/timesheet-table-wrapper';
+import TimesheetDetailsEditForm from '@/app/ui/dashboard/timesheets/details/details-edit-form';
+import TimesheetDetailsWrapper from '@/app/ui/dashboard/timesheets/details/details-wrapper';
+import TimesheetDetailsHeader from '@/app/ui/dashboard/timesheets/details/details-header';
+import TimesheetWrapper from '@/app/ui/dashboard/timesheets/table/timesheet-wrapper';
+import TimesheetTableWrapper from '@/app/ui/dashboard/timesheets/table/timesheet-table-wrapper';
+import TimesheetTableHeader from '@/app/ui/dashboard/timesheets/table/timesheet-table-header';
+import TimesheetTableBody from '@/app/ui/dashboard/timesheets/table/timesheet-table-body';
 
 export const metadata: Metadata = {
 	title: 'Dashboard',
@@ -37,7 +39,12 @@ export default async function Page() {
 			</h1>
 			<div className='flex'>
 				<TimesheetWrapper>
-					<TimesheetTableWrapper timesheetPromise={timesheetPromise}/>
+					<TimesheetTableWrapper
+						timesheetPromise={timesheetPromise}
+					>
+						<TimesheetTableHeader/>
+						<TimesheetTableBody/>
+					</TimesheetTableWrapper>
 					<TimesheetDetailsWrapper>
 						<TimesheetDetailsHeader/>
 						<TimesheetDetailsEditForm/>

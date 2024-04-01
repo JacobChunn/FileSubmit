@@ -1,7 +1,7 @@
 "use client"
 
 import { useContext } from "react"
-import { TimesheetContext } from "../../timesheet-wrapper"
+import { TimesheetContext } from "../table/timesheet-wrapper"
 
 export default function TimesheetDetailsWrapper({
 	children
@@ -12,7 +12,7 @@ export default function TimesheetDetailsWrapper({
 
 	return (
 		<div className="rounded-xl shadow-md p-6 w-full h-full">
-			{context?.selectedTimesheet == null ?
+			{context == undefined || context.selectedTimesheet == null ?
 				null
 				:
 				children

@@ -7,9 +7,9 @@ import clsx from 'clsx';
 import { lusitana } from '@/app/ui/fonts';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/options';
-import TimesheetDetailsEditForm from '@/app/ui/dashboard/timesheets/edit/details/details-edit-form';
-import TimesheetDetailsWrapper from '@/app/ui/dashboard/timesheets/edit/details/details-wrapper';
-import TimesheetDetailsHeader from '@/app/ui/dashboard/timesheets/edit/details/details-header';
+import TimesheetDetailsEditForm from '@/app/ui/dashboard/timesheets/details/details-edit-form';
+import TimesheetDetailsWrapper from '@/app/ui/dashboard/timesheets/details/details-wrapper';
+import TimesheetDetailsHeader from '@/app/ui/dashboard/timesheets/details/details-header';
 
 export const metadata: Metadata = {
   title: 'Edit Timesheet',

@@ -13,7 +13,7 @@ import SelectWithFocusControl from '@/app/ui/forms/general-helper-components/sel
 import Input from '@/app/ui/forms/general-helper-components/input';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { notFound } from 'next/navigation';
-import { TimesheetContext } from '../../timesheet-wrapper';
+import { TimesheetContext } from '../table/timesheet-wrapper';
 
 export default async function TimesheetDetailsEditForm({
 

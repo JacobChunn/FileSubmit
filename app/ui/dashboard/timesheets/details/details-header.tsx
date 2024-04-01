@@ -2,7 +2,7 @@
 import { addTimesheetDetails } from "@/app/lib/actions"
 import { Button } from "@/app/ui/button"
 import { useContext } from "react"
-import { TimesheetContext } from "../../timesheet-wrapper"
+import { TimesheetContext } from "../table/timesheet-wrapper"
 
 export default function TimesheetDetailsHeader({
 	children
