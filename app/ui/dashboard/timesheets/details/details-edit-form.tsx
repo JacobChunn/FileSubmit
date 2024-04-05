@@ -10,12 +10,13 @@ import FormSubmitButton from '@/app/ui/forms/form-submit-button';
 import { getServerSession } from 'next-auth';
 import { useContext, useEffect, useState } from 'react';
 import SelectWithFocusControl from '@/app/ui/forms/general-helper-components/select-w-description';
+import SelectWithFocusControl2 from '@/app/ui/forms/general-helper-components/select-w-description2';
 import Input from '@/app/ui/forms/general-helper-components/input';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { notFound } from 'next/navigation';
 import { TimesheetContext } from '../table/timesheet-wrapper';
 
-export default async function TimesheetDetailsEditForm({
+export default function TimesheetDetailsEditForm({
 
 }: {
 
@@ -37,41 +38,42 @@ export default async function TimesheetDetailsEditForm({
 	}
 
 	const [TSDData, setTSDData] = useState<{options: Options, timesheetDetails: TimesheetDetails[]} | null>(null);
+	const initialState = { message: null, errors: {} };
+	const editTimesheetDetailsWithID = editTimesheetDetails.bind(null, timesheetID);
+    const [state, dispatch] = useFormState(editTimesheetDetailsWithID, initialState);
 
 	useEffect(() => {
 		const fetchData = async () => {
+			console.log('TS-ID', timesheetID)
 			try {
+				setTSDData(null);
 				const TSDDataReturn = await fetchTimesheetDetailsEditFormData(timesheetID);
 				setTSDData(TSDDataReturn);
 			} catch (error) {
 				console.error(error);
 				notFound();
 			}
-			
-			if (!TSDData) {
-				notFound();
-			}
 		}
 
 		fetchData();
-	}, []);
+	}, [timesheetID]);
 
 	if (!TSDData) {
-		notFound();
+		console.log("Loading...")
+		return (<div>Loading...</div>)
 	}
 
-	const {options, timesheetDetails} = TSDData
+	const {options, timesheetDetails} = TSDData;
 		
 	if (timesheetDetails == null) {
+		console.log("notfound2")
 		notFound();
 	}
 
 
 
 
-    const initialState = { message: null, errors: {} };
-	const editTimesheetDetailsWithID = editTimesheetDetails.bind(null, timesheetID);
-    const [state, dispatch] = useFormState(editTimesheetDetailsWithID, initialState);
+
 
     const {
         id, project, phase, costcode, description, mon, monot, 
@@ -133,10 +135,14 @@ export default async function TimesheetDetailsEditForm({
 	const descRowStyle = 'w-1/6'
 
 
+	console.log("TSDs", timesheetDetails)
+
     return (
         <form
             action={dispatch}
             className='w-full h-full'
+			key={"form" + timesheetID}
+			id={"form" + timesheetID}
         >
 			<table className='w-full'>
 				<thead>
@@ -145,15 +151,15 @@ export default async function TimesheetDetailsEditForm({
 							<th
 								key={"header"+index}
 							>
-								{val}
+								{val + timesheetID}
 							</th>
 						))}
 					</tr>
 				</thead>
 				<tbody className='w-full'>
-				{timesheetDetails.map((val, index) => (
+				{timesheetDetails ? timesheetDetails.map((val, index) => (
 					<tr
-						key={"k-" + index}
+						key={"k-" + index + timesheetID}
 						className='w-full h-full'
 					>
 						<td className={selectRowStyle}>
@@ -168,13 +174,14 @@ export default async function TimesheetDetailsEditForm({
 							/>
 
 							{/* Project */}
-							<SelectWithFocusControl
+							<SelectWithFocusControl2
 								info={"TSD" + index + "[" + project + "]"}
+								info2={"TSD" + index + "[" + project + "] " + timesheetID}
 								value={val.projectid}
 								className = {selectStyle}
 							>
 								{projectOptions}
-							</SelectWithFocusControl>
+							</SelectWithFocusControl2>
 						</td>
 
 						<td className={selectRowStyle}>
@@ -322,7 +329,7 @@ export default async function TimesheetDetailsEditForm({
 						}
 						</td>
 					</tr>
-				))}
+				)) : null}
 				</tbody>
 			</table>
             <FormSubmitButton

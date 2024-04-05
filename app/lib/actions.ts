@@ -799,7 +799,6 @@ export async function fetchTimesheetDetailsEditFormData(
         WHERE timesheetdetails.timesheetid = ${validatedTimesheetID}
     `;
     const timesheetDetails = TSDData.rows;
-
     const projectsData = await sql<ProjectOption>`
       SELECT id, number, shortname, description FROM projects;
 	  `;
