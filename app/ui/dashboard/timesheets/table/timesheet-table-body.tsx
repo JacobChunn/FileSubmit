@@ -6,7 +6,8 @@ import { DateTime } from "luxon";
 import TextEntry from "./entries/text-entry";
 import DateEntry from "./entries/date-entry";
 import BoolEntry from "./entries/bool-entry";
-import { PencilIcon } from "@heroicons/react/24/outline";
+import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 export default function TimesheetTableBody({
     children
@@ -33,18 +34,18 @@ export default function TimesheetTableBody({
                 context.timesheetDetails.map((data, index) => (
                 <tr key={index}>
                     {/* ID */}
-                    <td className={rowStyles}>
+                    {/* <td className={rowStyles}>
                         <TextEntry>
                             {data['id']}
                         </TextEntry>
-                    </td>
+                    </td> */}
 
                     {/* Employee ID */}
-                    <td className={rowStyles}>
+                    {/* <td className={rowStyles}>
                         <TextEntry>
                             {data['employeeid']}
                         </TextEntry>
-                    </td>
+                    </td> */}
 
                     {/* End Date */}
                     <td className={rowStyles}>
@@ -116,17 +117,6 @@ export default function TimesheetTableBody({
                         </Typography>
                     </td> */}
 
-                    {/* Delete */}
-                    {/* <td className={rowStyles}>
-                        <Typography
-                            variant={variant}
-                            color={color}
-                            className={`font-normal text-blue-gray-900 text-xs ${addonStyles}`}
-                        >
-                            {data['id']}
-                        </Typography>
-                    </td> */}
-
                     {/* Edit Details */}
                     <td className={rowStyles}>
                         <Tooltip content="Edit Entry">
@@ -134,6 +124,17 @@ export default function TimesheetTableBody({
                                 <PencilIcon className="h-4 w-4"/>
                             </IconButton>
                         </Tooltip>
+                    </td>
+
+                    {/* Delete */}
+                    <td className={rowStyles}>
+                        <Link href={"/dashboard/" + data['id'] + "/delete"}>
+                            <Tooltip content="Delete Entry">
+                                <IconButton variant="text">
+                                    <TrashIcon className="h-4 w-4" />
+                                </IconButton>
+                            </Tooltip>
+                        </Link>
                     </td>
 
                 </tr>

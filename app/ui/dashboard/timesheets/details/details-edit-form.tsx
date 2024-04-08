@@ -151,7 +151,7 @@ export default function TimesheetDetailsEditForm({
 							<th
 								key={"header"+index}
 							>
-								{val + timesheetID}
+								{val}
 							</th>
 						))}
 					</tr>

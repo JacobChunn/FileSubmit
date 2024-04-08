@@ -1,3 +1,7 @@
+import { Button } from "@/app/ui/material-tailwind-wrapper";
+import { UserPlusIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
+
 export default function TimesheetTableHeader({
     children
 }: {
@@ -5,12 +9,21 @@ export default function TimesheetTableHeader({
 }) {
 
     const TABLE_HEAD = [
-		"ID", "Employee ID", "End Date", "Signed", "Approved", "Processed",
-		"Signed by", "Reg", "OT", "Total", "Edit", "Delete", "Edit Details",
+		"End Date", "Signed", "Approved", "Processed",
+		"Signed by", "Reg", "OT", "Total", "Edit", "Delete",
 	] as const;
 
     return (
         <thead>
+            <tr>
+                <th className="sticky right-5">
+                    <Link href={"/dashboard/add"}>
+                        <Button className="flex items-center gap-3" size="sm">
+                            <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> {"Add Timesheet"}
+                        </Button>
+                    </Link>
+                </th>
+            </tr>
             <tr>
                 {TABLE_HEAD.map((head, index) => (
                     <th
