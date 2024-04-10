@@ -6,10 +6,10 @@ import { revalidatePath, unstable_noStore } from 'next/cache';
 import { redirect } from 'next/navigation';
 //import { signIn } from '@/auth';
 //import { AuthError } from 'next-auth';
-import { CostCodeOption, EmployeeState, Options, PhaseOption, ProjectOption, ProjectState, TimesheetDetails } from './definitions';
+import { CostCodeOption, EmployeeState, Options, PhaseOption, ProjectOption, ProjectState, Timesheet, TimesheetDetails } from './definitions';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../api/auth/[...nextauth]/options';
-import { fetchEmployeeByID } from './data';
+import { fetchEmployeeByID, fetchTimesheetsByEmployeeID } from './data';
 import * as bcrypt from 'bcrypt';
 import { DateTime } from 'luxon';
 import { time } from 'console';
@@ -396,6 +396,42 @@ export async function addTimesheet(
 
   revalidatePath('/dashboard');
   redirect('/dashboard');
+}
+
+export async function fetchTimesheetsWithAuth() {
+
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    console.log("Session was unable to be retrieved!");
+    return null;
+
+  }
+
+  const employeeid = Number(session.user.id);
+
+  if (isNaN(employeeid)) {
+    console.error('id is not a number');
+    return null;
+  }
+
+  try {
+	  const data = await sql<Timesheet>`
+		SELECT
+    id, employeeid, weekending, processed, mgrapproved,
+    usercommitted, totalreghours, totalovertime, approvedby,
+    submittedby, processedby, dateprocessed, message
+		FROM timesheets
+    WHERE timesheets.employeeid = ${employeeid};
+	  `;
+	  const dataRows = data.rows;
+    //console.log(dataRows);
+	  return dataRows;
+	} catch (error) {
+	  console.error('Database Error:', error);
+	  return null;
+	}
+
 }
 
 // Intended to be ran as a server helper function

@@ -29,9 +29,9 @@ export default async function Page() {
 	}
 
 
-	const employeeID = Number(session.user.id);
+	//const employeeID = Number(session.user.id);
 
-	const timesheetPromise = (await fetchTimesheetsByEmployeeID(employeeID)).json()
+	//const timesheetPromise = (await fetchTimesheetsByEmployeeID(employeeID)).json()
 	return (
 		<main>
 			<h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
@@ -39,9 +39,7 @@ export default async function Page() {
 			</h1>
 			<div className='flex'>
 				<TimesheetWrapper>
-					<TimesheetTableWrapper
-						timesheetPromise={timesheetPromise}
-					>
+					<TimesheetTableWrapper>
 						<TimesheetTableHeader/>
 						<TimesheetTableBody/>
 					</TimesheetTableWrapper>

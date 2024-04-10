@@ -6,8 +6,8 @@ import { createContext, useState } from "react";
 type timesheetContextType = {
     selectedTimesheet: number | null;
     setSelectedTimesheet: React.Dispatch<React.SetStateAction<number | null>>;
-    timesheetDetails: Timesheet[] | null;
-    setTimesheetDetails: React.Dispatch<React.SetStateAction<Timesheet[] | null>>
+    timesheet: Timesheet[] | null;
+    setTimesheet: React.Dispatch<React.SetStateAction<Timesheet[] | null>>
 }
 
 export const TimesheetContext = createContext<timesheetContextType | null>(null)
@@ -19,13 +19,13 @@ export default function TimesheetWrapper({
 }) {
 
 	const [selectedTimesheet, setSelectedTimesheet] = useState<number | null>(null);
-    const [timesheetDetails, setTimesheetDetails] = useState<Timesheet[] | null>(null);
+    const [timesheet, setTimesheet] = useState<Timesheet[] | null>(null);
 
     return (
         <TimesheetContext.Provider
             value={{
                 selectedTimesheet, setSelectedTimesheet,
-                timesheetDetails, setTimesheetDetails,
+                timesheet, setTimesheet,
             }}
         >
             {children}

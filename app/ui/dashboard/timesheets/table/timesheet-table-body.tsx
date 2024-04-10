@@ -27,11 +27,13 @@ export default function TimesheetTableBody({
     const variant = 'small';
     const color = 'blue-gray';
     const addonStyles = '';
+
+    console.log(context.timesheet);
     
     return (
         <tbody>
-            {context.timesheetDetails !== null ?
-                context.timesheetDetails.map((data, index) => (
+            {context.timesheet !== null ?
+                context.timesheet.map((data, index) => (
                 <tr key={index}>
                     {/* ID */}
                     {/* <td className={rowStyles}>

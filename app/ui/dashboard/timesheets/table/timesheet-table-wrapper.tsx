@@ -2,12 +2,13 @@
 import { Timesheet } from "@/app/lib/definitions";
 import { useContext, useEffect } from "react";
 import { TimesheetContext } from "./timesheet-wrapper";
+import { fetchTimesheetsWithAuth } from "@/app/lib/actions";
 
 export default function TimesheetTableWrapper({
-	timesheetPromise,
+	//timesheetPromise,
 	children,
 }: {
-	timesheetPromise: Promise<Timesheet[]>;
+	//timesheetPromise: Promise<Timesheet[]>;
 	children?: React.ReactNode;
 }) {
 	const context = useContext(TimesheetContext);
@@ -20,8 +21,9 @@ export default function TimesheetTableWrapper({
 
     useEffect(() => {
 		const handleDataPromise = async() => {
-			const returnedData = await timesheetPromise;
-			context.setTimesheetDetails(returnedData);
+			const data = await fetchTimesheetsWithAuth();
+			console.log()
+			context.setTimesheet(data);
 		}
 		
 		handleDataPromise();

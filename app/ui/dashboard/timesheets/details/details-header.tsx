@@ -36,7 +36,6 @@ export default function TimesheetDetailsHeader({
 				<Button
 					onClick={() =>{
 						addTimesheetDetails(timesheetID)
-						const timesheetPromise = (await fetchTimesheetsByEmployeeID(employeeID)).json()
 					}}
 				>
 					Add Timesheet Details
