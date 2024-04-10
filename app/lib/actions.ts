@@ -511,8 +511,9 @@ export async function addTimesheetDetails(timesheetID: number) {
 				message: 'Failed to Create TimesheetDetails.',
 		};
 	}
-	revalidatePath(`/dashboard/${validatedTimesheetID}/edit/details`);
-	redirect(`/dashboard/${validatedTimesheetID}/edit/details`);
+  revalidatePath(`/dashboard`);
+	// revalidatePath(`/dashboard/${validatedTimesheetID}/edit/details`);
+	// redirect(`/dashboard/${validatedTimesheetID}/edit/details`);
 }
 
 export async function editTimesheetDetails(

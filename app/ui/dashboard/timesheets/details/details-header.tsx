@@ -1,7 +1,7 @@
 "use client"
 import { addTimesheetDetails } from "@/app/lib/actions"
 import { Button } from "@/app/ui/button"
-import { useContext } from "react"
+import { useContext, useEffect, useState } from "react"
 import { TimesheetContext } from "../table/timesheet-wrapper"
 
 export default function TimesheetDetailsHeader({
@@ -10,6 +10,11 @@ export default function TimesheetDetailsHeader({
 	children?: React.ReactNode
 }) {
 	const context = useContext(TimesheetContext)
+	const [changedTSD, setChangedTSD] = useState<number>(0);
+
+	useEffect(() => {
+		
+	}, [changedTSD]);
 
 	if (context == null) {
 		throw new Error(
@@ -29,7 +34,10 @@ export default function TimesheetDetailsHeader({
 		<div className="w-full h-full">
 			<div className="flex justify-end py-4">
 				<Button
-					onClick={() => addTimesheetDetails(timesheetID)}
+					onClick={() =>{
+						addTimesheetDetails(timesheetID)
+						const timesheetPromise = (await fetchTimesheetsByEmployeeID(employeeID)).json()
+					}}
 				>
 					Add Timesheet Details
 					{children}
