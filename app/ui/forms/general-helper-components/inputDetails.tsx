@@ -13,7 +13,7 @@ interface InputProps {
 	type?: string,
 }
 
-export default function inputDetails({
+export default function InputDetails({
 	index,
 	attr,
 	info,
