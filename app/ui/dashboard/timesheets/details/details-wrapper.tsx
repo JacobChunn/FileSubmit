@@ -11,7 +11,7 @@ export default function TimesheetDetailsWrapper({
 	const context = useContext(TimesheetContext)
 
 	return (
-		<div className="rounded-xl shadow-md p-6 w-full h-full">
+		<div className=" p-6 w-full h-full">
 			{context == undefined || context.selectedTimesheet == null ?
 				null
 				:

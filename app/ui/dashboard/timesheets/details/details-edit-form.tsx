@@ -16,6 +16,7 @@ import { notFound } from 'next/navigation';
 import { TimesheetContext } from '../table/timesheet-wrapper';
 import Input from '@/app/ui/forms/general-helper-components/inputDetails';
 import FormSubmitDetailsButton from '@/app/ui/forms/form-submit-details-button';
+import { IconButton, Tooltip } from '@/app/ui/material-tailwind-wrapper';
 
 export default function TimesheetDetailsEditForm({
 
@@ -42,7 +43,6 @@ export default function TimesheetDetailsEditForm({
 	const initialState = { message: null, errors: {} };
 	const editTimesheetDetailsWithID = editTimesheetDetails.bind(null, timesheetID);
     const [state, dispatch] = useFormState(editTimesheetDetailsWithID, initialState);
-	const [changes, setChanges] = useState<number | null>(null);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -91,7 +91,7 @@ export default function TimesheetDetailsEditForm({
 
 	const tableHeaders = [
 		"Project", "Phase", "Cost Code", "Description",
-		"Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun",
+		"Mn", "Tu", "Wd", "Tr", "Fr", "St", "Sn",
 	];
 
     const {projects, phases, costcodes} = options;
@@ -138,10 +138,13 @@ export default function TimesheetDetailsEditForm({
 	const selectStyle = 'h-12 w-full';
 	const descStyle = 'h-12 w-full';
 
-	const dayRowStyle = 'w-1/32'
+	const dayRowStyle = 'min-w-4 max-w-4'
 	const selectRowStyle = 'w-1/10'
 	const descRowStyle = 'w-1/6'
 
+	const colProjPhaseCostCodeStyle = 'w-1/6'
+	const colDescStyle = 'w-1/2'
+	const colDayStyle = 'w-40 min-w-40'
 
 	console.log("localTSDs", context.localTimesheetDetails);
 	const TSDLen = context.localTimesheetDetails?.length || 0;
@@ -356,25 +359,15 @@ export default function TimesheetDetailsEditForm({
 						{/* Delete TSD */}
 						<td className='h-auto w-1/32 relative'>
 							{!oneTSDExists ? 
-								<button
+								<IconButton
+									className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center p-"
+									variant='text'
 									type='button'
 									onClick={() => {
-										//deleteTimesheetDetails(val.id);
 										console.log(index);
 										const currentTSDs = context.localTimesheetDetails || [];
 										context.setLocalTimesheetDetails(null);
-										// console.log([
-										// 	...currentTSDs.slice(0, index),
-										// 	currentTSDs[index + 1],
-										// 	...currentTSDs.slice(index + 1)
-										// ]);
-										// context.setLocalTimesheetDetails(() => {
-										// 	return [
-										// 		...currentTSDs.slice(0, index),
-										// 		currentTSDs[index + 1],
-										// 		...currentTSDs.slice(index + 1)
-										// 	]
-										// })
+
 										context.setLocalTimesheetDetails(() => {
 											
 											console.log([
@@ -387,13 +380,13 @@ export default function TimesheetDetailsEditForm({
 												...currentTSDs.slice(index + 1)
 											]
 										});
-										// const newChange = changes || 0;
-										//setChanges(newChange + 1);
 									}}
-									className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center p-3"
+									
 								>
-									<TrashIcon className='h-full' />
-								</button>
+									<Tooltip content='Delete Entry'>
+										<TrashIcon className='w-4 h-4' />
+									</Tooltip>
+								</IconButton>
 							:
 							null
 						}
