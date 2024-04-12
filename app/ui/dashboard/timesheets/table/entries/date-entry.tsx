@@ -11,16 +11,15 @@ export default function DateEntry({
     children?: React.ReactNode
 }) {
     if (!children) return null;
-    const childType = typeof(children);
-    console.log(childType, children)
+	const date = new Date(children as string);
+	const formattedDate = DateTime.fromJSDate(date).setZone('utc').toLocaleString();
     return (
         <Typography
             variant={variant}
             color={color}
             className={`font-normal text-blue-gray-900 text-xs`}
         >
-        
-            {DateTime.fromISO(children as string).setZone('utc').toLocaleString()}
+            {formattedDate}
             
         </Typography>
     )
