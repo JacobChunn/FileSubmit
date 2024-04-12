@@ -11,10 +11,10 @@ import { getServerSession } from 'next-auth';
 import { useContext, useEffect, useState } from 'react';
 import SelectWithFocusControl from '@/app/ui/forms/general-helper-components/select-w-description';
 import SelectWithFocusControl2 from '@/app/ui/forms/general-helper-components/select-w-description2';
-import Input from '@/app/ui/forms/general-helper-components/input';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { notFound } from 'next/navigation';
 import { TimesheetContext } from '../table/timesheet-wrapper';
+import Input from '@/app/ui/forms/general-helper-components/inputDetails';
 
 export default function TimesheetDetailsEditForm({
 
@@ -38,18 +38,20 @@ export default function TimesheetDetailsEditForm({
 	}
 
 	const [TSDDataAndOptions, setTSDDataAndOptions] = useState<{options: Options, timesheetDetails: TimesheetDetails[]} | null>(null);
-	const [localTSDs, setLocalTSDs] = useState<>();
 	const initialState = { message: null, errors: {} };
 	const editTimesheetDetailsWithID = editTimesheetDetails.bind(null, timesheetID);
     const [state, dispatch] = useFormState(editTimesheetDetailsWithID, initialState);
+	const [changes, setChanges] = useState<number | null>(null);
 
 	useEffect(() => {
 		const fetchData = async () => {
 			console.log('TS-ID', timesheetID)
 			try {
+				context.setLocalTimesheetDetails(null);
 				setTSDDataAndOptions(null);
 				const TSDDataReturn = await fetchTimesheetDetailsEditFormData(timesheetID);
 				setTSDDataAndOptions(TSDDataReturn);
+				context.setLocalTimesheetDetails(TSDDataReturn.timesheetDetails);
 			} catch (error) {
 				console.error(error);
 				notFound();
@@ -58,6 +60,10 @@ export default function TimesheetDetailsEditForm({
 
 		fetchData();
 	}, [timesheetID]);
+
+	useEffect(() => {
+		console.log("need a repaint?")
+	},[timesheetID, context.localTimesheetDetails])
 
 	if (!TSDDataAndOptions) {
 		console.log("Loading...")
@@ -136,14 +142,16 @@ export default function TimesheetDetailsEditForm({
 	const descRowStyle = 'w-1/6'
 
 
-	console.log("TSDs", timesheetDetails)
+	console.log("localTSDs", context.localTimesheetDetails);
+	const TSDLen = context.localTimesheetDetails?.length || 0;
+	console.log("localTSD length", context.localTimesheetDetails?.length);
 
     return (
         <form
             action={dispatch}
             className='w-full h-full'
 			key={"form" + timesheetID}
-			id={"form" + timesheetID}
+			id={"form" + timesheetID + " " + TSDLen}
         >
 			<table className='w-full'>
 				<thead>
@@ -158,7 +166,7 @@ export default function TimesheetDetailsEditForm({
 					</tr>
 				</thead>
 				<tbody className='w-full'>
-				{timesheetDetails ? timesheetDetails.map((val, index) => (
+				{context.localTimesheetDetails ? context.localTimesheetDetails.map((val, index) => (
 					<tr
 						key={"k-" + index + timesheetID}
 						className='w-full h-full'
@@ -208,11 +216,12 @@ export default function TimesheetDetailsEditForm({
 
 						{/* Description */}
 						<td className={descRowStyle}>
-							
 							<Input
+								index={index}
+								attr='description'
 								info={"TSD" + index + "[" + description + "]"}
-								className={descStyle}
 								value={val.description}
+								className={descStyle}
 								type='text'
 							/>
 						</td>
@@ -220,11 +229,15 @@ export default function TimesheetDetailsEditForm({
 						{/* Monday */}
 						<td className={dayRowStyle}>
 							<Input
+								index={index}
+								attr='mon'
 								info={"TSD" + index + "[" + mon + "]"}
 								className={dayRegStyle}
 								value={val.mon}
 							/>
 							<Input
+								index={index}
+								attr='monot'
 								info={"TSD" + index + "[" + monot + "]"}
 								className={dayOTStyle}
 								value={val.monot}
@@ -234,11 +247,15 @@ export default function TimesheetDetailsEditForm({
 						{/* Tuesday */}
 						<td className={dayRowStyle}>
 							<Input
+								index={index}
+								attr='tues'
 								info={"TSD" + index + "[" + tues + "]"}
 								className={dayRegStyle}
 								value={val.tues}
 							/>
 							<Input
+								index={index}
+								attr='tuesot'
 								info={"TSD" + index + "[" + tuesot + "]"}
 								className={dayOTStyle}
 								value={val.tuesot}
@@ -248,11 +265,15 @@ export default function TimesheetDetailsEditForm({
 						{/* Wednesday */}
 						<td className={dayRowStyle}>
 							<Input
+								index={index}
+								attr='wed'
 								info={"TSD" + index + "[" + wed + "]"}
 								className={dayRegStyle}
 								value={val.wed}
 							/>
 							<Input
+								index={index}
+								attr='wedot'
 								info={"TSD" + index + "[" + wedot + "]"}
 								className={dayOTStyle}
 								value={val.wedot}
@@ -262,11 +283,15 @@ export default function TimesheetDetailsEditForm({
 						{/* Thursday */}
 						<td className={dayRowStyle}>
 							<Input
+								index={index}
+								attr='thurs'
 								info={"TSD" + index + "[" + thurs + "]"}
 								className={dayRegStyle}
 								value={val.thurs}
 							/>
 							<Input
+								index={index}
+								attr='thursot'
 								info={"TSD" + index + "[" + thursot + "]"}
 								className={dayOTStyle}
 								value={val.thursot}
@@ -276,11 +301,15 @@ export default function TimesheetDetailsEditForm({
 						{/* Friday */}
 						<td className={dayRowStyle}>
 							<Input
+								index={index}
+								attr='fri'
 								info={"TSD" + index + "[" + fri + "]"}
 								className={dayRegStyle}
 								value={val.fri}
 							/>
 							<Input
+								index={index}
+								attr='friot'
 								info={"TSD" + index + "[" + friot + "]"}
 								className={dayOTStyle}
 								value={val.friot}
@@ -290,11 +319,15 @@ export default function TimesheetDetailsEditForm({
 						{/* Saturday */}
 						<td className={dayRowStyle}>
 							<Input
+								index={index}
+								attr='sat'
 								info={"TSD" + index + "[" + sat + "]"}
 								className={dayRegStyle}
 								value={val.sat}
 							/>
 							<Input
+								index={index}
+								attr='satot'
 								info={"TSD" + index + "[" + satot + "]"}
 								className={dayOTStyle}
 								value={val.satot}
@@ -304,11 +337,15 @@ export default function TimesheetDetailsEditForm({
 						{/* Sunday */}
 						<td className={dayRowStyle}>
 							<Input
+								index={index}
+								attr='sun'
 								info={"TSD" + index + "[" + sun + "]"}
 								className={dayRegStyle}
 								value={val.sun}
 							/>
 							<Input
+								index={index}
+								attr='sunot'
 								info={"TSD" + index + "[" + sunot + "]"}
 								className={dayOTStyle}
 								value={val.sunot}
@@ -320,7 +357,38 @@ export default function TimesheetDetailsEditForm({
 							{!oneTSDExists ? 
 								<button
 									type='button'
-									onClick={() => deleteTimesheetDetails(val.id)}
+									onClick={() => {
+										//deleteTimesheetDetails(val.id);
+										console.log(index);
+										const currentTSDs = context.localTimesheetDetails || [];
+										context.setLocalTimesheetDetails(null);
+										// console.log([
+										// 	...currentTSDs.slice(0, index),
+										// 	currentTSDs[index + 1],
+										// 	...currentTSDs.slice(index + 1)
+										// ]);
+										// context.setLocalTimesheetDetails(() => {
+										// 	return [
+										// 		...currentTSDs.slice(0, index),
+										// 		currentTSDs[index + 1],
+										// 		...currentTSDs.slice(index + 1)
+										// 	]
+										// })
+										context.setLocalTimesheetDetails(() => {
+											
+											console.log([
+												...currentTSDs.slice(0, index),
+												...currentTSDs.slice(index + 1)
+											]);
+											if (!currentTSDs) return [];
+											return [
+												...currentTSDs.slice(0, index),
+												...currentTSDs.slice(index + 1)
+											]
+										});
+										// const newChange = changes || 0;
+										//setChanges(newChange + 1);
+									}}
 									className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center p-3"
 								>
 									<TrashIcon className='h-full' />
@@ -340,3 +408,5 @@ export default function TimesheetDetailsEditForm({
         </form>
     );
 }
+
+

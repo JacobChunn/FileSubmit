@@ -4,34 +4,39 @@ import { Timesheet, TimesheetDetails } from "@/app/lib/definitions";
 import { createContext, useState } from "react";
 
 type timesheetContextType = {
+    employeeid: number;
+
     selectedTimesheet: number | null;
     setSelectedTimesheet: React.Dispatch<React.SetStateAction<number | null>>;
 
     timesheet: Timesheet[] | null;
     setTimesheet: React.Dispatch<React.SetStateAction<Timesheet[] | null>>
 
-    timesheetDetails: TimesheetDetails[] | null;
-    setTimesheetDetails: React.Dispatch<React.SetStateAction<TimesheetDetails[] | null>>
+    localTimesheetDetails: TimesheetDetails[] | null;
+    setLocalTimesheetDetails: React.Dispatch<React.SetStateAction<TimesheetDetails[] | null>>
 }
 
 export const TimesheetContext = createContext<timesheetContextType | null>(null)
 
 export default function TimesheetWrapper({
+    employeeid,
     children,
 }: {
+    employeeid: number,
     children: React.ReactNode,
 }) {
 
 	const [selectedTimesheet, setSelectedTimesheet] = useState<number | null>(null);
     const [timesheet, setTimesheet] = useState<Timesheet[] | null>(null);
-    const [timesheetDetails, setTimesheetDetails] = useState<TimesheetDetails[] | null>(null);
+    const [localTimesheetDetails, setLocalTimesheetDetails] = useState<TimesheetDetails[] | null>(null);
 
     return (
         <TimesheetContext.Provider
             value={{
+                employeeid,
                 selectedTimesheet, setSelectedTimesheet,
                 timesheet, setTimesheet,
-                timesheetDetails, setTimesheetDetails,
+                localTimesheetDetails, setLocalTimesheetDetails,
             }}
         >
             {children}

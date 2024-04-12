@@ -3,6 +3,7 @@ import { addTimesheetDetails } from "@/app/lib/actions"
 import { Button } from "@/app/ui/button"
 import { useContext, useEffect, useState } from "react"
 import { TimesheetContext } from "../table/timesheet-wrapper"
+import { TimesheetDetails } from "@/app/lib/definitions"
 
 export default function TimesheetDetailsHeader({
 	children
@@ -35,7 +36,33 @@ export default function TimesheetDetailsHeader({
 			<div className="flex justify-end py-4">
 				<Button
 					onClick={() =>{
-						addTimesheetDetails(timesheetID)
+						//addTimesheetDetails(timesheetID)
+						const currentTSDs = context.localTimesheetDetails || [];
+						const newTSD: TimesheetDetails = {
+							id: 0,
+							timesheetid: timesheetID,
+							employeeid: context.employeeid,
+							projectid: 0,
+							phase: 0,
+							costcode: 0,
+							description: null,
+							mon: 0,
+							monot: 0,
+							tues: 0,
+							tuesot: 0,
+							wed: 0,
+							wedot: 0,
+							thurs: 0,
+							thursot: 0,
+							fri: 0,
+							friot: 0,
+							sat: 0,
+							satot: 0,
+							sun: 0,
+							sunot: 0,
+							lasteditdate: ""
+						}
+						context.setLocalTimesheetDetails([...currentTSDs, newTSD]);
 					}}
 				>
 					Add Timesheet Details
