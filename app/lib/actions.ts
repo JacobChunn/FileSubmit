@@ -559,12 +559,6 @@ export async function editTimesheetDetails(
 ) {
 	//console.log(formData);
 
-	// // Validate timesheetID
-	// const validatedTimesheetID = SingleTimesheetID.safeParse({
-	// 	timesheetid: Number(timesheetID)
-	// })
-
-
 	const validatedTimesheet = z.number().safeParse(timesheetID);
 
 	// If form validation fails, return errors early. Otherwise, continue.
@@ -604,7 +598,7 @@ export async function editTimesheetDetails(
 
 	// Validate each TSD and add it to array
 
-  	type validatedTSDType = {
+  type validatedTSDType = {
 		id: number;
 		project: number;
 		phase: number;
@@ -629,11 +623,6 @@ export async function editTimesheetDetails(
 	const validatedTSDs: validatedTSDType[] = [];
 
  	for (const tsdkey in separateTSDs) {
-		//console.log(separateTSDs[tsdkey])
-		// for (const propertykey in separateTSDs[tsdkey]) {
-		// 	console.log(propertykey)
-		// 	console.log(separateTSDs[tsdkey][propertykey])
-		// }
 		const validatedTSD = EditTimesheetDetails.safeParse({
 			id: Number(separateTSDs[tsdkey]['id']),
 			project: Number(separateTSDs[tsdkey]['project']),
@@ -664,58 +653,66 @@ export async function editTimesheetDetails(
 				message: 'Incorrect or Missing Fields. Failed to Validate timesheetID.',
 			};
 		}
-		
-		// Ensure validatedTSD's id field is linked to the timesheet
 
-		const TSDBelongsToTimesheet = await timesheetDetailsBelongsToTimesheet(validatedTSD.data.id, validatedTimesheetID);
-
-		if (!TSDBelongsToTimesheet) {
-			const error = 'Timesheet Details does not belong to Timesheet';
-			console.error(error)
-			return {
-				message: error,
-			}
-		}
-
-		validatedTSDs.push(validatedTSD.data)
+		validatedTSDs.push(validatedTSD.data);
 
 	}
 
 	//console.log(validatedTSDs);
 
+  // Delete all TSDs associated with the timesheet
+  try{
+    await sql`
+      DELETE FROM timesheetdetails
+      WHERE timesheetid = ${validatedTimesheetID};
+    `;
+  } catch(error) {
+    console.error(error);
+    throw error;
+  }
+
+  // Add all validated TSDs to Database
 	for (const TSD of validatedTSDs) {
 		const {id, project, phase, costcode, description,
 			mon, tues, wed, thurs, fri, sat, sun,
 			monot, tuesot, wedot, thursot, friot, satot, sunot} = TSD;
 
-		try{
-			await sql`
-			UPDATE timesheetdetails
-			SET 
-				projectid = ${project},
-				phase = ${phase},
-				costcode = ${costcode},
-				description = ${description},
-				mon = ${mon},
-				monot = ${monot},
-				tues = ${tues},
-				tuesot = ${tuesot},
-				wed = ${wed},
-				wedot = ${wedot},
-				thurs = ${thurs},
-				thursot = ${thursot},
-				fri = ${fri},
-				friot = ${friot},
-				sat = ${sat},
-				satot = ${satot},
-				sun = ${sun},
-				sunot = ${sunot}
-			WHERE id = ${id};
-			`;
-		} catch(error) {
-			console.error(error);
-			throw error;
-		}
+      try{
+        const addSuccess = await addTimesheetDetailsHelper({
+          timesheetid: validatedTimesheetID,
+          employeeid: employeeID,
+          projectid: project,
+          phase: phase,
+          costcode: costcode,
+          description: description,
+          mon: mon,
+          monot: monot,
+          tues: tues,
+          tuesot: tuesot,
+          wed: wed,
+          wedot: wedot,
+          thurs: thurs,
+          thursot: thursot,
+          fri: fri,
+          friot: friot,
+          sat: sat,
+          satot: satot,
+          sun: sun,
+          sunot: sunot,
+        });
+      
+        if(!addSuccess) {
+          return {
+            message: 'Failed to Create TimesheetDetails.',
+          };
+        }
+    
+      } catch(error) {
+        console.error(error);
+          return {
+            message: 'Failed to Create TimesheetDetails.',
+        };
+      }
 	}
 
 

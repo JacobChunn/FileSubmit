@@ -37,7 +37,8 @@ export default function TimesheetDetailsEditForm({
 		);
 	}
 
-	const [TSDData, setTSDData] = useState<{options: Options, timesheetDetails: TimesheetDetails[]} | null>(null);
+	const [TSDDataAndOptions, setTSDDataAndOptions] = useState<{options: Options, timesheetDetails: TimesheetDetails[]} | null>(null);
+	const [localTSDs, setLocalTSDs] = useState<>();
 	const initialState = { message: null, errors: {} };
 	const editTimesheetDetailsWithID = editTimesheetDetails.bind(null, timesheetID);
     const [state, dispatch] = useFormState(editTimesheetDetailsWithID, initialState);
@@ -46,9 +47,9 @@ export default function TimesheetDetailsEditForm({
 		const fetchData = async () => {
 			console.log('TS-ID', timesheetID)
 			try {
-				setTSDData(null);
+				setTSDDataAndOptions(null);
 				const TSDDataReturn = await fetchTimesheetDetailsEditFormData(timesheetID);
-				setTSDData(TSDDataReturn);
+				setTSDDataAndOptions(TSDDataReturn);
 			} catch (error) {
 				console.error(error);
 				notFound();
@@ -58,12 +59,12 @@ export default function TimesheetDetailsEditForm({
 		fetchData();
 	}, [timesheetID]);
 
-	if (!TSDData) {
+	if (!TSDDataAndOptions) {
 		console.log("Loading...")
 		return (<div>Loading...</div>)
 	}
 
-	const {options, timesheetDetails} = TSDData;
+	const {options, timesheetDetails} = TSDDataAndOptions;
 		
 	if (timesheetDetails == null) {
 		console.log("notfound2")
