@@ -15,6 +15,7 @@ import { TrashIcon } from '@heroicons/react/24/outline';
 import { notFound } from 'next/navigation';
 import { TimesheetContext } from '../table/timesheet-wrapper';
 import Input from '@/app/ui/forms/general-helper-components/inputDetails';
+import FormSubmitDetailsButton from '@/app/ui/forms/form-submit-details-button';
 
 export default function TimesheetDetailsEditForm({
 
@@ -401,8 +402,7 @@ export default function TimesheetDetailsEditForm({
 				)) : null}
 				</tbody>
 			</table>
-            <FormSubmitButton
-                cancelHref='/dashboard'
+            <FormSubmitDetailsButton
                 text='Submit Edits'
             />
         </form>

@@ -22,8 +22,7 @@ export default function TimesheetTableWrapper({
     useEffect(() => {
 		const handleDataPromise = async() => {
 			const data = await fetchTimesheetsWithAuth();
-			console.log()
-			context.setTimesheet(data);
+			context.setTimesheets(data);
 		}
 		
 		handleDataPromise();

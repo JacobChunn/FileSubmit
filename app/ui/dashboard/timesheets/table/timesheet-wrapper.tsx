@@ -9,8 +9,8 @@ type timesheetContextType = {
     selectedTimesheet: number | null;
     setSelectedTimesheet: React.Dispatch<React.SetStateAction<number | null>>;
 
-    timesheet: Timesheet[] | null;
-    setTimesheet: React.Dispatch<React.SetStateAction<Timesheet[] | null>>
+    timesheets: Timesheet[] | null;
+    setTimesheets: React.Dispatch<React.SetStateAction<Timesheet[] | null>>
 
     localTimesheetDetails: TimesheetDetails[] | null;
     setLocalTimesheetDetails: React.Dispatch<React.SetStateAction<TimesheetDetails[] | null>>
@@ -27,7 +27,7 @@ export default function TimesheetWrapper({
 }) {
 
 	const [selectedTimesheet, setSelectedTimesheet] = useState<number | null>(null);
-    const [timesheet, setTimesheet] = useState<Timesheet[] | null>(null);
+    const [timesheets, setTimesheets] = useState<Timesheet[] | null>(null);
     const [localTimesheetDetails, setLocalTimesheetDetails] = useState<TimesheetDetails[] | null>(null);
 
     return (
@@ -35,7 +35,7 @@ export default function TimesheetWrapper({
             value={{
                 employeeid,
                 selectedTimesheet, setSelectedTimesheet,
-                timesheet, setTimesheet,
+                timesheets, setTimesheets,
                 localTimesheetDetails, setLocalTimesheetDetails,
             }}
         >
