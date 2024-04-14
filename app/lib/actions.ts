@@ -1336,6 +1336,48 @@ async function deleteTimesheetDetailsByTimesheet(timesheetid: number) {
 	}
 }
 
+export async function toggleTimesheetSignedValue(timesheetid: number) {
+	const validatedFields = DeleteTimesheet.safeParse({
+		id: timesheetid,
+	});
+	
+	  // If form validation fails, return errors early. Otherwise, continue.
+	if (!validatedFields.success) {
+		return {
+			errors: validatedFields.error.flatten().fieldErrors,
+			message: 'Missing Fields. Failed to Create Project.',
+		};
+	}
+	
+	const { id } = validatedFields.data;
+
+	// Get the user session to ensure they are who they say they are
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		console.log("Session was unable to be retrieved!");
+		return {
+			message: 'Session was unable to be retrieved!',
+		};
+	}
+	
+	const employeeid = Number(session.user.id);
+
+	try {
+		await sql`
+			UPDATE timesheets
+			SET usercommitted = NOT usercommitted
+			WHERE id = ${id} AND employeeid = ${employeeid};
+		`;
+	} catch(error) {
+		console.error(error);
+		return {
+			message: 'Failed to toggle signed value!',
+		};
+	}
+
+}
+
 export async function createInvoice(prevState: InvoiceState, formData: FormData) {
     const validatedFields = CreateInvoice.safeParse({
       customerId: formData.get('customerId'),

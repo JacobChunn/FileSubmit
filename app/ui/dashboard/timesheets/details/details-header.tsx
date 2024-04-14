@@ -3,6 +3,7 @@ import { Button } from "@/app/ui/button"
 import { useContext, useEffect, useState } from "react"
 import { TimesheetContext } from "../timesheet-context-wrapper"
 import { TimesheetDetails } from "@/app/lib/definitions"
+import SignTimesheetToggleButton from "./sign-timesheet-toggle-button"
 
 export default function TimesheetDetailsHeader({
 	children
@@ -28,10 +29,6 @@ export default function TimesheetDetailsHeader({
 		throw new Error(
 			"selectedTimesheet of TimesheetContext has not been set!"
 		);
-	}
-
-	const signTimesheet = () => {
-		//TODO: FINISH
 	}
 
 	const addTSD = () => {
@@ -66,12 +63,7 @@ export default function TimesheetDetailsHeader({
 	return (
 		<div className="w-full h-full">
 			<div className="flex justify-end py-4">
-				<button
-					className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
-					onClick={signTimesheet}
-				>
-					Sign Timesheet
-				</button>
+				<SignTimesheetToggleButton/>
 				<div className="w-2"/>
 				<Button
 					onClick={addTSD}

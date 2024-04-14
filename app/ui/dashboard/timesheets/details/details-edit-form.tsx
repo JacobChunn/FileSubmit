@@ -86,12 +86,10 @@ export default function TimesheetDetailsEditForm({
 
 	const tableHeaders = [
 		"Project", "Phase", "Cost Code", "Description",
-		"Mn", "Tu", "Wd", "Tr", "Fr", "St", "Sn",
+		"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su",
 	];
 
     const {projects, phases, costcodes} = options;
-
-	const oneTSDExists = timesheetDetails.length == 1;
 
     // Changes to focused version after focused
     const projectOptions = projects.map((val, index) => (
@@ -352,38 +350,34 @@ export default function TimesheetDetailsEditForm({
 
 						{/* Delete TSD */}
 						<td className='h-auto w-11 relative'>
-							{!oneTSDExists ? 
-								<IconButton
-									className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center p-"
-									variant='text'
-									type='button'
-									onClick={() => {
-										console.log(index);
-										const currentTSDs = context.localTimesheetDetails || [];
-										context.setLocalTimesheetDetails(null);
+							<IconButton
+								className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center p-"
+								variant='text'
+								type='button'
+								onClick={() => {
+									console.log(index);
+									const currentTSDs = context.localTimesheetDetails || [];
+									context.setLocalTimesheetDetails(null);
 
-										context.setLocalTimesheetDetails(() => {
-											
-											console.log([
-												...currentTSDs.slice(0, index),
-												...currentTSDs.slice(index + 1)
-											]);
-											if (!currentTSDs) return [];
-											return [
-												...currentTSDs.slice(0, index),
-												...currentTSDs.slice(index + 1)
-											]
-										});
-									}}
-									
-								>
-									<Tooltip content='Delete Entry'>
-										<TrashIcon className='w-4 h-4' />
-									</Tooltip>
-								</IconButton>
-							:
-							null
-						}
+									context.setLocalTimesheetDetails(() => {
+										
+										console.log([
+											...currentTSDs.slice(0, index),
+											...currentTSDs.slice(index + 1)
+										]);
+										if (!currentTSDs) return [];
+										return [
+											...currentTSDs.slice(0, index),
+											...currentTSDs.slice(index + 1)
+										]
+									});
+								}}
+								
+							>
+								<Tooltip content='Delete Entry'>
+									<TrashIcon className='w-4 h-4' />
+								</Tooltip>
+							</IconButton>
 						</td>
 					</tr>
 				)) : null}
