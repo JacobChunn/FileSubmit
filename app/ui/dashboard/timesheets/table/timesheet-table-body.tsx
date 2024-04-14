@@ -1,6 +1,6 @@
 "use client"
 import { useContext } from "react";
-import { TimesheetContext } from "./timesheet-wrapper";
+import { TimesheetContext } from "../timesheet-context-wrapper";
 import { IconButton, Tooltip, Typography } from "../../../material-tailwind-wrapper";
 import { DateTime } from "luxon";
 import TextEntry from "./entries/text-entry";

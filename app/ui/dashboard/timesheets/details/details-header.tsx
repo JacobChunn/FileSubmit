@@ -1,7 +1,7 @@
 "use client"
 import { Button } from "@/app/ui/button"
 import { useContext, useEffect, useState } from "react"
-import { TimesheetContext } from "../table/timesheet-wrapper"
+import { TimesheetContext } from "../timesheet-context-wrapper"
 import { TimesheetDetails } from "@/app/lib/definitions"
 
 export default function TimesheetDetailsHeader({

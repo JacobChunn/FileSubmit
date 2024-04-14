@@ -1,7 +1,7 @@
 "use client"
 import { Timesheet } from "@/app/lib/definitions";
 import { useContext, useEffect } from "react";
-import { TimesheetContext } from "./timesheet-wrapper";
+import { TimesheetContext } from "../timesheet-context-wrapper";
 import { fetchTimesheetsWithAuth } from "@/app/lib/actions";
 
 export default function TimesheetTableWrapper({

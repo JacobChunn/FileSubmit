@@ -1,7 +1,7 @@
 "use client"
 
 import { useContext } from "react"
-import { TimesheetContext } from "../table/timesheet-wrapper"
+import { TimesheetContext } from "../timesheet-context-wrapper"
 
 export default function TimesheetDetailsWrapper({
 	children

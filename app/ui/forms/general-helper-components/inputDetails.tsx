@@ -1,7 +1,7 @@
 "use client"
 
 import { useContext } from "react";
-import { TimesheetContext } from "../../dashboard/timesheets/table/timesheet-wrapper";
+import { TimesheetContext } from "../../dashboard/timesheets/timesheet-context-wrapper";
 import { TimesheetDetails } from "@/app/lib/definitions";
 
 interface InputProps {

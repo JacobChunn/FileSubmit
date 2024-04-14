@@ -8,7 +8,7 @@ import TableDateEntry from "../../table/entries/table-date-entry";
 import TableDeleteEntry from "../../table/entries/table-delete-entry";
 import TableArgumentEntry from "../../table/entries/table-argument-entry";
 import { useContext } from "react";
-import { TimesheetContext } from "../timesheets/table/timesheet-wrapper";
+import { TimesheetContext } from "../timesheets/timesheet-context-wrapper";
 import { IconButton, Tooltip } from "../../material-tailwind-wrapper";
 import { PencilIcon } from "@heroicons/react/24/outline";
 

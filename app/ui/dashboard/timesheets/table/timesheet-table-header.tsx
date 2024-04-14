@@ -14,33 +14,27 @@ export default function TimesheetTableHeader({
 	] as const;
 
     return (
-        <thead>
-            <tr>
-                <th className="sticky right-5">
-                    <Link href={"/dashboard/add"}>
-                        <Button className="flex items-center gap-3" size="sm">
-                            <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> {"Add Timesheet"}
-                        </Button>
-                    </Link>
-                </th>
-            </tr>
-            <tr>
-                {TABLE_HEAD.map((head, index) => (
-                    <th
-                        key={head + index}
-                        className="cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 py-4 px-2 transition-colors hover:bg-blue-gray-50 text-left"
-                    >
-                        <div
-                            className="font-normal leading-none text-blue-gray-900 opacity-80 text-xs"
-                        >
-                            {head}
-                        </div>
-                        {/*" "*/}{/*index !== TABLE_HEAD.length - 1 && (
-                                <ChevronUpDownIcon strokeWidth={2} className="h-4 w-4" />
-                        )*/}
-                    </th>
-                ))}
-            </tr>
-		</thead>
+		<>
+
+			<thead>
+				<tr>
+					{TABLE_HEAD.map((head, index) => (
+						<th
+							key={head + index}
+							className="cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 py-4 px-2 transition-colors hover:bg-blue-gray-50 text-left"
+						>
+							<div
+								className="font-normal leading-none text-blue-gray-900 opacity-80 text-xs"
+							>
+								{head}
+							</div>
+							{/*" "*/}{/*index !== TABLE_HEAD.length - 1 && (
+									<ChevronUpDownIcon strokeWidth={2} className="h-4 w-4" />
+							)*/}
+						</th>
+					))}
+				</tr>
+			</thead>
+		</>
     )
 }

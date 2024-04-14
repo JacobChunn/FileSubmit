@@ -13,7 +13,7 @@ import SelectWithFocusControl from '@/app/ui/forms/general-helper-components/sel
 import SelectWithFocusControl2 from '@/app/ui/forms/general-helper-components/select-w-description2';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { notFound } from 'next/navigation';
-import { TimesheetContext } from '../table/timesheet-wrapper';
+import { TimesheetContext } from '../timesheet-context-wrapper';
 import Input from '@/app/ui/forms/general-helper-components/inputDetails';
 import FormSubmitDetailsButton from '@/app/ui/forms/form-submit-details-button';
 import { IconButton, Tooltip } from '@/app/ui/material-tailwind-wrapper';
@@ -78,11 +78,6 @@ export default function TimesheetDetailsEditForm({
 		notFound();
 	}
 
-
-
-
-
-
     const {
         id, project, phase, costcode, description, mon, monot, 
         tues, tuesot, wed, wedot, thurs, thursot, 
@@ -138,13 +133,11 @@ export default function TimesheetDetailsEditForm({
 	const selectStyle = 'h-12 w-full';
 	const descStyle = 'h-12 w-full';
 
-	const dayRowStyle = 'min-w-4 max-w-4'
-	const selectRowStyle = 'w-1/10'
+	const dayRowStyle = 'w-11'
+	const projectRowStyle = 'w-1/6'
+	const phaseRowStyle = 'w-1/6'
+	const costCodeRowStyle = 'w-1/6'
 	const descRowStyle = 'w-1/6'
-
-	const colProjPhaseCostCodeStyle = 'w-1/6'
-	const colDescStyle = 'w-1/2'
-	const colDayStyle = 'w-40 min-w-40'
 
 	console.log("localTSDs", context.localTimesheetDetails);
 	const TSDLen = context.localTimesheetDetails?.length || 0;
@@ -175,13 +168,14 @@ export default function TimesheetDetailsEditForm({
 						key={"k-" + index + timesheetID}
 						className='w-full h-full'
 					>
-						<td className={selectRowStyle}>
+						<td className={projectRowStyle}>
 							{/* Hidden TSD id */}
 							<input
 								id={"TSD" + index + "[" + id + "]"}
 								key={"TSD" + index + "[" + id + "]"}
 								name={"TSD" + index + "[" + id + "]"}
 								value={val.id}
+								className='w-0'
 								readOnly
 								hidden
 							/>
@@ -197,7 +191,7 @@ export default function TimesheetDetailsEditForm({
 							</SelectWithFocusControl2>
 						</td>
 
-						<td className={selectRowStyle}>
+						<td className={phaseRowStyle}>
 							{/* Phase */}
 							<SelectWithFocusControl
 								info={"TSD" + index + "[" + phase + "]"}
@@ -207,7 +201,7 @@ export default function TimesheetDetailsEditForm({
 								{phaseOptions}
 							</SelectWithFocusControl>
 						</td>
-						<td className={selectRowStyle}>
+						<td className={costCodeRowStyle}>
 							{/* Cost Code */}
 							<SelectWithFocusControl
 								info={"TSD" + index + "[" + costcode + "]"}
@@ -357,7 +351,7 @@ export default function TimesheetDetailsEditForm({
 						</td>
 
 						{/* Delete TSD */}
-						<td className='h-auto w-1/32 relative'>
+						<td className='h-auto w-11 relative'>
 							{!oneTSDExists ? 
 								<IconButton
 									className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center p-"

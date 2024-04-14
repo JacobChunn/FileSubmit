@@ -4,7 +4,7 @@ import { StateType } from "@/app/lib/definitions";
 import Link from "next/link";
 import { Button } from "../button";
 import { useContext } from "react";
-import { TimesheetContext } from "../dashboard/timesheets/table/timesheet-wrapper";
+import { TimesheetContext } from "../dashboard/timesheets/timesheet-context-wrapper";
 
 export type Props = {
 	text: string,

@@ -1,16 +1,17 @@
 import { lusitana } from '@/app/ui/fonts';
 import { Metadata } from 'next';
-import { fetchTimesheetsByEmployeeID } from '@/app/lib/data';
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/options';
 import TimesheetDetailsEditForm from '@/app/ui/dashboard/timesheets/details/details-edit-form';
 import TimesheetDetailsWrapper from '@/app/ui/dashboard/timesheets/details/details-wrapper';
 import TimesheetDetailsHeader from '@/app/ui/dashboard/timesheets/details/details-header';
-import TimesheetWrapper from '@/app/ui/dashboard/timesheets/table/timesheet-wrapper';
+import TimesheetContextWrapper from '@/app/ui/dashboard/timesheets/timesheet-context-wrapper';
 import TimesheetTableWrapper from '@/app/ui/dashboard/timesheets/table/timesheet-table-wrapper';
 import TimesheetTableHeader from '@/app/ui/dashboard/timesheets/table/timesheet-table-header';
 import TimesheetTableBody from '@/app/ui/dashboard/timesheets/table/timesheet-table-body';
+import TimesheetWrapper from '@/app/ui/dashboard/timesheets/timesheet-wrapper';
+import AddTimesheetButton from '@/app/ui/dashboard/timesheets/add-timesheet-button';
 
 export const metadata: Metadata = {
 	title: 'Dashboard',
@@ -38,16 +39,19 @@ export default async function Page() {
 				Dashboard
 			</h1>
 			<div className='flex'>
-				<TimesheetWrapper employeeid={employeeID}>
-					<TimesheetTableWrapper>
-						<TimesheetTableHeader/>
-						<TimesheetTableBody/>
-					</TimesheetTableWrapper>
+				<TimesheetContextWrapper employeeid={employeeID}>
+					<TimesheetWrapper>
+						<AddTimesheetButton className = "py-2"/>
+						<TimesheetTableWrapper>
+							<TimesheetTableHeader/>
+							<TimesheetTableBody/>
+						</TimesheetTableWrapper>
+					</TimesheetWrapper>
 					<TimesheetDetailsWrapper>
 						<TimesheetDetailsHeader/>
 						<TimesheetDetailsEditForm/>
 					</TimesheetDetailsWrapper>
-				</TimesheetWrapper>
+				</TimesheetContextWrapper>
 			</div>
 		</main>
 	);
