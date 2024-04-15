@@ -672,59 +672,68 @@ export async function editTimesheetDetails(
   }
 
   // Add all validated TSDs to Database
+  let totalReg = 0.0;
+  let totalOT = 0.0;
 	for (const TSD of validatedTSDs) {
 		const {id, project, phase, costcode, description,
 			mon, tues, wed, thurs, fri, sat, sun,
 			monot, tuesot, wedot, thursot, friot, satot, sunot} = TSD;
 
-      try{
-        const addSuccess = await addTimesheetDetailsHelper({
-          timesheetid: validatedTimesheetID,
-          employeeid: employeeID,
-          projectid: project,
-          phase: phase,
-          costcode: costcode,
-          description: description,
-          mon: mon,
-          monot: monot,
-          tues: tues,
-          tuesot: tuesot,
-          wed: wed,
-          wedot: wedot,
-          thurs: thurs,
-          thursot: thursot,
-          fri: fri,
-          friot: friot,
-          sat: sat,
-          satot: satot,
-          sun: sun,
-          sunot: sunot,
-        });
-      
-        if(!addSuccess) {
-          return {
-            message: 'Failed to Create TimesheetDetails.',
-          };
-        }
+    try{
+      const addSuccess = await addTimesheetDetailsHelper({
+        timesheetid: validatedTimesheetID,
+        employeeid: employeeID,
+        projectid: project,
+        phase: phase,
+        costcode: costcode,
+        description: description,
+        mon: mon,
+        monot: monot,
+        tues: tues,
+        tuesot: tuesot,
+        wed: wed,
+        wedot: wedot,
+        thurs: thurs,
+        thursot: thursot,
+        fri: fri,
+        friot: friot,
+        sat: sat,
+        satot: satot,
+        sun: sun,
+        sunot: sunot,
+      });
+
+      totalReg += (mon + tues + wed + thurs + fri + sat + sun);
+      totalOT += (monot + tuesot + wedot + thursot + friot + satot + sunot);
     
-      } catch(error) {
-        console.error(error);
-          return {
-            message: 'Failed to Create TimesheetDetails.',
+      if(!addSuccess) {
+        return {
+          message: 'Failed to Create TimesheetDetails.',
         };
       }
+  
+    } catch(error) {
+      console.error(error);
+      return {
+          message: 'Failed to Create TimesheetDetails.',
+      };
+    }
 	}
 
-
-  // formData.forEach((val, name) => {
-  //   console.log(name, val);
-  // })
-
-  // const validatedFields = EditTimesheetDetails.safeParse({
-  //   id: formData.f
-  // })
-
-  // console.log(validatedFields)
+  // Update the associated timesheet's totalreghours and totalovertime
+  try {
+    await sql`
+      UPDATE timesheets
+      SET totalreghours = ${totalReg}, 
+        totalovertime =${totalOT}
+      WHERE id = ${validatedTimesheetID};    
+    `;
+  } catch(error) {
+    console.error(error);
+    return {
+      message: 'Failed to Update Timesheet',
+    };
+  }
 }
 
 async function timesheetDetailsBelongsToTimesheet(timesheetDetailsID: number, timesheetID: number) {

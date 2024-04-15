@@ -86,7 +86,7 @@ export default function TimesheetDetailsEditForm({
 
 	const tableHeaders = [
 		"Project", "Phase", "Cost Code", "Description",
-		"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su",
+		"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su", "Tot",
 	];
 
     const {projects, phases, costcodes} = options;
@@ -348,6 +348,21 @@ export default function TimesheetDetailsEditForm({
 							/>
 						</td>
 
+						{/* Total */}
+						<td className={dayRowStyle}>
+							<div className="max-w-sm mx-auto m-0.5 bg-white border border-black">
+								<p className='text-sm'>
+									{Number(val.mon) + Number(val.tues) + Number(val.wed) + Number(val.thurs) + Number(val.fri) + Number(val.sat) + Number(val.sun)}
+								</p>
+							</div>
+							<div className="max-w-sm mx-auto m-0.5 bg-zinc-200 border border-black">
+								<p className='text-sm'>
+									{Number(val.monot) + Number(val.tuesot) + Number(val.wedot) + Number(val.thursot) + Number(val.friot) + Number(val.satot) + Number(val.sunot)}
+
+								</p>
+							</div>
+						</td>
+
 						{/* Delete TSD */}
 						<td className='h-auto w-11 relative'>
 							<IconButton
@@ -381,6 +396,16 @@ export default function TimesheetDetailsEditForm({
 						</td>
 					</tr>
 				)) : null}
+					<tr>
+						<td/>
+						<td/>
+						<td/>
+						<td>
+							<p className='text-right'>
+								Total: 
+							</p>
+						</td>
+					</tr>
 				</tbody>
 			</table>
             <FormSubmitDetailsButton

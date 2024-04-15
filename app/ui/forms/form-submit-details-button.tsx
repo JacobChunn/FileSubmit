@@ -33,7 +33,36 @@ export default function FormSubmitDetailsButton({
 			>
 				Cancel
 			</button>
-			<Button type="submit">{text}</Button>
+			<Button 
+				type="submit"
+				onClick={() => {
+					context.setTimesheets(prev => {
+						if (!prev || !context.selectedTimesheet || !context.localTimesheetDetails) return null;
+						
+
+						const updatedTimesheets = [...prev];
+						const selectedTimesheet = updatedTimesheets.find(timesheet => timesheet.id === context.selectedTimesheet);
+						if (!selectedTimesheet) return null;
+
+						const localTSDs = context.localTimesheetDetails;
+
+						let totalReg = 0.0;
+						let totalOT = 0.0;
+
+						localTSDs.forEach(TSD => {
+							totalReg += (Number(TSD.mon) + Number(TSD.tues) + Number(TSD.wed) + Number(TSD.thurs) + Number(TSD.fri) + Number(TSD.sat) + Number(TSD.sun));
+							totalOT += (Number(TSD.monot) + Number(TSD.tuesot) + Number(TSD.wedot) + Number(TSD.thursot) + Number(TSD.friot) + Number(TSD.satot) + Number(TSD.sunot));
+						});
+
+						selectedTimesheet.totalreghours = totalReg;
+						selectedTimesheet.totalovertime = totalOT;
+
+						return updatedTimesheets;
+					}
+				)}}
+			>
+				{text}
+			</Button>
 		</div>
 	)
 }
