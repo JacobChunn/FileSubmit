@@ -47,12 +47,12 @@ export default function InputDetailsDesc({
                 id={info+len}
                 key={info+len}
                 name={info}
-                        className={`transition-all duration-300 ease-in-out text-base resize-none ${
-                            isFocused ? 'h-32 text-3xl w-80 bg-white shadow-xl rounded-lg' : 'h-12 w-full bg-gray-100'
-                        }`}
+                className={`transition-all duration-300 ease-in-out text-base resize-none ${
+                    isFocused ? 'h-32 text-3xl w-80 bg-white shadow-xl rounded-lg' : 'h-12 w-full bg-gray-100'
+                }`}
                 value={formattedValue}
-                        onFocus={() => setIsFocused(true)}
-                        onBlur={() => setIsFocused(false)}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
                 onChange={handleChange}
             />
         </div>
