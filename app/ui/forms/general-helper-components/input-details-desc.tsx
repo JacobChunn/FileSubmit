@@ -7,8 +7,9 @@ import { TimesheetDetails } from "@/app/lib/definitions";
 interface InputProps {
 	index: number,
 	attr: keyof TimesheetDetails,
-	info: string;
+	info: string,
 	value: string | null | undefined,
+    readOnly: boolean,
 }
 
 export default function InputDetailsDesc({
@@ -16,6 +17,7 @@ export default function InputDetailsDesc({
 	attr,
 	info,
 	value,
+    readOnly,
 }: InputProps) {
 	const context = useContext(TimesheetContext);
     const [isFocused, setIsFocused] = useState(false);
@@ -54,6 +56,7 @@ export default function InputDetailsDesc({
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
                 onChange={handleChange}
+                readOnly={readOnly}
             />
         </div>
 	)

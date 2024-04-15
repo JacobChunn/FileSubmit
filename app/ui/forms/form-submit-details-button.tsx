@@ -1,17 +1,14 @@
 "use client"
 
-import { StateType } from "@/app/lib/definitions";
-import Link from "next/link";
-import { Button } from "../button";
 import { useContext } from "react";
 import { TimesheetContext } from "../dashboard/timesheets/timesheet-context-wrapper";
 
 export type Props = {
-	text: string,
+	submitDisabled: boolean,
 }
 
 export default function FormSubmitDetailsButton({
-	text,
+	submitDisabled,
 }: Props
 ) {
 	const context = useContext(TimesheetContext);
@@ -22,47 +19,55 @@ export default function FormSubmitDetailsButton({
 		);
 	}
 
+	const handleCancelOnClick = () => {
+		context.setLocalTimesheetDetails(null);
+		context.setSelectedTimesheet(null);
+	}
+
+	const handleSubmitOnClick = () => {
+		context.setTimesheets(prev => {
+			if (!prev || !context.selectedTimesheet || !context.localTimesheetDetails) return null;
+			
+
+			const updatedTimesheets = [...prev];
+			const selectedTimesheet = updatedTimesheets.find(timesheet => timesheet.id === context.selectedTimesheet);
+			if (!selectedTimesheet) return null;
+
+			const localTSDs = context.localTimesheetDetails;
+
+			let totalReg = 0.0;
+			let totalOT = 0.0;
+
+			localTSDs.forEach(TSD => {
+				totalReg += (Number(TSD.mon) + Number(TSD.tues) + Number(TSD.wed) + Number(TSD.thurs) + Number(TSD.fri) + Number(TSD.sat) + Number(TSD.sun));
+				totalOT += (Number(TSD.monot) + Number(TSD.tuesot) + Number(TSD.wedot) + Number(TSD.thursot) + Number(TSD.friot) + Number(TSD.satot) + Number(TSD.sunot));
+			});
+
+			selectedTimesheet.totalreghours = totalReg;
+			selectedTimesheet.totalovertime = totalOT;
+
+			return updatedTimesheets;
+		}
+	)}
+
 	return (
 		<div className="mt-6 flex justify-end gap-4">
 			<button
 				className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
-				onClick={() => {
-					context.setLocalTimesheetDetails(null);
-					context.setSelectedTimesheet(null);
-				}}
+				onClick={handleCancelOnClick}
 			>
 				Cancel
 			</button>
-			<Button 
+			<button 
 				type="submit"
-				onClick={() => {
-					context.setTimesheets(prev => {
-						if (!prev || !context.selectedTimesheet || !context.localTimesheetDetails) return null;
-						
-
-						const updatedTimesheets = [...prev];
-						const selectedTimesheet = updatedTimesheets.find(timesheet => timesheet.id === context.selectedTimesheet);
-						if (!selectedTimesheet) return null;
-
-						const localTSDs = context.localTimesheetDetails;
-
-						let totalReg = 0.0;
-						let totalOT = 0.0;
-
-						localTSDs.forEach(TSD => {
-							totalReg += (Number(TSD.mon) + Number(TSD.tues) + Number(TSD.wed) + Number(TSD.thurs) + Number(TSD.fri) + Number(TSD.sat) + Number(TSD.sun));
-							totalOT += (Number(TSD.monot) + Number(TSD.tuesot) + Number(TSD.wedot) + Number(TSD.thursot) + Number(TSD.friot) + Number(TSD.satot) + Number(TSD.sunot));
-						});
-
-						selectedTimesheet.totalreghours = totalReg;
-						selectedTimesheet.totalovertime = totalOT;
-
-						return updatedTimesheets;
-					}
-				)}}
+				className={`flex h-10 items-center rounded-lg px-4 text-sm font-medium text-white transition-colors
+					${submitDisabled ? 'bg-gray-400 cursor-not-allowed opacity-50' : 'bg-blue-500 hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600'}`}
+				onClick={handleSubmitOnClick}
+				disabled={submitDisabled}
 			>
-				{text}
-			</Button>
+    Submit Edits
+</button>
+
 		</div>
 	)
 }

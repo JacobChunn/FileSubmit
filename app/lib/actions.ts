@@ -593,6 +593,27 @@ export async function editTimesheetDetails(
 		};
 	}
 
+  // Ensure that timesheet is not signed
+  try {
+    const timesheetIsSigned = await sql`
+      SELECT usercommitted
+      FROM timesheets
+      WHERE id = ${validatedTimesheetID};
+    `
+    console.log(timesheetIsSigned.rows[0]);
+    if (timesheetIsSigned.rows[0].usercommitted) {
+      return {
+        message: 'Cannot edit a signed timesheet!'
+      }
+    }
+
+  } catch(error) {
+    console.error(error);
+    return {
+      message: 'Error checking if timesheet is signed!'
+    }
+  }
+
 	// Separate TDSs from formData
 	const separateTSDs = separateFormData(formData);
 

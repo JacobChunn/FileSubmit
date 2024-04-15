@@ -18,6 +18,7 @@ import Input from '@/app/ui/forms/general-helper-components/input-details';
 import FormSubmitDetailsButton from '@/app/ui/forms/form-submit-details-button';
 import { IconButton, Tooltip } from '@/app/ui/material-tailwind-wrapper';
 import InputDetailsDesc from '@/app/ui/forms/general-helper-components/input-details-desc';
+import DeleteDetailButton from './delete-detail-button';
 
 export default function TimesheetDetailsEditForm({
 
@@ -37,6 +38,12 @@ export default function TimesheetDetailsEditForm({
 	if (timesheetID == null) {
 		throw new Error(
 			"selectedTimesheet of TimesheetContext has not been set!"
+		);
+	}
+
+	if (context.timesheets == null) {
+		throw new Error(
+			"timesheets of TimesheetContext has not been set!"
 		);
 	}
 
@@ -78,6 +85,15 @@ export default function TimesheetDetailsEditForm({
 		console.log("notfound2")
 		notFound();
 	}
+
+	const currentTimesheet = context.timesheets.find(timesheet => timesheet.id == timesheetID);
+	if (!currentTimesheet) {
+		throw new Error(
+			"Could not find selectedTimesheet in timesheets!"
+		);
+	}
+
+	const timesheetIsSigned = currentTimesheet.usercommitted;
 
     const {
         id, project, phase, costcode, description, mon, monot, 
@@ -130,7 +146,6 @@ export default function TimesheetDetailsEditForm({
     const dayOTStyle = dayStyle + ' bg-zinc-200';
 
 	const selectStyle = 'h-12 w-full';
-	const descStyle = 'h-12 w-full';
 
 	const dayRowStyle = 'w-11'
 	const projectRowStyle = 'w-1/6'
@@ -185,6 +200,7 @@ export default function TimesheetDetailsEditForm({
 								info2={"TSD" + index + "[" + project + "] " + timesheetID}
 								value={val.projectid}
 								className = {selectStyle}
+								disabled={timesheetIsSigned}
 							>
 								{projectOptions}
 							</SelectWithFocusControl2>
@@ -196,6 +212,7 @@ export default function TimesheetDetailsEditForm({
 								info={"TSD" + index + "[" + phase + "]"}
 								value={val.phase}
 								className = {selectStyle}
+								disabled={timesheetIsSigned}
 							>
 								{phaseOptions}
 							</SelectWithFocusControl>
@@ -206,6 +223,7 @@ export default function TimesheetDetailsEditForm({
 								info={"TSD" + index + "[" + costcode + "]"}
 								value={val.costcode}
 								className = {selectStyle}
+								disabled={timesheetIsSigned}
 							>
 								{costCodeOptions}
 							</SelectWithFocusControl>
@@ -218,6 +236,7 @@ export default function TimesheetDetailsEditForm({
 								attr='description'
 								info={"TSD" + index + "[" + description + "]"}
 								value={val.description}
+								readOnly={timesheetIsSigned}
 							/>
 						</td>
 						
@@ -229,6 +248,7 @@ export default function TimesheetDetailsEditForm({
 								info={"TSD" + index + "[" + mon + "]"}
 								className={dayRegStyle}
 								value={val.mon}
+								disabled={timesheetIsSigned}
 							/>
 							<Input
 								index={index}
@@ -236,6 +256,7 @@ export default function TimesheetDetailsEditForm({
 								info={"TSD" + index + "[" + monot + "]"}
 								className={dayOTStyle}
 								value={val.monot}
+								disabled={timesheetIsSigned}
 							/>
 						</td>
 
@@ -247,6 +268,7 @@ export default function TimesheetDetailsEditForm({
 								info={"TSD" + index + "[" + tues + "]"}
 								className={dayRegStyle}
 								value={val.tues}
+								disabled={timesheetIsSigned}
 							/>
 							<Input
 								index={index}
@@ -254,6 +276,7 @@ export default function TimesheetDetailsEditForm({
 								info={"TSD" + index + "[" + tuesot + "]"}
 								className={dayOTStyle}
 								value={val.tuesot}
+								disabled={timesheetIsSigned}
 							/>
 						</td>
 
@@ -265,6 +288,7 @@ export default function TimesheetDetailsEditForm({
 								info={"TSD" + index + "[" + wed + "]"}
 								className={dayRegStyle}
 								value={val.wed}
+								disabled={timesheetIsSigned}
 							/>
 							<Input
 								index={index}
@@ -272,6 +296,7 @@ export default function TimesheetDetailsEditForm({
 								info={"TSD" + index + "[" + wedot + "]"}
 								className={dayOTStyle}
 								value={val.wedot}
+								disabled={timesheetIsSigned}
 							/>
 						</td>
 
@@ -283,6 +308,7 @@ export default function TimesheetDetailsEditForm({
 								info={"TSD" + index + "[" + thurs + "]"}
 								className={dayRegStyle}
 								value={val.thurs}
+								disabled={timesheetIsSigned}
 							/>
 							<Input
 								index={index}
@@ -290,6 +316,7 @@ export default function TimesheetDetailsEditForm({
 								info={"TSD" + index + "[" + thursot + "]"}
 								className={dayOTStyle}
 								value={val.thursot}
+								disabled={timesheetIsSigned}
 							/>
 						</td>
 
@@ -301,6 +328,7 @@ export default function TimesheetDetailsEditForm({
 								info={"TSD" + index + "[" + fri + "]"}
 								className={dayRegStyle}
 								value={val.fri}
+								disabled={timesheetIsSigned}
 							/>
 							<Input
 								index={index}
@@ -308,6 +336,7 @@ export default function TimesheetDetailsEditForm({
 								info={"TSD" + index + "[" + friot + "]"}
 								className={dayOTStyle}
 								value={val.friot}
+								disabled={timesheetIsSigned}
 							/>
 						</td>
 
@@ -319,6 +348,7 @@ export default function TimesheetDetailsEditForm({
 								info={"TSD" + index + "[" + sat + "]"}
 								className={dayRegStyle}
 								value={val.sat}
+								disabled={timesheetIsSigned}
 							/>
 							<Input
 								index={index}
@@ -326,6 +356,7 @@ export default function TimesheetDetailsEditForm({
 								info={"TSD" + index + "[" + satot + "]"}
 								className={dayOTStyle}
 								value={val.satot}
+								disabled={timesheetIsSigned}
 							/>
 						</td>
 
@@ -337,6 +368,7 @@ export default function TimesheetDetailsEditForm({
 								info={"TSD" + index + "[" + sun + "]"}
 								className={dayRegStyle}
 								value={val.sun}
+								disabled={timesheetIsSigned}
 							/>
 							<Input
 								index={index}
@@ -344,6 +376,7 @@ export default function TimesheetDetailsEditForm({
 								info={"TSD" + index + "[" + sunot + "]"}
 								className={dayOTStyle}
 								value={val.sunot}
+								disabled={timesheetIsSigned}
 							/>
 						</td>
 
@@ -364,34 +397,10 @@ export default function TimesheetDetailsEditForm({
 
 						{/* Delete TSD */}
 						<td className='h-auto w-11 relative'>
-							<IconButton
-								className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center p-"
-								variant='text'
-								type='button'
-								onClick={() => {
-									console.log(index);
-									const currentTSDs = context.localTimesheetDetails || [];
-									context.setLocalTimesheetDetails(null);
-
-									context.setLocalTimesheetDetails(() => {
-										
-										console.log([
-											...currentTSDs.slice(0, index),
-											...currentTSDs.slice(index + 1)
-										]);
-										if (!currentTSDs) return [];
-										return [
-											...currentTSDs.slice(0, index),
-											...currentTSDs.slice(index + 1)
-										]
-									});
-								}}
-								
-							>
-								<Tooltip content='Delete Entry'>
-									<TrashIcon className='w-4 h-4' />
-								</Tooltip>
-							</IconButton>
+							<DeleteDetailButton
+								index={index}
+								hidden={timesheetIsSigned}
+							/>
 						</td>
 					</tr>
 				)) : null}
@@ -408,7 +417,7 @@ export default function TimesheetDetailsEditForm({
 				</tbody>
 			</table>
             <FormSubmitDetailsButton
-                text='Submit Edits'
+				submitDisabled={timesheetIsSigned}
             />
         </form>
     );

@@ -7,6 +7,7 @@ interface SelectWithFocusControl {
 	info2: string,
 	className: string;
 	value: string | number,
+	disabled: boolean,
 	children: React.ReactElement<HTMLOptionElement & {"focused-label": string, "unfocused-label": string}>[];
 }
 
@@ -15,6 +16,7 @@ export default function SelectWithFocusControl2({
 	info2,
 	className,
 	value,
+	disabled,
 	children,
 }: SelectWithFocusControl) {
 	const focusedInfoRef = useRef<string | null>(null);
@@ -78,6 +80,7 @@ export default function SelectWithFocusControl2({
 			name={info}
 			className={className}
 			defaultValue={value}
+			disabled={disabled}
 		>
 			{children}
 		</select>

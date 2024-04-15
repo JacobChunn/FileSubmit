@@ -7,10 +7,11 @@ import { TimesheetDetails } from "@/app/lib/definitions";
 interface InputProps {
 	index: number,
 	attr: keyof TimesheetDetails,
-	info: string;
-	className?: string;
+	info: string,
+	className?: string,
 	value: string | number | null | undefined,
 	type?: string,
+	disabled: boolean,
 }
 
 export default function InputDetails({
@@ -20,6 +21,7 @@ export default function InputDetails({
 	className='',
 	value,
 	type='number',
+	disabled,
 }: InputProps) {
 	const context = useContext(TimesheetContext);
 
@@ -60,6 +62,7 @@ export default function InputDetails({
 			className={className}
 			value={formattedValue}
 			onChange={handleChange}
+			disabled={disabled}
 		/>
 	)
 }
