@@ -47,12 +47,15 @@ export default function SignTimesheetToggleButton({
 		}
 	}
 
+	const selectedTimesheet = context.timesheets?.find(timesheet => timesheet.id === context.selectedTimesheet);
+	if (!selectedTimesheet) return null;
+
 	return (
 		<button
 			className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
 			onClick={toggleTimesheetSigned}
 		>
-			Sign Timesheet
+			{selectedTimesheet.usercommitted ? 'Unsign Timesheet' : 'Sign Timesheet' }
 		</button>
 	)
 }
