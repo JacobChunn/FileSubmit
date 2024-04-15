@@ -1,3 +1,4 @@
+import { Tooltip } from "@/app/ui/material-tailwind-wrapper";
 import { CheckIcon, DocumentArrowUpIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 
 export default function TimesheetTableHeader({
@@ -6,9 +7,22 @@ export default function TimesheetTableHeader({
     children?: React.ReactNode
 }) {
 
-	const signedIcon = <PencilSquareIcon className="w-6 h-6"/>
-	const approvedIcon = <CheckIcon className="w-6 h-6"/>
-	const processedIcon = <DocumentArrowUpIcon className="w-6 h-6"/>
+	const signedIcon = (
+		<Tooltip content="Timesheet Signed">
+			<PencilSquareIcon className="w-6 h-6"/>
+		</Tooltip>
+	)
+
+	const approvedIcon = (
+		<Tooltip content="Timesheet Approved">
+			<CheckIcon className="w-6 h-6"/>
+		</Tooltip>
+	)
+	const processedIcon = (
+		<Tooltip content="Timesheet Processed">
+			<DocumentArrowUpIcon className="w-6 h-6"/>
+		</Tooltip>
+	)
 
     const TABLE_HEAD = [
 		"End Date",
