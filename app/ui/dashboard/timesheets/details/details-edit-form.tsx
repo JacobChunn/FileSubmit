@@ -14,9 +14,10 @@ import SelectWithFocusControl2 from '@/app/ui/forms/general-helper-components/se
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { notFound } from 'next/navigation';
 import { TimesheetContext } from '../timesheet-context-wrapper';
-import Input from '@/app/ui/forms/general-helper-components/inputDetails';
+import Input from '@/app/ui/forms/general-helper-components/input-details';
 import FormSubmitDetailsButton from '@/app/ui/forms/form-submit-details-button';
 import { IconButton, Tooltip } from '@/app/ui/material-tailwind-wrapper';
+import InputDetailsDesc from '@/app/ui/forms/general-helper-components/input-details-desc';
 
 export default function TimesheetDetailsEditForm({
 
@@ -135,7 +136,7 @@ export default function TimesheetDetailsEditForm({
 	const projectRowStyle = 'w-1/6'
 	const phaseRowStyle = 'w-1/6'
 	const costCodeRowStyle = 'w-1/6'
-	const descRowStyle = 'w-1/6'
+	const descRowStyle = 'w-1/6 h-10'
 
 	console.log("localTSDs", context.localTimesheetDetails);
 	const TSDLen = context.localTimesheetDetails?.length || 0;
@@ -212,13 +213,11 @@ export default function TimesheetDetailsEditForm({
 
 						{/* Description */}
 						<td className={descRowStyle}>
-							<Input
+							<InputDetailsDesc
 								index={index}
 								attr='description'
 								info={"TSD" + index + "[" + description + "]"}
 								value={val.description}
-								className={descStyle}
-								type='text'
 							/>
 						</td>
 						
