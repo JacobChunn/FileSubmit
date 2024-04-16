@@ -405,13 +405,13 @@ export default function TimesheetDetailsEditForm({
 					</tr>
 				)) : null}
 					<tr>
-						<td/>
-						<td/>
-						<td/>
-						<td>
+						<td colSpan={4}>
 							<p className='text-right'>
 								Total: 
 							</p>
+						</td>
+						<td>
+							
 						</td>
 					</tr>
 				</tbody>
