@@ -14,15 +14,15 @@ interface InputProps {
 	disabled: boolean,
 }
 
-export default function InputDetails({
+export default function InputDetailsNumber({
 	index,
 	attr,
 	info,
 	className='',
 	value,
-	type='number',
 	disabled,
 }: InputProps) {
+	console.log("in inputdetailsnumber!!!")
 	const context = useContext(TimesheetContext);
 
 	if (context == null) {
@@ -33,18 +33,16 @@ export default function InputDetails({
 
 	const len = context.localTimesheetDetails?.length || 0;
 
-	let formattedValue;
-
-	if (type == 'number') {
-		formattedValue = (value !== null && value !== undefined) ? value : 0;
-	}
-
-	if (type == 'text') {
-		formattedValue = (value !== null && value !== undefined) ? value : '';
-	}
+	const formattedValue = (value !== null && value !== undefined) ? value : 0;
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const newValue = type === 'number' ? parseFloat(event.target.value) : event.target.value;
+		const inputValue = event.target.value;
+
+		const result = inputValue.match(/\d/g);
+		const newValue = result && !Number.isNaN(result) ? parseInt(result.join(''), 10) : "";
+
+		console.log(newValue, typeof(newValue))
+
 		context.setLocalTimesheetDetails(prev => {
 		  if (prev === null) return null;
 		  const updatedTSDs = [...prev];

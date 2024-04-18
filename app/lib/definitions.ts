@@ -221,6 +221,31 @@ export type TimesheetState = {
   message?: string | null;
 };
 
+export type LocalTimesheetDetails = {
+	id: number;
+	timesheetid: number;
+	employeeid: number;
+	projectid: number;
+	phase: number;
+	costcode: number;
+	description?: string | null;
+	mon: number | '';
+	monot: number | '';
+	tues: number | '';
+	tuesot: number | '';
+	wed: number | '';
+	wedot: number | '';
+	thurs: number | '';
+	thursot: number | '';
+	fri: number | '';
+	friot: number | '';
+	sat: number | '';
+	satot: number | '';
+	sun: number | '';
+	sunot: number | '';
+	lasteditdate: string;
+  };
+
 export type TimesheetDetails = {
   id: number;
   timesheetid: number;

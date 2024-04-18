@@ -14,7 +14,7 @@ import SelectWithFocusControl2 from '@/app/ui/forms/general-helper-components/se
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { notFound } from 'next/navigation';
 import { TimesheetContext } from '../timesheet-context-wrapper';
-import Input from '@/app/ui/forms/general-helper-components/input-details';
+import InputDetailsNumber from '@/app/ui/forms/general-helper-components/input-details-number';
 import FormSubmitDetailsButton from '@/app/ui/forms/form-submit-details-button';
 import { IconButton, Tooltip } from '@/app/ui/material-tailwind-wrapper';
 import InputDetailsDesc from '@/app/ui/forms/general-helper-components/input-details-desc';
@@ -157,6 +157,57 @@ export default function TimesheetDetailsEditForm({
 	const TSDLen = context.localTimesheetDetails?.length || 0;
 	console.log("localTSD length", context.localTimesheetDetails?.length);
 
+	const monTot = context.localTimesheetDetails ? 
+		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
+			return accumulator + Number(currentValue.mon) + Number(currentValue.monot);
+		}, 0)
+		:
+		0;
+
+	const tuesTot = context.localTimesheetDetails ? 
+		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
+			return accumulator + Number(currentValue.tues) + Number(currentValue.tues);
+		}, 0)
+		:
+		0;
+
+	const wedTot = context.localTimesheetDetails ? 
+		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
+			return accumulator + Number(currentValue.tues) + Number(currentValue.tues);
+		}, 0)
+		:
+		0;
+
+	const thursTot = context.localTimesheetDetails ? 
+		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
+			return accumulator + Number(currentValue.tues) + Number(currentValue.tues);
+		}, 0)
+		:
+		0;
+
+	const friTot = context.localTimesheetDetails ?
+		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
+			return accumulator + Number(currentValue.tues) + Number(currentValue.tues);
+		}, 0)
+		:
+		0;
+
+	const satTot = context.localTimesheetDetails ?
+		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
+			return accumulator + Number(currentValue.tues) + Number(currentValue.tues);
+		}, 0)
+		:
+		0;
+
+	const sunTot = context.localTimesheetDetails ?
+		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
+			return accumulator + Number(currentValue.tues) + Number(currentValue.tues);
+		}, 0)
+		:
+		0;
+
+	const totalTot = monTot + tuesTot + wedTot + thursTot + friTot + satTot + sunTot;
+
     return (
         <form
             action={dispatch}
@@ -242,7 +293,7 @@ export default function TimesheetDetailsEditForm({
 						
 						{/* Monday */}
 						<td className={dayRowStyle}>
-							<Input
+							<InputDetailsNumber
 								index={index}
 								attr='mon'
 								info={"TSD" + index + "[" + mon + "]"}
@@ -250,7 +301,7 @@ export default function TimesheetDetailsEditForm({
 								value={val.mon}
 								disabled={timesheetIsSigned}
 							/>
-							<Input
+							<InputDetailsNumber
 								index={index}
 								attr='monot'
 								info={"TSD" + index + "[" + monot + "]"}
@@ -262,7 +313,7 @@ export default function TimesheetDetailsEditForm({
 
 						{/* Tuesday */}
 						<td className={dayRowStyle}>
-							<Input
+							<InputDetailsNumber
 								index={index}
 								attr='tues'
 								info={"TSD" + index + "[" + tues + "]"}
@@ -270,7 +321,7 @@ export default function TimesheetDetailsEditForm({
 								value={val.tues}
 								disabled={timesheetIsSigned}
 							/>
-							<Input
+							<InputDetailsNumber
 								index={index}
 								attr='tuesot'
 								info={"TSD" + index + "[" + tuesot + "]"}
@@ -282,7 +333,7 @@ export default function TimesheetDetailsEditForm({
 
 						{/* Wednesday */}
 						<td className={dayRowStyle}>
-							<Input
+							<InputDetailsNumber
 								index={index}
 								attr='wed'
 								info={"TSD" + index + "[" + wed + "]"}
@@ -290,7 +341,7 @@ export default function TimesheetDetailsEditForm({
 								value={val.wed}
 								disabled={timesheetIsSigned}
 							/>
-							<Input
+							<InputDetailsNumber
 								index={index}
 								attr='wedot'
 								info={"TSD" + index + "[" + wedot + "]"}
@@ -302,7 +353,7 @@ export default function TimesheetDetailsEditForm({
 
 						{/* Thursday */}
 						<td className={dayRowStyle}>
-							<Input
+							<InputDetailsNumber
 								index={index}
 								attr='thurs'
 								info={"TSD" + index + "[" + thurs + "]"}
@@ -310,7 +361,7 @@ export default function TimesheetDetailsEditForm({
 								value={val.thurs}
 								disabled={timesheetIsSigned}
 							/>
-							<Input
+							<InputDetailsNumber
 								index={index}
 								attr='thursot'
 								info={"TSD" + index + "[" + thursot + "]"}
@@ -322,7 +373,7 @@ export default function TimesheetDetailsEditForm({
 
 						{/* Friday */}
 						<td className={dayRowStyle}>
-							<Input
+							<InputDetailsNumber
 								index={index}
 								attr='fri'
 								info={"TSD" + index + "[" + fri + "]"}
@@ -330,7 +381,7 @@ export default function TimesheetDetailsEditForm({
 								value={val.fri}
 								disabled={timesheetIsSigned}
 							/>
-							<Input
+							<InputDetailsNumber
 								index={index}
 								attr='friot'
 								info={"TSD" + index + "[" + friot + "]"}
@@ -342,7 +393,7 @@ export default function TimesheetDetailsEditForm({
 
 						{/* Saturday */}
 						<td className={dayRowStyle}>
-							<Input
+							<InputDetailsNumber
 								index={index}
 								attr='sat'
 								info={"TSD" + index + "[" + sat + "]"}
@@ -350,7 +401,7 @@ export default function TimesheetDetailsEditForm({
 								value={val.sat}
 								disabled={timesheetIsSigned}
 							/>
-							<Input
+							<InputDetailsNumber
 								index={index}
 								attr='satot'
 								info={"TSD" + index + "[" + satot + "]"}
@@ -362,7 +413,7 @@ export default function TimesheetDetailsEditForm({
 
 						{/* Sunday */}
 						<td className={dayRowStyle}>
-							<Input
+							<InputDetailsNumber
 								index={index}
 								attr='sun'
 								info={"TSD" + index + "[" + sun + "]"}
@@ -370,7 +421,7 @@ export default function TimesheetDetailsEditForm({
 								value={val.sun}
 								disabled={timesheetIsSigned}
 							/>
-							<Input
+							<InputDetailsNumber
 								index={index}
 								attr='sunot'
 								info={"TSD" + index + "[" + sunot + "]"}
@@ -411,7 +462,28 @@ export default function TimesheetDetailsEditForm({
 							</p>
 						</td>
 						<td>
-							
+							{monTot}
+						</td>
+						<td>
+							{tuesTot}
+						</td>
+						<td>
+							{wedTot}
+						</td>
+						<td>
+							{thursTot}
+						</td>
+						<td>
+							{friTot}
+						</td>
+						<td>
+							{satTot}
+						</td>
+						<td>
+							{sunTot}
+						</td>
+						<td>
+							{totalTot}
 						</td>
 					</tr>
 				</tbody>
