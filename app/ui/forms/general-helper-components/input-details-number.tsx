@@ -33,7 +33,9 @@ export default function InputDetailsNumber({
 
 	const len = context.localTimesheetDetails?.length || 0;
 
-	const formattedValue = (value !== null && value !== undefined) ? value : 0;
+	const definedValue = (value !== null && value !== undefined) ? value : 0;
+
+	const formattedValue = definedValue == 0 ? "" : definedValue;
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const inputValue = event.target.value;
