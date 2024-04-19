@@ -166,42 +166,42 @@ export default function TimesheetDetailsEditForm({
 
 	const tuesTot = context.localTimesheetDetails ? 
 		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
-			return accumulator + Number(currentValue.tues) + Number(currentValue.tues);
+			return accumulator + Number(currentValue.tues) + Number(currentValue.tuesot);
 		}, 0)
 		:
 		0;
 
 	const wedTot = context.localTimesheetDetails ? 
 		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
-			return accumulator + Number(currentValue.tues) + Number(currentValue.tues);
+			return accumulator + Number(currentValue.wed) + Number(currentValue.wedot);
 		}, 0)
 		:
 		0;
 
 	const thursTot = context.localTimesheetDetails ? 
 		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
-			return accumulator + Number(currentValue.tues) + Number(currentValue.tues);
+			return accumulator + Number(currentValue.thurs) + Number(currentValue.thursot);
 		}, 0)
 		:
 		0;
 
 	const friTot = context.localTimesheetDetails ?
 		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
-			return accumulator + Number(currentValue.tues) + Number(currentValue.tues);
+			return accumulator + Number(currentValue.fri) + Number(currentValue.friot);
 		}, 0)
 		:
 		0;
 
 	const satTot = context.localTimesheetDetails ?
 		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
-			return accumulator + Number(currentValue.tues) + Number(currentValue.tues);
+			return accumulator + Number(currentValue.sat) + Number(currentValue.satot);
 		}, 0)
 		:
 		0;
 
 	const sunTot = context.localTimesheetDetails ?
 		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
-			return accumulator + Number(currentValue.tues) + Number(currentValue.tues);
+			return accumulator + Number(currentValue.sun) + Number(currentValue.sunot);
 		}, 0)
 		:
 		0;
