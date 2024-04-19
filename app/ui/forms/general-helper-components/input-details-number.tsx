@@ -22,7 +22,6 @@ export default function InputDetailsNumber({
 	value,
 	disabled,
 }: InputProps) {
-	console.log("in inputdetailsnumber!!!")
 	const context = useContext(TimesheetContext);
 
 	if (context == null) {

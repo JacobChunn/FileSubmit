@@ -22,6 +22,7 @@ export default function FormSubmitDetailsButton({
 	const handleCancelOnClick = () => {
 		context.setLocalTimesheetDetails(null);
 		context.setSelectedTimesheet(null);
+		context.setTimesheetDetailsState(null);
 	}
 
 	const handleSubmitOnClick = () => {
@@ -47,8 +48,9 @@ export default function FormSubmitDetailsButton({
 			selectedTimesheet.totalovertime = totalOT;
 
 			return updatedTimesheets;
-		}
-	)}
+		})
+		context.setTimesheetDetailsState("saving");
+	}
 
 	return (
 		<div className="mt-6 flex justify-end gap-4">

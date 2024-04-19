@@ -2,7 +2,7 @@
 
 import { deleteTimesheetDetails, editTimesheetDetails, fetchTimesheetDetailsEditFormData } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
-import { Options, TimesheetDetails, TimesheetDetailsEditInfo, timesheetDetailsLabels } from '@/app/lib/definitions';
+import { Options, TimesheetDetails, TimesheetDetailsEditInfo, TimesheetDetailsState, timesheetDetailsLabels } from '@/app/lib/definitions';
 import FormTextEntry from '@/app/ui/forms/edit-form/form-entry';
 import FormBoolEntry from '@/app/ui/forms/edit-form/form-bool-entry';
 import FormErrorHandling from '@/app/ui/forms/form-error-handling';
@@ -10,7 +10,6 @@ import FormSubmitButton from '@/app/ui/forms/form-submit-button';
 import { getServerSession } from 'next-auth';
 import { useContext, useEffect, useState } from 'react';
 import SelectWithFocusControl from '@/app/ui/forms/general-helper-components/select-w-description';
-import SelectWithFocusControl2 from '@/app/ui/forms/general-helper-components/select-w-description2';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { notFound } from 'next/navigation';
 import { TimesheetContext } from '../timesheet-context-wrapper';
@@ -50,17 +49,30 @@ export default function TimesheetDetailsEditForm({
 	const [TSDDataAndOptions, setTSDDataAndOptions] = useState<{options: Options, timesheetDetails: TimesheetDetails[]} | null>(null);
 	const initialState = { message: null, errors: {} };
 	const editTimesheetDetailsWithID = editTimesheetDetails.bind(null, timesheetID);
-    const [state, dispatch] = useFormState(editTimesheetDetailsWithID, initialState);
+    const [formState, dispatch] = useFormState(editTimesheetDetailsWithID, initialState);
 
 	useEffect(() => {
 		const fetchData = async () => {
-			console.log('TS-ID', timesheetID)
+			console.log('TS-ID', timesheetID);
 			try {
 				context.setLocalTimesheetDetails(null);
 				setTSDDataAndOptions(null);
 				const TSDDataReturn = await fetchTimesheetDetailsEditFormData(timesheetID);
+
 				setTSDDataAndOptions(TSDDataReturn);
+
 				context.setLocalTimesheetDetails(TSDDataReturn.timesheetDetails);
+				context.setDatabaseTimesheetDetails(TSDDataReturn.timesheetDetails);
+
+				let initialTimesheetDetailsState: TimesheetDetailsState;
+				console.log("First set local");
+				if (context.timesheets?.find(timesheet => timesheet.id == timesheetID)?.usercommitted) {
+					initialTimesheetDetailsState = "signed";
+				} else {
+					initialTimesheetDetailsState = "saved";
+				}
+
+				context.setTimesheetDetailsState(initialTimesheetDetailsState);
 			} catch (error) {
 				console.error(error);
 				notFound();
@@ -70,9 +82,33 @@ export default function TimesheetDetailsEditForm({
 		fetchData();
 	}, [timesheetID]);
 
+	// Change TSD state to saved upon successful save
 	useEffect(() => {
-		console.log("need a repaint?")
-	},[timesheetID, context.localTimesheetDetails])
+		console.log("formState: " + JSON.stringify(formState));
+
+		let timesheetDetailsState: TimesheetDetailsState;
+		if (context.timesheetDetailsState === null) {
+			timesheetDetailsState = null;
+		} else if (formState.success === true) {
+			timesheetDetailsState = "saved";
+		} else {
+			timesheetDetailsState = "unsaved";
+		}
+		
+		context.setTimesheetDetailsState(timesheetDetailsState);
+	},[formState])
+
+	// useEffect(() => {
+	// 	console.log("localTimesheetDetails Changed!", context.timesheetDetailsState)
+	// 	let timesheetDetailsState: TimesheetDetailsState;
+	// 	if (context.timesheetDetailsState === null) {
+	// 		timesheetDetailsState = null;
+	// 	} else {
+	// 		timesheetDetailsState = "unsaved";
+	// 	}
+	// 	console.log("changing TSDState to: ", timesheetDetailsState)
+	// 	context.setTimesheetDetailsState(timesheetDetailsState);
+	// }, [context.localTimesheetDetails]);
 
 	if (!TSDDataAndOptions) {
 		console.log("Loading...")
@@ -153,9 +189,7 @@ export default function TimesheetDetailsEditForm({
 	const costCodeRowStyle = 'w-1/6'
 	const descRowStyle = 'w-1/6 h-10'
 
-	console.log("localTSDs", context.localTimesheetDetails);
 	const TSDLen = context.localTimesheetDetails?.length || 0;
-	console.log("localTSD length", context.localTimesheetDetails?.length);
 
 	const monTot = context.localTimesheetDetails ? 
 		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
@@ -246,15 +280,14 @@ export default function TimesheetDetailsEditForm({
 							/>
 
 							{/* Project */}
-							<SelectWithFocusControl2
+							<SelectWithFocusControl
 								info={"TSD" + index + "[" + project + "]"}
-								info2={"TSD" + index + "[" + project + "] " + timesheetID}
 								value={val.projectid}
 								className = {selectStyle}
 								disabled={timesheetIsSigned}
 							>
 								{projectOptions}
-							</SelectWithFocusControl2>
+							</SelectWithFocusControl>
 						</td>
 
 						<td className={phaseRowStyle}>

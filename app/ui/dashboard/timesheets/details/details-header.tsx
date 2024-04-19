@@ -78,6 +78,9 @@ export default function TimesheetDetailsHeader({
 	return (
 		<div className="w-full h-full">
 			<div className="flex justify-end py-4">
+				<div>
+					{"State: " + context.timesheetDetailsState}
+				</div>
 				<SignTimesheetToggleButton/>
 				<div className="w-2"/>
 				<button

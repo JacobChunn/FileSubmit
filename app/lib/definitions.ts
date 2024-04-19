@@ -221,7 +221,7 @@ export type TimesheetState = {
   message?: string | null;
 };
 
-export type LocalTimesheetDetails = {
+export type TimesheetDetailsExtended = {
 	id: number;
 	timesheetid: number;
 	employeeid: number;
@@ -244,7 +244,7 @@ export type LocalTimesheetDetails = {
 	sun: number | '';
 	sunot: number | '';
 	lasteditdate: string;
-  };
+};
 
 export type TimesheetDetails = {
   id: number;
@@ -317,6 +317,8 @@ export const timesheetDetailsLabels = {
 	sun: 'sun',
 	sunot: 'sunOT',
 };
+
+export type TimesheetDetailsState = "signed" | "unsaved" | "saving" | "saved" | null;
 
 export type ProjectOption = {
   id: number;

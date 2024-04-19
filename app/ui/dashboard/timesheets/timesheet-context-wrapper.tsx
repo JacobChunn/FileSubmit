@@ -1,6 +1,6 @@
 "use client"
 
-import { LocalTimesheetDetails, Timesheet, TimesheetDetails } from "@/app/lib/definitions";
+import { Timesheet, TimesheetDetails, TimesheetDetailsExtended, TimesheetDetailsState } from "@/app/lib/definitions";
 import { createContext, useState } from "react";
 
 type timesheetContextType = {
@@ -10,10 +10,16 @@ type timesheetContextType = {
     setSelectedTimesheet: React.Dispatch<React.SetStateAction<number | null>>;
 
     timesheets: Timesheet[] | null;
-    setTimesheets: React.Dispatch<React.SetStateAction<Timesheet[] | null>>
+    setTimesheets: React.Dispatch<React.SetStateAction<Timesheet[] | null>>;
 
-    localTimesheetDetails: LocalTimesheetDetails[] | null;
-    setLocalTimesheetDetails: React.Dispatch<React.SetStateAction<LocalTimesheetDetails[] | null>>
+    localTimesheetDetails: TimesheetDetailsExtended[] | null;
+    setLocalTimesheetDetails: React.Dispatch<React.SetStateAction<TimesheetDetailsExtended[] | null>>;
+
+    databaseTimesheetDetails: TimesheetDetailsExtended[] | null;
+    setDatabaseTimesheetDetails: React.Dispatch<React.SetStateAction<TimesheetDetailsExtended[] | null>>;
+
+    timesheetDetailsState: TimesheetDetailsState;
+    setTimesheetDetailsState: React.Dispatch<React.SetStateAction<TimesheetDetailsState>>;
 }
 
 export const TimesheetContext = createContext<timesheetContextType | null>(null)
@@ -28,7 +34,9 @@ export default function TimesheetContextWrapper({
 
 	const [selectedTimesheet, setSelectedTimesheet] = useState<number | null>(null);
     const [timesheets, setTimesheets] = useState<Timesheet[] | null>(null);
-    const [localTimesheetDetails, setLocalTimesheetDetails] = useState<LocalTimesheetDetails[] | null>(null);
+    const [localTimesheetDetails, setLocalTimesheetDetails] = useState<TimesheetDetailsExtended[] | null>(null);
+    const [databaseTimesheetDetails, setDatabaseTimesheetDetails] = useState<TimesheetDetailsExtended[] | null>(null);
+    const [timesheetDetailsState, setTimesheetDetailsState] = useState<TimesheetDetailsState>(null);
 
     return (
         <TimesheetContext.Provider
@@ -37,6 +45,8 @@ export default function TimesheetContextWrapper({
                 selectedTimesheet, setSelectedTimesheet,
                 timesheets, setTimesheets,
                 localTimesheetDetails, setLocalTimesheetDetails,
+                databaseTimesheetDetails, setDatabaseTimesheetDetails,
+                timesheetDetailsState, setTimesheetDetailsState,
             }}
         >
             {children}

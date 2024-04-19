@@ -1,6 +1,6 @@
 'use server';
 
-import { z } from 'zod';
+import { boolean, z } from 'zod';
 import { sql } from '@vercel/postgres';
 import { revalidatePath, unstable_noStore } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -552,11 +552,21 @@ export async function addTimesheetDetails(timesheetID: number) {
 	// redirect(`/dashboard/${validatedTimesheetID}/edit/details`);
 }
 
+type FieldErrors = {
+  [key: string]: string[] | undefined;
+}
+
+type EditTimesheetDetailsType = {
+  success: boolean,
+  errors?: string | FieldErrors,
+  message: string,
+}
+
 export async function editTimesheetDetails(
 	timesheetID: number,
 	prevState: any,
 	formData: FormData
-) {
+): Promise<EditTimesheetDetailsType> {
 	//console.log(formData);
 
 	const validatedTimesheet = z.number().safeParse(timesheetID);
@@ -564,6 +574,7 @@ export async function editTimesheetDetails(
 	// If form validation fails, return errors early. Otherwise, continue.
 	if (!validatedTimesheet.success) {
 		return {
+      success: false,
 			errors: validatedTimesheet.error.flatten().fieldErrors,
 			message: 'Failed to Validate timesheetID.',
 		};
@@ -577,6 +588,7 @@ export async function editTimesheetDetails(
 	if (!session) {
 		console.log("Session was unable to be retrieved!");
 		return {
+      success: false,
 			message: 'Session was unable to be retrieved!',
 		};
 
@@ -589,6 +601,7 @@ export async function editTimesheetDetails(
 	if (!validOwnership) {
 		console.log("Employee does not own provided timesheet!");
 		return {
+      success: false,
 			message: 'Employee does not own provided timesheet!',
 		};
 	}
@@ -603,6 +616,7 @@ export async function editTimesheetDetails(
     console.log(timesheetIsSigned.rows[0]);
     if (timesheetIsSigned.rows[0].usercommitted) {
       return {
+        success: false,
         message: 'Cannot edit a signed timesheet!'
       }
     }
@@ -610,6 +624,8 @@ export async function editTimesheetDetails(
   } catch(error) {
     console.error(error);
     return {
+      success: false,
+      errors: JSON.stringify(error),
       message: 'Error checking if timesheet is signed!'
     }
   }
@@ -670,8 +686,9 @@ export async function editTimesheetDetails(
 		if (!validatedTSD.success) {
 			console.error(validatedTSD.error);
 			return {
+        success: false,
 				errors: validatedTSD.error.flatten().fieldErrors,
-				message: 'Incorrect or Missing Fields. Failed to Validate timesheetID.',
+				message: 'Incorrect or Missing Fields. Failed to Validate timesheet ID.',
 			};
 		}
 
@@ -679,17 +696,19 @@ export async function editTimesheetDetails(
 
 	}
 
-	//console.log(validatedTSDs);
-
   // Delete all TSDs associated with the timesheet
-  try{
+  try{ // Note - could make this more robost by temporarily storing the TSDs in DB before deletion
     await sql`
       DELETE FROM timesheetdetails
       WHERE timesheetid = ${validatedTimesheetID};
     `;
   } catch(error) {
     console.error(error);
-    throw error;
+    return {
+      success: false,
+      errors: JSON.stringify(error),
+      message: 'Failed to delete old TSDs'
+    }
   }
 
   // Add all validated TSDs to Database
@@ -729,14 +748,17 @@ export async function editTimesheetDetails(
     
       if(!addSuccess) {
         return {
-          message: 'Failed to Create TimesheetDetails.',
+          success: false,
+          message: 'Failed to Create Timesheet Details.',
         };
       }
   
     } catch(error) {
       console.error(error);
       return {
-          message: 'Failed to Create TimesheetDetails.',
+        success: false,
+        errors: JSON.stringify(error),
+        message: 'Failed to Create Timesheet Details.',
       };
     }
 	}
@@ -752,9 +774,18 @@ export async function editTimesheetDetails(
   } catch(error) {
     console.error(error);
     return {
-      message: 'Failed to Update Timesheet',
+      success: false,
+      errors: JSON.stringify(error),
+      message: 'Failed to Update Timesheet Details',
     };
   }
+
+  // Return success
+  return {
+    success: true,
+    message: 'Timesheet Details were successfully updated!'
+  }
+
 }
 
 async function timesheetDetailsBelongsToTimesheet(timesheetDetailsID: number, timesheetID: number) {

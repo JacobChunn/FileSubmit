@@ -54,7 +54,6 @@ export default function SelectWithFocusControl({
 	}
 
 	useEffect(() => {
-		console.log("here")
 		const element = document.getElementById(info) as HTMLSelectElement;
 		if (!element) return;
 
