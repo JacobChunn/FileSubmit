@@ -2,11 +2,11 @@
 
 import { useContext } from "react";
 import { TimesheetContext } from "../../dashboard/timesheets/timesheet-context-wrapper";
-import { TimesheetDetails } from "@/app/lib/definitions";
+import { TimesheetDetails, TimesheetDetailsExtended } from "@/app/lib/definitions";
 
 interface InputProps {
 	index: number,
-	attr: keyof TimesheetDetails,
+	attr: keyof TimesheetDetailsExtended,
 	info: string,
 	className?: string,
 	value: string | number | null | undefined,

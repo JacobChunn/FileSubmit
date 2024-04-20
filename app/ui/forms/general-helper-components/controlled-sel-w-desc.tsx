@@ -1,26 +1,38 @@
 'use client'
 
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
+import { TimesheetContext } from "../../dashboard/timesheets/timesheet-context-wrapper";
+import { TimesheetDetails, TimesheetDetailsExtended } from "@/app/lib/definitions";
 
-interface SelectWithFocusControl {
-	info: string;
-	className: string;
+interface ControlledSelectProps {
+	index: number,
+	attr: keyof TimesheetDetailsExtended,
+	info: string,
+	className: string,
 	value: string | number,
 	dbValue: string | number | undefined,
 	disabled: boolean,
 	children: React.ReactElement<HTMLOptionElement & {"focused-label": string, "unfocused-label": string}>[];
 }
 
-export default function SelectWithFocusControl({
+export default function ControlledSelect({
+	index,
+	attr,
 	info,
 	className,
 	value,
 	dbValue,
 	disabled,
 	children,
-}: SelectWithFocusControl) {
+}: ControlledSelectProps) {
+	const context = useContext(TimesheetContext);
 	const focusedInfoRef = useRef<string | null>(null);
 
+	if (context == null) {
+		throw new Error(
+			"context has to be used within <TimesheetContext.Provider>"
+		);
+	}
 
 	const saveFocusedContent = (data: string) => {
 		focusedInfoRef.current = data;
@@ -55,6 +67,23 @@ export default function SelectWithFocusControl({
 		selectedOption.textContent = unfocusedLabel;
 	}
 
+	const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+		const inputValue = event.target.value;
+		console.log("inputValue: ",inputValue)
+		// const result = inputValue.match(/\d/g);
+		// const newValue = result && !Number.isNaN(result) ? parseInt(result.join(''), 10) : "";
+
+		// console.log(newValue, typeof(newValue))
+
+		context.setLocalTimesheetDetails(prev => {
+		  if (prev === null) return null;
+		  const updatedTSDs = [...prev];
+		  const updatedItem = { ...updatedTSDs[index], [attr]: Number(inputValue) };
+		  updatedTSDs[index] = updatedItem;
+		  return updatedTSDs;
+		});
+	  };
+
 	useEffect(() => {
 		const element = document.getElementById(info) as HTMLSelectElement;
 		if (!element) return;
@@ -73,7 +102,7 @@ export default function SelectWithFocusControl({
 		});
 	}, []);
 
-	const editStyle = !dbValue || dbValue !== value ? "bg-red-300" : ""
+	const editStyle = !dbValue || dbValue !== value ? "bg-red-300 " : ""
 	console.log(info, " vals: ", value, dbValue);
 
 	return (
@@ -82,7 +111,8 @@ export default function SelectWithFocusControl({
 			key={info}
 			name={info}
 			className={editStyle + className}
-			defaultValue={value}
+			onChange={handleChange}
+			value={value}
 			disabled={disabled}
 		>
 			{children}

@@ -18,6 +18,7 @@ import FormSubmitDetailsButton from '@/app/ui/forms/form-submit-details-button';
 import { IconButton, Tooltip } from '@/app/ui/material-tailwind-wrapper';
 import InputDetailsDesc from '@/app/ui/forms/general-helper-components/input-details-desc';
 import DeleteDetailButton from './delete-detail-button';
+import ControlledSelect from '@/app/ui/forms/general-helper-components/controlled-sel-w-desc';
 
 export default function TimesheetDetailsEditForm({
 
@@ -262,232 +263,245 @@ export default function TimesheetDetailsEditForm({
 					</tr>
 				</thead>
 				<tbody className='w-full'>
-				{context.localTimesheetDetails ? context.localTimesheetDetails.map((val, index) => (
-					<tr
-						key={"k-" + index + timesheetID}
-						className='w-full h-full'
-					>
-						<td className={projectRowStyle}>
-							{/* Hidden TSD id */}
-							<input
-								id={"TSD" + index + "[" + id + "]"}
-								key={"TSD" + index + "[" + id + "]"}
-								name={"TSD" + index + "[" + id + "]"}
-								value={val.id}
-								className='w-0'
-								readOnly
-								hidden
-							/>
+				{context.localTimesheetDetails && context.databaseTimesheetDetails ? context.localTimesheetDetails.map((val, index) => {
+					const dbTSDs = context.databaseTimesheetDetails;
+					const dbTSDsLen = dbTSDs ? dbTSDs.length : 0;
 
-							{/* Project */}
-							<SelectWithFocusControl
-								info={"TSD" + index + "[" + project + "]"}
-								value={val.projectid}
-								className = {selectStyle}
-								disabled={timesheetIsSigned}
-							>
-								{projectOptions}
-							</SelectWithFocusControl>
-						</td>
+					const dbVal = dbTSDsLen > index && dbTSDs ? 
+						dbTSDs[index] : null;
 
-						<td className={phaseRowStyle}>
-							{/* Phase */}
-							<SelectWithFocusControl
-								info={"TSD" + index + "[" + phase + "]"}
-								value={val.phase}
-								className = {selectStyle}
-								disabled={timesheetIsSigned}
-							>
-								{phaseOptions}
-							</SelectWithFocusControl>
-						</td>
-						<td className={costCodeRowStyle}>
-							{/* Cost Code */}
-							<SelectWithFocusControl
-								info={"TSD" + index + "[" + costcode + "]"}
-								value={val.costcode}
-								className = {selectStyle}
-								disabled={timesheetIsSigned}
-							>
-								{costCodeOptions}
-							</SelectWithFocusControl>
-						</td>
+					return (
+						<tr
+							key={"k-" + index + timesheetID}
+							className='w-full h-full'
+						>
+							<td className={projectRowStyle}>
+								{/* Hidden TSD id */}
+								<input
+									id={"TSD" + index + "[" + id + "]"}
+									key={"TSD" + index + "[" + id + "]"}
+									name={"TSD" + index + "[" + id + "]"}
+									value={val.id}
+									className='w-0'
+									readOnly
+									hidden
+								/>
 
-						{/* Description */}
-						<td className={descRowStyle}>
-							<InputDetailsDesc
-								index={index}
-								attr='description'
-								info={"TSD" + index + "[" + description + "]"}
-								value={val.description}
-								readOnly={timesheetIsSigned}
-							/>
-						</td>
-						
-						{/* Monday */}
-						<td className={dayRowStyle}>
-							<InputDetailsNumber
-								index={index}
-								attr='mon'
-								info={"TSD" + index + "[" + mon + "]"}
-								className={dayRegStyle}
-								value={val.mon}
-								disabled={timesheetIsSigned}
-							/>
-							<InputDetailsNumber
-								index={index}
-								attr='monot'
-								info={"TSD" + index + "[" + monot + "]"}
-								className={dayOTStyle}
-								value={val.monot}
-								disabled={timesheetIsSigned}
-							/>
-						</td>
+								{/* Project */}
+								<ControlledSelect
+									index={index}
+									attr='projectid'
+									info={"TSD" + index + "[" + project + "]"}
+									value={val.projectid}
+									dbValue={dbVal?.projectid}
+									className = {selectStyle}
+									disabled={timesheetIsSigned}
+								>
+									{projectOptions}
+								</ControlledSelect>
+							</td>
 
-						{/* Tuesday */}
-						<td className={dayRowStyle}>
-							<InputDetailsNumber
-								index={index}
-								attr='tues'
-								info={"TSD" + index + "[" + tues + "]"}
-								className={dayRegStyle}
-								value={val.tues}
-								disabled={timesheetIsSigned}
-							/>
-							<InputDetailsNumber
-								index={index}
-								attr='tuesot'
-								info={"TSD" + index + "[" + tuesot + "]"}
-								className={dayOTStyle}
-								value={val.tuesot}
-								disabled={timesheetIsSigned}
-							/>
-						</td>
+							<td className={phaseRowStyle}>
+								{/* Phase */}
+								<SelectWithFocusControl
+									info={"TSD" + index + "[" + phase + "]"}
+									value={val.phase}
+									dbValue={dbVal?.phase}
+									className = {selectStyle}
+									disabled={timesheetIsSigned}
+								>
+									{phaseOptions}
+								</SelectWithFocusControl>
+							</td>
+							<td className={costCodeRowStyle}>
+								{/* Cost Code */}
+								<SelectWithFocusControl
+									info={"TSD" + index + "[" + costcode + "]"}
+									value={val.costcode}
+									dbValue={dbVal?.costcode}
+									className = {selectStyle}
+									disabled={timesheetIsSigned}
+								>
+									{costCodeOptions}
+								</SelectWithFocusControl>
+							</td>
 
-						{/* Wednesday */}
-						<td className={dayRowStyle}>
-							<InputDetailsNumber
-								index={index}
-								attr='wed'
-								info={"TSD" + index + "[" + wed + "]"}
-								className={dayRegStyle}
-								value={val.wed}
-								disabled={timesheetIsSigned}
-							/>
-							<InputDetailsNumber
-								index={index}
-								attr='wedot'
-								info={"TSD" + index + "[" + wedot + "]"}
-								className={dayOTStyle}
-								value={val.wedot}
-								disabled={timesheetIsSigned}
-							/>
-						</td>
+							{/* Description */}
+							<td className={descRowStyle}>
+								<InputDetailsDesc
+									index={index}
+									attr='description'
+									info={"TSD" + index + "[" + description + "]"}
+									value={val.description}
+									readOnly={timesheetIsSigned}
+								/>
+							</td>
+							
+							{/* Monday */}
+							<td className={dayRowStyle}>
+								<InputDetailsNumber
+									index={index}
+									attr='mon'
+									info={"TSD" + index + "[" + mon + "]"}
+									className={dayRegStyle}
+									value={val.mon}
+									disabled={timesheetIsSigned}
+								/>
+								<InputDetailsNumber
+									index={index}
+									attr='monot'
+									info={"TSD" + index + "[" + monot + "]"}
+									className={dayOTStyle}
+									value={val.monot}
+									disabled={timesheetIsSigned}
+								/>
+							</td>
 
-						{/* Thursday */}
-						<td className={dayRowStyle}>
-							<InputDetailsNumber
-								index={index}
-								attr='thurs'
-								info={"TSD" + index + "[" + thurs + "]"}
-								className={dayRegStyle}
-								value={val.thurs}
-								disabled={timesheetIsSigned}
-							/>
-							<InputDetailsNumber
-								index={index}
-								attr='thursot'
-								info={"TSD" + index + "[" + thursot + "]"}
-								className={dayOTStyle}
-								value={val.thursot}
-								disabled={timesheetIsSigned}
-							/>
-						</td>
+							{/* Tuesday */}
+							<td className={dayRowStyle}>
+								<InputDetailsNumber
+									index={index}
+									attr='tues'
+									info={"TSD" + index + "[" + tues + "]"}
+									className={dayRegStyle}
+									value={val.tues}
+									disabled={timesheetIsSigned}
+								/>
+								<InputDetailsNumber
+									index={index}
+									attr='tuesot'
+									info={"TSD" + index + "[" + tuesot + "]"}
+									className={dayOTStyle}
+									value={val.tuesot}
+									disabled={timesheetIsSigned}
+								/>
+							</td>
 
-						{/* Friday */}
-						<td className={dayRowStyle}>
-							<InputDetailsNumber
-								index={index}
-								attr='fri'
-								info={"TSD" + index + "[" + fri + "]"}
-								className={dayRegStyle}
-								value={val.fri}
-								disabled={timesheetIsSigned}
-							/>
-							<InputDetailsNumber
-								index={index}
-								attr='friot'
-								info={"TSD" + index + "[" + friot + "]"}
-								className={dayOTStyle}
-								value={val.friot}
-								disabled={timesheetIsSigned}
-							/>
-						</td>
+							{/* Wednesday */}
+							<td className={dayRowStyle}>
+								<InputDetailsNumber
+									index={index}
+									attr='wed'
+									info={"TSD" + index + "[" + wed + "]"}
+									className={dayRegStyle}
+									value={val.wed}
+									disabled={timesheetIsSigned}
+								/>
+								<InputDetailsNumber
+									index={index}
+									attr='wedot'
+									info={"TSD" + index + "[" + wedot + "]"}
+									className={dayOTStyle}
+									value={val.wedot}
+									disabled={timesheetIsSigned}
+								/>
+							</td>
 
-						{/* Saturday */}
-						<td className={dayRowStyle}>
-							<InputDetailsNumber
-								index={index}
-								attr='sat'
-								info={"TSD" + index + "[" + sat + "]"}
-								className={dayRegStyle}
-								value={val.sat}
-								disabled={timesheetIsSigned}
-							/>
-							<InputDetailsNumber
-								index={index}
-								attr='satot'
-								info={"TSD" + index + "[" + satot + "]"}
-								className={dayOTStyle}
-								value={val.satot}
-								disabled={timesheetIsSigned}
-							/>
-						</td>
+							{/* Thursday */}
+							<td className={dayRowStyle}>
+								<InputDetailsNumber
+									index={index}
+									attr='thurs'
+									info={"TSD" + index + "[" + thurs + "]"}
+									className={dayRegStyle}
+									value={val.thurs}
+									disabled={timesheetIsSigned}
+								/>
+								<InputDetailsNumber
+									index={index}
+									attr='thursot'
+									info={"TSD" + index + "[" + thursot + "]"}
+									className={dayOTStyle}
+									value={val.thursot}
+									disabled={timesheetIsSigned}
+								/>
+							</td>
 
-						{/* Sunday */}
-						<td className={dayRowStyle}>
-							<InputDetailsNumber
-								index={index}
-								attr='sun'
-								info={"TSD" + index + "[" + sun + "]"}
-								className={dayRegStyle}
-								value={val.sun}
-								disabled={timesheetIsSigned}
-							/>
-							<InputDetailsNumber
-								index={index}
-								attr='sunot'
-								info={"TSD" + index + "[" + sunot + "]"}
-								className={dayOTStyle}
-								value={val.sunot}
-								disabled={timesheetIsSigned}
-							/>
-						</td>
+							{/* Friday */}
+							<td className={dayRowStyle}>
+								<InputDetailsNumber
+									index={index}
+									attr='fri'
+									info={"TSD" + index + "[" + fri + "]"}
+									className={dayRegStyle}
+									value={val.fri}
+									disabled={timesheetIsSigned}
+								/>
+								<InputDetailsNumber
+									index={index}
+									attr='friot'
+									info={"TSD" + index + "[" + friot + "]"}
+									className={dayOTStyle}
+									value={val.friot}
+									disabled={timesheetIsSigned}
+								/>
+							</td>
 
-						{/* Total */}
-						<td className={dayRowStyle}>
-							<div className="max-w-sm mx-auto m-0.5 bg-white border border-black">
-								<p className='text-sm'>
-									{Number(val.mon) + Number(val.tues) + Number(val.wed) + Number(val.thurs) + Number(val.fri) + Number(val.sat) + Number(val.sun)}
-								</p>
-							</div>
-							<div className="max-w-sm mx-auto m-0.5 bg-zinc-200 border border-black">
-								<p className='text-sm'>
-									{Number(val.monot) + Number(val.tuesot) + Number(val.wedot) + Number(val.thursot) + Number(val.friot) + Number(val.satot) + Number(val.sunot)}
+							{/* Saturday */}
+							<td className={dayRowStyle}>
+								<InputDetailsNumber
+									index={index}
+									attr='sat'
+									info={"TSD" + index + "[" + sat + "]"}
+									className={dayRegStyle}
+									value={val.sat}
+									disabled={timesheetIsSigned}
+								/>
+								<InputDetailsNumber
+									index={index}
+									attr='satot'
+									info={"TSD" + index + "[" + satot + "]"}
+									className={dayOTStyle}
+									value={val.satot}
+									disabled={timesheetIsSigned}
+								/>
+							</td>
 
-								</p>
-							</div>
-						</td>
+							{/* Sunday */}
+							<td className={dayRowStyle}>
+								<InputDetailsNumber
+									index={index}
+									attr='sun'
+									info={"TSD" + index + "[" + sun + "]"}
+									className={dayRegStyle}
+									value={val.sun}
+									disabled={timesheetIsSigned}
+								/>
+								<InputDetailsNumber
+									index={index}
+									attr='sunot'
+									info={"TSD" + index + "[" + sunot + "]"}
+									className={dayOTStyle}
+									value={val.sunot}
+									disabled={timesheetIsSigned}
+								/>
+							</td>
 
-						{/* Delete TSD */}
-						<td className='h-auto w-11 relative'>
-							<DeleteDetailButton
-								index={index}
-								hidden={timesheetIsSigned}
-							/>
-						</td>
-					</tr>
-				)) : null}
+							{/* Total */}
+							<td className={dayRowStyle}>
+								<div className="max-w-sm mx-auto m-0.5 bg-white border border-black">
+									<p className='text-sm'>
+										{Number(val.mon) + Number(val.tues) + Number(val.wed) + Number(val.thurs) + Number(val.fri) + Number(val.sat) + Number(val.sun)}
+									</p>
+								</div>
+								<div className="max-w-sm mx-auto m-0.5 bg-zinc-200 border border-black">
+									<p className='text-sm'>
+										{Number(val.monot) + Number(val.tuesot) + Number(val.wedot) + Number(val.thursot) + Number(val.friot) + Number(val.satot) + Number(val.sunot)}
+
+									</p>
+								</div>
+							</td>
+
+							{/* Delete TSD */}
+							<td className='h-auto w-11 relative'>
+								<DeleteDetailButton
+									index={index}
+									hidden={timesheetIsSigned}
+								/>
+							</td>
+						</tr>
+					)
+				}) : null}
 					<tr>
 						<td colSpan={4}>
 							<p className='text-right'>
@@ -523,8 +537,9 @@ export default function TimesheetDetailsEditForm({
 			</table>
             <FormSubmitDetailsButton
 				submitDisabled={timesheetIsSigned}
-            />
+            /> 
         </form>
+		// Add "row was removed" text somewhere
     );
 }
 

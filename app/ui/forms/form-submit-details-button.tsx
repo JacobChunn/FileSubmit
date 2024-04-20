@@ -67,9 +67,8 @@ export default function FormSubmitDetailsButton({
 				onClick={handleSubmitOnClick}
 				disabled={submitDisabled}
 			>
-    Submit Edits
-</button>
-
+				Submit Edits
+			</button>
 		</div>
 	)
 }
