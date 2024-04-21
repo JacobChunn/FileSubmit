@@ -51,7 +51,7 @@ export default function InputDetailsNumber({
 		context.setLocalTimesheetDetails(prev => {
 		  if (prev === null) return null;
 		  const updatedTSDs = [...prev];
-		  const updatedItem = { ...updatedTSDs[index], [attr]: newValue };
+		  const updatedItem = { ...updatedTSDs[index], [attr]: String(newValue) };
 		  updatedTSDs[index] = updatedItem;
 		  return updatedTSDs;
 		});
@@ -63,6 +63,8 @@ export default function InputDetailsNumber({
 	} else {
 		bgCol = dbValue == null || dbValue !== value ? "bg-red-300 " : "bg-white ";
 	}
+
+	console.log("compare: ", info, dbValue, value)
 
 	return (
 		<input

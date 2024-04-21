@@ -46,10 +46,12 @@ export default function InputDetailsDesc({
 		});
 	};
 
-	const editStyle = dbValue == null || dbValue !== value ?
+	const editStyle = dbValue !== value ?
 	"bg-red-300 "
 	:
 	isFocused ? "bg-white" : "bg-gray-100";
+
+	console.log("desc: ", dbValue, value);
 
 	return (
         <div className="flex items-center justify-center h-max">

@@ -102,7 +102,6 @@ export default function TimesheetDetailsEditForm({
 	},[formState])
 
 	useEffect(() => {
-		console.log("localTimesheetDetails Changed!", context.timesheetDetailsState)
 		const localTSDs = context.localTimesheetDetails;
 		const dbTSDs = context.databaseTimesheetDetails;
 
@@ -112,7 +111,6 @@ export default function TimesheetDetailsEditForm({
 		} else {
 			timesheetDetailsState = "unsaved";
 		}
-		console.log("changing TSDState to: ", timesheetDetailsState)
 		context.setTimesheetDetailsState(timesheetDetailsState);
 	}, [context.localTimesheetDetails]);
 
