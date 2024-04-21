@@ -102,8 +102,7 @@ export default function ControlledSelect({
 		});
 	}, []);
 
-	const editStyle = !dbValue || dbValue !== value ? "bg-red-300 " : ""
-	console.log(info, " vals: ", value, dbValue);
+	const editStyle = dbValue == null || dbValue !== value ? "bg-red-300 " : "";
 
 	return (
 		<select

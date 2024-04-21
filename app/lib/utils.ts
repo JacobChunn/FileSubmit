@@ -1,4 +1,28 @@
-import { Revenue } from './definitions';
+import { Revenue, TimesheetDetailsExtended } from './definitions';
+
+export function compareTimesheetDetailsExtended(
+    tsds1: TimesheetDetailsExtended[] | null,
+    tsds2: TimesheetDetailsExtended[] | null,
+): boolean {
+	if (!tsds1 && !tsds2) return true;
+	if (!tsds1 || !tsds2) return false;
+
+    if (tsds1.length !== tsds2.length) return false;
+
+    for (let index = 0; index < tsds1.length; index++) {
+        const v1 = tsds1[index];
+        const v2 = tsds2[index];
+
+		for (const key of Object.keys(v1) as Array<keyof TimesheetDetailsExtended>) {
+			if (v1[key] !== v2[key]) {
+				return false;
+			}
+		}
+    }
+
+    return true;
+}
+
 
 export const formatCurrency = (amount: number) => {
   return (amount / 100).toLocaleString('en-US', {

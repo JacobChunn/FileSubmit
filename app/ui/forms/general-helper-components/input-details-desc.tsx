@@ -3,12 +3,14 @@
 import { useContext, useState } from "react";
 import { TimesheetContext } from "../../dashboard/timesheets/timesheet-context-wrapper";
 import { TimesheetDetails, TimesheetDetailsExtended } from "@/app/lib/definitions";
+import { isFunction } from "util";
 
 interface InputProps {
 	index: number,
 	attr: keyof TimesheetDetailsExtended,
 	info: string,
 	value: string | null | undefined,
+	dbValue: string | null | undefined,
     readOnly: boolean,
 }
 
@@ -17,6 +19,7 @@ export default function InputDetailsDesc({
 	attr,
 	info,
 	value,
+	dbValue,
     readOnly,
 }: InputProps) {
 	const context = useContext(TimesheetContext);
@@ -41,7 +44,12 @@ export default function InputDetailsDesc({
 		  updatedTSDs[index] = updatedItem;
 		  return updatedTSDs;
 		});
-	  };
+	};
+
+	const editStyle = dbValue == null || dbValue !== value ?
+	"bg-red-300 "
+	:
+	isFocused ? "bg-white" : "bg-gray-100";
 
 	return (
         <div className="flex items-center justify-center h-max">
@@ -49,8 +57,8 @@ export default function InputDetailsDesc({
                 id={info+len}
                 key={info+len}
                 name={info}
-                className={`transition-all duration-300 ease-in-out text-base resize-none ${
-                    isFocused ? 'h-32 text-3xl w-80 bg-white shadow-xl rounded-lg' : 'h-12 w-full bg-gray-100'
+                className={`transition-all duration-300 ease-in-out text-base resize-none ${editStyle} ${
+                    isFocused ? 'h-32 text-3xl w-80 shadow-xl rounded-lg' : 'h-12 w-full'
                 }`}
                 value={formattedValue}
                 onFocus={() => setIsFocused(true)}

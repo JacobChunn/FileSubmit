@@ -9,7 +9,9 @@ interface InputProps {
 	attr: keyof TimesheetDetailsExtended,
 	info: string,
 	className?: string,
+	isOT?: boolean,
 	value: string | number | null | undefined,
+	dbValue: string | number | null | undefined,
 	type?: string,
 	disabled: boolean,
 }
@@ -19,7 +21,9 @@ export default function InputDetailsNumber({
 	attr,
 	info,
 	className='',
+	isOT=false,
 	value,
+	dbValue,
 	disabled,
 }: InputProps) {
 	const context = useContext(TimesheetContext);
@@ -51,14 +55,21 @@ export default function InputDetailsNumber({
 		  updatedTSDs[index] = updatedItem;
 		  return updatedTSDs;
 		});
-	  };
+	};
+
+	let bgCol;
+	if (isOT) {
+		bgCol = dbValue == null || dbValue !== value ? "bg-red-300 " : "bg-zinc-200 ";
+	} else {
+		bgCol = dbValue == null || dbValue !== value ? "bg-red-300 " : "bg-white ";
+	}
 
 	return (
 		<input
 			id={info+len}
 			key={info+len}
 			name={info}
-			className={className}
+			className={bgCol + className}
 			value={formattedValue}
 			onChange={handleChange}
 			disabled={disabled}
