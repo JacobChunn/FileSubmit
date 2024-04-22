@@ -51,7 +51,7 @@ export default function InputDetailsDesc({
 	:
 	isFocused ? "bg-white" : "bg-gray-100";
 
-	console.log("desc: ", dbValue, value);
+	//console.log("desc: ", dbValue, value);
 
 	return (
         <div className="flex items-center justify-center h-max">

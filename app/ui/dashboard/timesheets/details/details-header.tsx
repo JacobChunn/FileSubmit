@@ -37,14 +37,7 @@ export default function TimesheetDetailsHeader({
 		);
 	}
 
-	const currentTimesheet = context.timesheets.find(timesheet => timesheet.id == timesheetID);
-	if (!currentTimesheet) {
-		throw new Error(
-			"Could not find selectedTimesheet in timesheets!"
-		);
-	}
-
-	const timesheetIsSigned = currentTimesheet.usercommitted;
+	const canAddTSD = context.timesheetDetailsState == "saved" || context.timesheetDetailsState == "unsaved";
 
 	const addTSD = () => {
 		const currentTSDs = context.localTimesheetDetails || [];
@@ -85,7 +78,7 @@ export default function TimesheetDetailsHeader({
 				<div className="w-2"/>
 				<button
 					className={`flex h-10 items-center rounded-lg px-4 text-sm font-medium text-white transition-colors
-					${timesheetIsSigned ? 'bg-gray-400 cursor-not-allowed opacity-50' : 'bg-blue-500 hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600'}`}
+					${canAddTSD ? 'bg-blue-500 hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600' : 'bg-gray-400 cursor-not-allowed opacity-50'}`}
 					onClick={addTSD}
 				>
 					Add Timesheet Details

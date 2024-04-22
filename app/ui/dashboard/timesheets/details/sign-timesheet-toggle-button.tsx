@@ -3,6 +3,7 @@
 import { useContext } from "react";
 import { TimesheetContext } from "../timesheet-context-wrapper";
 import { toggleTimesheetSignedValue } from "@/app/lib/actions";
+import { TimesheetDetailsState } from "@/app/lib/definitions";
 
 export default function SignTimesheetToggleButton({
 
@@ -27,20 +28,15 @@ export default function SignTimesheetToggleButton({
 
 				const updatedTimesheets = [...prev];
 
-				console.log("prevTSs", prev);
-				console.log("selectedTSNumber", context.selectedTimesheet);
-
 				const selectedTimesheet = updatedTimesheets.find(timesheet => timesheet.id === context.selectedTimesheet);
 				if (!selectedTimesheet) return null;
-				console.log("selectedTS", selectedTimesheet);
 
 				selectedTimesheet.usercommitted = !selectedTimesheet.usercommitted;
-				
-				console.log("updatedTSs", updatedTimesheets);
 
 				return updatedTimesheets;
 			})
-
+			const newTSDState: TimesheetDetailsState = context.timesheetDetailsState == "signed" ? "saved" : "signed";
+			context.setTimesheetDetailsState(newTSDState);
 			
 		} catch (error) {
 			console.error(error);
@@ -50,9 +46,12 @@ export default function SignTimesheetToggleButton({
 	const selectedTimesheet = context.timesheets?.find(timesheet => timesheet.id === context.selectedTimesheet);
 	if (!selectedTimesheet) return null;
 
+	const isTogglable = context.timesheetDetailsState == "saved" || context.timesheetDetailsState == "signed";
+
 	return (
 		<button
-			className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
+			className={`flex h-10 items-center rounded-lg px-4 text-sm font-medium text-white transition-colors
+				${isTogglable ? 'bg-blue-500 hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600' : 'bg-gray-400 cursor-not-allowed opacity-50'}`}
 			onClick={toggleTimesheetSigned}
 		>
 			{selectedTimesheet.usercommitted ? 'Unsign Timesheet' : 'Sign Timesheet' }

@@ -69,7 +69,7 @@ export default function ControlledSelect({
 
 	const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
 		const inputValue = event.target.value;
-		console.log("inputValue: ",inputValue)
+		//console.log("inputValue: ",inputValue)
 		// const result = inputValue.match(/\d/g);
 		// const newValue = result && !Number.isNaN(result) ? parseInt(result.join(''), 10) : "";
 

@@ -49,7 +49,7 @@ export default function FormSubmitDetailsButton({
 
 			return updatedTimesheets;
 		})
-		context.setTimesheetDetailsState("saving");
+		//context.setTimesheetDetailsState("saving");
 	}
 
 	return (

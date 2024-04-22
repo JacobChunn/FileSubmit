@@ -46,12 +46,14 @@ export default function InputDetailsNumber({
 		const result = inputValue.match(/\d/g);
 		const newValue = result && !Number.isNaN(result) ? parseInt(result.join(''), 10) : "";
 
-		console.log(newValue, typeof(newValue))
+		const formattedNewValue = newValue == "" ? 0.0 : newValue
+
+		//console.log(newValue, typeof(newValue))
 
 		context.setLocalTimesheetDetails(prev => {
 		  if (prev === null) return null;
 		  const updatedTSDs = [...prev];
-		  const updatedItem = { ...updatedTSDs[index], [attr]: String(newValue) };
+		  const updatedItem = { ...updatedTSDs[index], [attr]: String(formattedNewValue) };
 		  updatedTSDs[index] = updatedItem;
 		  return updatedTSDs;
 		});
@@ -59,12 +61,12 @@ export default function InputDetailsNumber({
 
 	let bgCol;
 	if (isOT) {
-		bgCol = dbValue == null || dbValue !== value ? "bg-red-300 " : "bg-zinc-200 ";
+		bgCol = dbValue == null || String(dbValue) !== String(value) ? "bg-red-300 " : "bg-zinc-200 ";
 	} else {
-		bgCol = dbValue == null || dbValue !== value ? "bg-red-300 " : "bg-white ";
+		bgCol = dbValue == null || String(dbValue) !== String(value) ? "bg-red-300 " : "bg-white ";
 	}
 
-	console.log("compare: ", info, dbValue, value)
+	//console.log("compare: ", info, dbValue, typeof dbValue,  value, typeof value)
 
 	return (
 		<input
