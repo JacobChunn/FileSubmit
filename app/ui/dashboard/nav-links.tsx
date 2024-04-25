@@ -24,7 +24,11 @@ const links = [
   { name: 'Projects', href: '/dashboard/projects', icon: BriefcaseIcon },
 ];
 
-export default function NavLinks() {
+export default function NavLinks({
+  displayText,
+}: {
+  displayText: boolean,
+}) {
   const pathname = usePathname();
   return (
     <>
@@ -42,7 +46,7 @@ export default function NavLinks() {
              )}
           >
             <LinkIcon className="w-6" />
-            <p className="hidden md:block">{link.name}</p>
+            {displayText ? <p className="hidden md:block">{link.name}</p> : null}
           </Link>
         );
       })}
