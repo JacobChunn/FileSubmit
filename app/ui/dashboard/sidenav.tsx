@@ -29,10 +29,14 @@ export default function SideNav() {
 	}
 
 	const displayText = !isTransitioning && !isNavMin;
+	console.log("transition", isTransitioning)
+	console.log("isNavMin", isNavMin);
+	console.log("displayText", displayText)
+	console.log("-----------------------")
 
 	return (
-		<div className={`flex ${isNavMin ? "w-16" : "w-64"} `}>
-			<div className={`fixed flex h-full flex-col px-2 py-4 transition-width duration-300 ${isNavMin ? "w-16" : "w-64"}`}>
+		<div className={`flex ${!isTransitioning && isNavMin ? "w-16" : "w-64"} `}>
+			<div className={`relative flex h-full flex-col px-2 py-4 transition-width duration-300 ${isNavMin ? "w-16" : "w-64"}`}>
 				<Link
 					className="mb-2 flex items-start justify-start rounded-md bg-blue-600"
 					href="/"
