@@ -29,10 +29,10 @@ export default function SideNav() {
 	}
 
 	const displayText = !isTransitioning && !isNavMin;
-	console.log("transition", isTransitioning)
-	console.log("isNavMin", isNavMin);
-	console.log("displayText", displayText)
-	console.log("-----------------------")
+	// console.log("transition", isTransitioning)
+	// console.log("isNavMin", isNavMin);
+	// console.log("displayText", displayText)
+	// console.log("-----------------------")
 
 	return (
 		<div className={`flex ${!isTransitioning && isNavMin ? "w-16" : "w-64"} `}>

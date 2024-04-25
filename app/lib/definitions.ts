@@ -301,6 +301,7 @@ export const timesheetDetailsLabels = {
 	project: 'project',
 	phase: 'phase',
 	costcode: 'costcode',
+  phase_costcode: 'phase_costcode',
 	description: 'description',
 	mon: 'mon',
 	monot: 'monOT',
@@ -337,10 +338,17 @@ export type CostCodeOption = {
   description: string;
 };
 
+export type PhaseCostCodeOption = {
+  phase: number;
+  costcode: number;
+  description: string;
+};
+
 export type Options = {
   projects: ProjectOption[];
-  phases: PhaseOption[];
-  costcodes: CostCodeOption[];
+  phaseCostCodes: PhaseCostCodeOption[];
+  // phases: PhaseOption[];
+  // costcodes: CostCodeOption[];
 };
 
 export type TabType = {

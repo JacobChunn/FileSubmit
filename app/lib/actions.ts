@@ -6,7 +6,7 @@ import { revalidatePath, unstable_noStore } from 'next/cache';
 import { redirect } from 'next/navigation';
 //import { signIn } from '@/auth';
 //import { AuthError } from 'next-auth';
-import { CostCodeOption, EmployeeState, Options, PhaseOption, ProjectOption, ProjectState, Timesheet, TimesheetDetails } from './definitions';
+import { CostCodeOption, EmployeeState, Options, PhaseCostCodeOption, PhaseOption, ProjectOption, ProjectState, Timesheet, TimesheetDetails } from './definitions';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../api/auth/[...nextauth]/options';
 import { fetchEmployeeByID, fetchTimesheetsByEmployeeID } from './data';
@@ -898,22 +898,28 @@ export async function fetchTimesheetDetailsEditFormData(
       SELECT id, number, shortname, description FROM projects;
 	  `;
   
-	  const phasesData = await sql<PhaseOption>`
-      SELECT id, description FROM phases;
-	  `;
+	  // const phasesData = await sql<PhaseOption>`
+    //   SELECT id, description FROM phases;
+	  // `;
 
-    const costCodesData = await sql<CostCodeOption>`
-      SELECT id, description FROM costcodes;
+    // const costCodesData = await sql<CostCodeOption>`
+    //   SELECT id, description FROM costcodes;
+	  // `;
+
+    const phaseCostCodesData = await sql<PhaseCostCodeOption>`
+      SELECT phase, costcode, description FROM phase_costcodes;
 	  `;
 
 	  const projects = projectsData.rows;
-    const phases = phasesData.rows;
-    const costcodes = costCodesData.rows;
+    const phaseCostCodes = phaseCostCodesData.rows;
+    // const phases = phasesData.rows;
+    // const costcodes = costCodesData.rows;
 
     const options: Options = {
       projects,
-      phases,
-      costcodes,
+      phaseCostCodes,
+      // phases,
+      // costcodes,
     }
 	  
     return {options, timesheetDetails};

@@ -20,6 +20,7 @@ import InputDetailsDesc from '@/app/ui/forms/general-helper-components/input-det
 import DeleteDetailButton from './delete-detail-button';
 import ControlledSelect from '@/app/ui/forms/general-helper-components/controlled-sel-w-desc';
 import { compareTimesheetDetailsExtended } from '@/app/lib/utils';
+import DoubleControlledSelect from '@/app/ui/forms/general-helper-components/double-controlled-sel-w-desc';
 
 export default function TimesheetDetailsEditForm({
 
@@ -72,7 +73,6 @@ export default function TimesheetDetailsEditForm({
 				} else {
 					initialTimesheetDetailsState = "saved";
 				}
-				console.log("1: ", initialTimesheetDetailsState);
 				context.setTimesheetDetailsState(initialTimesheetDetailsState);
 			} catch (error) {
 				console.error(error);
@@ -81,7 +81,6 @@ export default function TimesheetDetailsEditForm({
 		}
 
 		fetchData();
-		console.log("done 1---------------------------------")
 	}, [timesheetID]);
 
 	// Change TSD state to saved upon successful save
@@ -101,9 +100,7 @@ export default function TimesheetDetailsEditForm({
 		
 		
 		context.setDatabaseTimesheetDetails(context.localTimesheetDetails);
-		console.log("2: ", timesheetDetailsState);
 		context.setTimesheetDetailsState(timesheetDetailsState);
-		console.log("done 2---------------------------------")
 	},[formState])
 
 	useEffect(() => {
@@ -120,9 +117,7 @@ export default function TimesheetDetailsEditForm({
 		} else {
 			timesheetDetailsState = "unsaved";
 		}
-		console.log("3: ", timesheetDetailsState, "current: ", context.timesheetDetailsState);
 		context.setTimesheetDetailsState(timesheetDetailsState);
-		console.log("done 3---------------------------------")
 	}, [context.localTimesheetDetails]);
 
 	if (!TSDDataAndOptions) {
@@ -138,17 +133,17 @@ export default function TimesheetDetailsEditForm({
 	}
 
     const {
-        id, project, phase, costcode, description, mon, monot, 
+        id, project, phase, costcode, phase_costcode, description, mon, monot, 
         tues, tuesot, wed, wedot, thurs, thursot, 
         fri, friot, sat, satot, sun, sunot 
     } = timesheetDetailsLabels;
 
 	const tableHeaders = [
-		"Project", "Phase", "Cost Code", "Description",
+		"Project", "Phase - Cost Code", "Description",
 		"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su", "Tot",
 	];
 
-    const {projects, phases, costcodes} = options;
+    const {projects, phaseCostCodes} = options;
 
     // Changes to focused version after focused
     const projectOptions = projects.map((val, index) => (
@@ -162,29 +157,40 @@ export default function TimesheetDetailsEditForm({
 		</option>
     ));
 
-    // Changes to focused version after focused
-    const phaseOptions = phases.map((val, index) => (
-        <option 
-			value={val.id}
+	const phaseCostCodeOptions = phaseCostCodes.map((val, index) => (
+        <option
+			value={val.phase + "-" + val.costcode}
 			className=' bg-white'
-			key={"key-" + val.id + "-" + index}
-			unfocused-label={val.id}
+			key={"key-" + val.phase + val.costcode + "-" + index}
+			unfocused-label={val.phase + "-" + val.costcode}
 		>
-			{val.id + ": " + val.description}
+			{val.phase + "-" + val.costcode + ": " + val.description}
 		</option>
     ));
 
     // Changes to focused version after focused
-    const costCodeOptions = costcodes.map((val, index) => (
-        <option
-			value={val.id}
-			className=' bg-white'
-			key={"key-" + val.id + "-" + index}
-			unfocused-label={val.id}
-		>
-			{val.id + ": " + val.description}
-		</option>
-    ));
+    // const phaseOptions = phases.map((val, index) => (
+    //     <option 
+	// 		value={val.id}
+	// 		className=' bg-white'
+	// 		key={"key-" + val.id + "-" + index}
+	// 		unfocused-label={val.id}
+	// 	>
+	// 		{val.id + ": " + val.description}
+	// 	</option>
+    // ));
+
+    // Changes to focused version after focused
+    // const costCodeOptions = costcodes.map((val, index) => (
+    //     <option
+	// 		value={val.id}
+	// 		className=' bg-white'
+	// 		key={"key-" + val.id + "-" + index}
+	// 		unfocused-label={val.id}
+	// 	>
+	// 		{val.id + ": " + val.description}
+	// 	</option>
+    // ));
 
     const dayStyle = 'h-1/2 w-full p-0';
 
@@ -192,6 +198,7 @@ export default function TimesheetDetailsEditForm({
 
 	const dayRowStyle = 'w-11'
 	const projectRowStyle = 'w-1/6'
+	const phaseCostCodeRowStyle = 'w-1/6'
 	const phaseRowStyle = 'w-1/6'
 	const costCodeRowStyle = 'w-1/6'
 	const descRowStyle = 'w-1/6 h-10'
@@ -321,34 +328,22 @@ export default function TimesheetDetailsEditForm({
 								</ControlledSelect>
 							</td>
 
-							{/* Phase */}
-							<td className={phaseRowStyle}>
-								<ControlledSelect
+							{/* PhaseCostCode*/}
+							<td className={phaseCostCodeRowStyle}>
+								<DoubleControlledSelect
 									index={index}
-									attr='phase'
-									info={"TSD" + index + "[" + phase + "]"}
-									value={val.phase}
-									dbValue={dbVal?.phase}
+									phaseAttr='phase'
+									costcodeAttr='costcode'
+									info={"TSD" + index + "[" + phase_costcode + "]"}
+									phaseValue={val.phase}
+									costcodeValue={val.costcode}
+									phaseDbValue={dbVal?.phase}
+									costcodeDbValue={dbVal?.costcode}
 									className = {selectStyle}
 									disabled={isNotEditable}
 								>
-									{phaseOptions}
-								</ControlledSelect>
-							</td>
-
-							{/* Cost Code */}
-							<td className={costCodeRowStyle}>
-								<ControlledSelect
-									index={index}
-									attr='costcode'
-									info={"TSD" + index + "[" + costcode + "]"}
-									value={val.costcode}
-									dbValue={dbVal?.costcode}
-									className = {selectStyle}
-									disabled={isNotEditable}
-								>
-									{costCodeOptions}
-								</ControlledSelect>
+									{phaseCostCodeOptions}
+								</DoubleControlledSelect>
 							</td>
 
 							{/* Description */}
