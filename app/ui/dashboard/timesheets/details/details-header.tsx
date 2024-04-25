@@ -4,6 +4,7 @@ import { useContext, useEffect, useState } from "react"
 import { TimesheetContext } from "../timesheet-context-wrapper"
 import { TimesheetDetails } from "@/app/lib/definitions"
 import SignTimesheetToggleButton from "./sign-timesheet-toggle-button"
+import DetailsStateIndicator from "./details-state-indicator"
 
 export default function TimesheetDetailsHeader({
 	children
@@ -13,9 +14,9 @@ export default function TimesheetDetailsHeader({
 	const context = useContext(TimesheetContext)
 	const [changedTSD, setChangedTSD] = useState<number>(0);
 
-	useEffect(() => {
+	// useEffect(() => {
 		
-	}, [changedTSD]);
+	// }, [changedTSD]);
 
 	if (context == null) {
 		throw new Error(
@@ -70,19 +71,19 @@ export default function TimesheetDetailsHeader({
 
 	return (
 		<div className="w-full h-full">
-			<div className="flex justify-end py-4">
-				<div>
-					{"State: " + context.timesheetDetailsState}
+			<div className="flex justify-between py-4">
+				<DetailsStateIndicator/>
+				<div className="flex items-center space-x-1">
+					<SignTimesheetToggleButton/>
+					<div className="w-2"/>
+					<button
+						className={`flex h-10 items-center rounded-lg px-4 text-sm font-medium text-white transition-colors
+						${canAddTSD ? 'bg-blue-500 hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600' : 'bg-gray-400 cursor-not-allowed opacity-50'}`}
+						onClick={addTSD}
+					>
+						Add Timesheet Details
+					</button>
 				</div>
-				<SignTimesheetToggleButton/>
-				<div className="w-2"/>
-				<button
-					className={`flex h-10 items-center rounded-lg px-4 text-sm font-medium text-white transition-colors
-					${canAddTSD ? 'bg-blue-500 hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600' : 'bg-gray-400 cursor-not-allowed opacity-50'}`}
-					onClick={addTSD}
-				>
-					Add Timesheet Details
-				</button>
 			</div>
 			{children}
 		</div>

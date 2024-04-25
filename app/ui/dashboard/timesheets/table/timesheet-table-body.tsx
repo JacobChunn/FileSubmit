@@ -23,6 +23,7 @@ export default function TimesheetTableBody({
 		);
 	}
 
+    //const rowStyles = '';
     const rowStyles = 'p-2 align-middle border-b border-blue-gray-50';
     const variant = 'small';
     const color = 'blue-gray';
@@ -30,10 +31,10 @@ export default function TimesheetTableBody({
 
     
     return (
-        <tbody>
+        <tbody className="w-full h-full">
             {context.timesheets !== null ?
                 context.timesheets.map((data, index) => (
-                <tr key={index}>
+                <tr key={index} className="w-min h-12">
                     {/* ID */}
                     {/* <td className={rowStyles}>
                         <TextEntry>

@@ -5,7 +5,7 @@ export default function TimesheetWrapper({
 }) {
 
 	return (
-		<div>
+		<div className="w-min h-full">
 			{children}
 		</div>
 	)

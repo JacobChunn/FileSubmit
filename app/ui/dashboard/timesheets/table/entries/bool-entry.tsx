@@ -13,16 +13,14 @@ export default function BoolEntry({
 
     return (
         childType === 'boolean' ?
-            (<div className={`w-fit p-1 rounded-lg ${children ? "bg-green-200" : "bg-red-200"}`}>
-
+            (<div className={`flex justify-center items-center w-5 h-5 p-1 rounded-lg ${children ? "bg-green-200" : "bg-red-200"}`}>
                 {children ? 
-                    (<CheckIcon strokeWidth="2" className={`w-5 text-green-700`}/>)
+                    (<CheckIcon strokeWidth="2" className='w-3 h-3 text-green-700'/>)
                     :
-                    (<XMarkIcon strokeWidth="2" className={`w-5 text-red-700`}/>)
+                    (<XMarkIcon strokeWidth="2" className='w-3 h-3 text-red-700'/>)
                 }
             </div>)
             :
             null
-        
     )
 }

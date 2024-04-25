@@ -31,27 +31,22 @@ export default function TimesheetTableHeader({
 	] as const;
 
     return (
-		<>
-			<thead>
-				<tr>
-					{TABLE_HEAD.map((head, index) => (
-						<th
-							key={"head-" + index}
-							className="border-y border-blue-gray-100 bg-blue-gray-50/50 py-4 px-2"
+		<thead className="w-min h-min">
+			<tr className="w-min h-min">
+				{TABLE_HEAD.map((head, index) => (
+					<th
+						key={"head-" + index}
+						className="w-min h-min border-y border-blue-gray-100 bg-blue-gray-50/50 py-4 px-2"
+					>
+						<div
+							className="w-min h-min font-normal leading-none text-blue-gray-900 opacity-80 text-xs"
 						>
-							<div
-								className="font-normal leading-none text-blue-gray-900 opacity-80 text-xs"
-							>
-								{head}
-							</div>
-							{/*" "*/}{/*index !== TABLE_HEAD.length - 1 && (
-									<ChevronUpDownIcon strokeWidth={2} className="h-4 w-4" />
-							)*/}
-						</th>
-					))}
-				</tr>
-				{children}
-			</thead>
-		</>
+							{head}
+						</div>
+					</th>
+				))}
+			</tr>
+			{children}
+		</thead>
     )
 }
