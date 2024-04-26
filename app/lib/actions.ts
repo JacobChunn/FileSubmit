@@ -113,8 +113,9 @@ const TimesheetDetailsSchema = z.object({
   timesheetid: z.coerce.number(),
   employeeid: z.coerce.number(),
   project: z.coerce.number(),
-  phase: z.coerce.number(),
-  costcode: z.coerce.number(),
+  phase_costcode: z.string().regex(/^\d+-\d+$/, "Input must be two numbers separated by a dash"),
+  // phase: z.coerce.number(),
+  // costcode: z.coerce.number(),
   description: z.string().max(128),
   mon: z.coerce.number().min(0.0),
   monot: z.coerce.number().min(0.0),
@@ -638,8 +639,9 @@ export async function editTimesheetDetails(
   type validatedTSDType = {
 		id: number;
 		project: number;
-		phase: number;
-		costcode: number;
+    phase_costcode: string;
+		// phase: number;
+		// costcode: number;
 		description: string;
 		mon: number;
 		tues: number;
@@ -663,8 +665,9 @@ export async function editTimesheetDetails(
 		const validatedTSD = EditTimesheetDetails.safeParse({
 			id: Number(separateTSDs[tsdkey]['id']),
 			project: Number(separateTSDs[tsdkey]['project']),
-			phase: Number(separateTSDs[tsdkey]['phase']),
-			costcode: Number(separateTSDs[tsdkey]['costcode']),
+      phase_costcode: separateTSDs[tsdkey]['phase_costcode'],
+			// phase: Number(separateTSDs[tsdkey]['phase']),
+			// costcode: Number(separateTSDs[tsdkey]['costcode']),
 			description: separateTSDs[tsdkey]['description'],
 			mon: Number(separateTSDs[tsdkey]['mon']),
 			tues: Number(separateTSDs[tsdkey]['tues']),
@@ -715,9 +718,13 @@ export async function editTimesheetDetails(
   let totalReg = 0.0;
   let totalOT = 0.0;
 	for (const TSD of validatedTSDs) {
-		const {id, project, phase, costcode, description,
+		const {id, project, phase_costcode, description,
 			mon, tues, wed, thurs, fri, sat, sun,
 			monot, tuesot, wedot, thursot, friot, satot, sunot} = TSD;
+
+    const phase_costcode_split = phase_costcode.split('-');
+    const phase = Number(phase_costcode_split[0]);
+    const costcode = Number(phase_costcode_split[1]);
 
     try{
       const addSuccess = await addTimesheetDetailsHelper({

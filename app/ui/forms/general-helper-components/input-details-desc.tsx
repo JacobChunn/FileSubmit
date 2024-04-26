@@ -3,7 +3,6 @@
 import { useContext, useState } from "react";
 import { TimesheetContext } from "../../dashboard/timesheets/timesheet-context-wrapper";
 import { TimesheetDetails, TimesheetDetailsExtended } from "@/app/lib/definitions";
-import { isFunction } from "util";
 
 interface InputProps {
 	index: number,
@@ -35,7 +34,7 @@ export default function InputDetailsDesc({
 
 	const formattedValue = (value !== null && value !== undefined) ? value : '';
 
-	const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const newValue = event.target.value;
 		context.setLocalTimesheetDetails(prev => {
 		  if (prev === null) return null;
@@ -46,22 +45,17 @@ export default function InputDetailsDesc({
 		});
 	};
 
-	const editStyle = dbValue !== value ?
-	"bg-red-300 "
-	:
-	isFocused ? "bg-white" : "bg-gray-100";
+	const editStyle = dbValue !== value ? "bg-red-300 " : "bg-white";
 
 	//console.log("desc: ", dbValue, value);
 
 	return (
         <div className="flex items-center justify-center h-max">
-            <textarea
+            <input
                 id={info+len}
                 key={info+len}
                 name={info}
-                className={`transition-all duration-300 ease-in-out text-base resize-none ${editStyle} ${
-                    isFocused ? 'h-32 text-3xl w-80 shadow-xl rounded-lg' : 'h-12 w-full'
-                }`}
+                className={`transition-all duration-300 ease-in-out text-sm resize-none ${editStyle} h-12 w-full`}
                 value={formattedValue}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}

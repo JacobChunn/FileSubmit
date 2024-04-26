@@ -97,9 +97,14 @@ export default function TimesheetDetailsEditForm({
 		} else {
 			timesheetDetailsState = "unsaved";
 		}
+		let newDbTimesheetDetails;
+		if (formState["success"] == false) {
+			newDbTimesheetDetails = context.databaseTimesheetDetails;
+		} else {
+			newDbTimesheetDetails = context.localTimesheetDetails;
+		}
 		
-		
-		context.setDatabaseTimesheetDetails(context.localTimesheetDetails);
+		context.setDatabaseTimesheetDetails(newDbTimesheetDetails);
 		context.setTimesheetDetailsState(timesheetDetailsState);
 	},[formState])
 
@@ -192,67 +197,26 @@ export default function TimesheetDetailsEditForm({
 	// 	</option>
     // ));
 
-    const dayStyle = 'h-1/2 w-full p-0';
-
-	const selectStyle = 'h-full w-full';
-
-	const dayRowStyle = 'w-11'
-	const projectRowStyle = 'w-1/6'
-	const phaseCostCodeRowStyle = 'w-1/6'
-	const phaseRowStyle = 'w-1/6'
-	const costCodeRowStyle = 'w-1/6'
-	const descRowStyle = 'w-1/6 h-10'
-
 	const TSDLen = context.localTimesheetDetails?.length || 0;
 
-	const monTot = context.localTimesheetDetails ? 
-		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
-			return accumulator + Number(currentValue.mon) + Number(currentValue.monot);
-		}, 0)
-		:
-		0;
+	type DayKey = 'mon' | 'tues' | 'wed' | 'thurs' | 'fri' | 'sat' | 'sun';
+	type OvertimeKey = 'monot' | 'tuesot' | 'wedot' | 'thursot' | 'friot' | 'satot' | 'sunot';
+	function calculateTotalHoursForDay(day: DayKey, overtime: OvertimeKey) {
+		const details = context?.localTimesheetDetails;
+		return details ? 
+			details.reduce((accumulator, currentValue) => {
+				return accumulator + Number(currentValue[day]) + Number(currentValue[overtime]);
+			}, 0) :
+			0;
+	}
 
-	const tuesTot = context.localTimesheetDetails ? 
-		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
-			return accumulator + Number(currentValue.tues) + Number(currentValue.tuesot);
-		}, 0)
-		:
-		0;
-
-	const wedTot = context.localTimesheetDetails ? 
-		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
-			return accumulator + Number(currentValue.wed) + Number(currentValue.wedot);
-		}, 0)
-		:
-		0;
-
-	const thursTot = context.localTimesheetDetails ? 
-		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
-			return accumulator + Number(currentValue.thurs) + Number(currentValue.thursot);
-		}, 0)
-		:
-		0;
-
-	const friTot = context.localTimesheetDetails ?
-		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
-			return accumulator + Number(currentValue.fri) + Number(currentValue.friot);
-		}, 0)
-		:
-		0;
-
-	const satTot = context.localTimesheetDetails ?
-		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
-			return accumulator + Number(currentValue.sat) + Number(currentValue.satot);
-		}, 0)
-		:
-		0;
-
-	const sunTot = context.localTimesheetDetails ?
-		context.localTimesheetDetails.reduce((accumulator, currentValue) => {
-			return accumulator + Number(currentValue.sun) + Number(currentValue.sunot);
-		}, 0)
-		:
-		0;
+	const monTot = calculateTotalHoursForDay('mon', 'monot');
+	const tuesTot = calculateTotalHoursForDay('tues', 'tuesot');
+	const wedTot = calculateTotalHoursForDay('wed', 'wedot');
+	const thursTot = calculateTotalHoursForDay('thurs', 'thursot');
+	const friTot = calculateTotalHoursForDay('fri', 'friot');
+	const satTot = calculateTotalHoursForDay('sat', 'satot');
+	const sunTot = calculateTotalHoursForDay('sun', 'sunot');
 
 	const totalTot = monTot + tuesTot + wedTot + thursTot + friTot + satTot + sunTot;
 
@@ -269,6 +233,13 @@ export default function TimesheetDetailsEditForm({
 		context.setTimesheetDetailsState("saving");
 		dispatch(payload);
 	}
+	const projectRowStyle = 'w-48';
+	const phaseCostCodeRowStyle = 'w-32';
+	const descRowStyle = 'w-max h-10';
+	const dayRowStyle = 'w-11';
+
+    const dayStyle = 'h-1/2 w-full p-0';
+	const selectStyle = 'h-full w-full';
 
     return (
         <form
@@ -535,7 +506,7 @@ export default function TimesheetDetailsEditForm({
 							</td>
 
 							{/* Delete TSD */}
-							<td className='h-auto w-11 relative'>
+							<td className='h-10 w-11'>
 								<DeleteDetailButton
 									index={index}
 									hidden={isNotEditable}

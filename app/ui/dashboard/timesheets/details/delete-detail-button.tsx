@@ -41,7 +41,7 @@ export default function DeleteDetailButton({
     return (
         <div hidden={hidden}>
             <IconButton
-                className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center p-"
+                className="flex items-center justify-center"
                 variant='text'
                 type='button'
                 onClick={handleOnClick}
