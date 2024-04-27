@@ -22,6 +22,7 @@ export default function FormSubmitDetailsButton({
 	const handleCancelOnClick = () => {
 		context.setLocalTimesheetDetails(null);
 		context.setSelectedTimesheet(null);
+		context.setSelectedTimesheetWeekEnding(null);
 		context.setTimesheetDetailsState(null);
 	}
 

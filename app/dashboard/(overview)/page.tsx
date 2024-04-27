@@ -38,10 +38,10 @@ export default async function Page() {
 			<h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
 				Dashboard
 			</h1>
-			<div className='flex'>
+			<div className='flex space-x-6'>
 				<TimesheetContextWrapper employeeid={employeeID}>
 					<TimesheetWrapper>
-						<AddTimesheetButton className = "py-2"/>
+						<AddTimesheetButton className = "pb-2"/>
 						<TimesheetTableWrapper>
 							<TimesheetTableHeader/>
 							<TimesheetTableBody/>

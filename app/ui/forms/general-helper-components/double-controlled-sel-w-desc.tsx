@@ -114,8 +114,8 @@ export default function DoubleControlledSelect({
 
 	const editStyle = costcodeDbValue == null || phaseDbValue == null || phaseDbValue !== phaseValue || costcodeDbValue !== costcodeValue ? "bg-red-300 " : "";
 
-	console.log("phase val + db", phaseValue, phaseDbValue);
-	console.log("costcode val + db", costcodeValue, costcodeDbValue);
+	// console.log("phase val + db", phaseValue, phaseDbValue);
+	// console.log("costcode val + db", costcodeValue, costcodeDbValue);
 
 	return (
 		<select

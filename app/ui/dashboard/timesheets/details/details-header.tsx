@@ -5,6 +5,7 @@ import { TimesheetContext } from "../timesheet-context-wrapper"
 import { TimesheetDetails } from "@/app/lib/definitions"
 import SignTimesheetToggleButton from "./sign-timesheet-toggle-button"
 import DetailsStateIndicator from "./details-state-indicator"
+import WeekEditor from "./week-editor"
 
 export default function TimesheetDetailsHeader({
 	children
@@ -71,8 +72,9 @@ export default function TimesheetDetailsHeader({
 
 	return (
 		<div className="w-full h-full">
-			<div className="flex justify-between py-4">
+			<div className="flex justify-between pb-2">
 				<DetailsStateIndicator/>
+				<WeekEditor/>
 				<div className="flex items-center space-x-1">
 					<SignTimesheetToggleButton/>
 					<div className="w-2"/>

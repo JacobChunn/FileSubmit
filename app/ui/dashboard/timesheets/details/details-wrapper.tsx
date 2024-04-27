@@ -11,14 +11,15 @@ export default function TimesheetDetailsWrapper({
 	const context = useContext(TimesheetContext)
 
 	return (
-		<div className=" p-6 w-full h-full">
+		<>
 			{context == undefined || context.selectedTimesheet == null ?
 				null
 				:
-				children
+				<div className="w-full h-full shadow-md rounded-lg pt-4 pb-6 px-4">
+					{children}
+				</div>
 			}
-			
-		</div>
+		</>
 	)
 
 }

@@ -122,7 +122,12 @@ export default function TimesheetTableBody({
                     {/* Edit Details */}
                     <td className={rowStyles}>
                         <Tooltip content="Edit Entry">
-                            <IconButton variant="text" onClick={() => context.setSelectedTimesheet(data['id'])}>
+                            <IconButton variant="text"
+								onClick={() => {
+									context.setSelectedTimesheet(data['id']);
+									context.setSelectedTimesheetWeekEnding(data['weekending']);
+								}}
+							>
                                 <PencilIcon className="h-4 w-4"/>
                             </IconButton>
                         </Tooltip>
