@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import { Revenue, TimesheetDetailsExtended } from './definitions';
 
 export function compareTimesheetDetailsExtended(
@@ -23,6 +24,14 @@ export function compareTimesheetDetailsExtended(
     return true;
 }
 
+export function compareWeekEnding(
+	local: DateTime<true> | DateTime<false> | null,
+	database: DateTime<true> | DateTime<false> | null,
+): boolean {
+	if (!local || !database) return false;
+
+	return local.equals(database);
+}
 
 export const formatCurrency = (amount: number) => {
   return (amount / 100).toLocaleString('en-US', {

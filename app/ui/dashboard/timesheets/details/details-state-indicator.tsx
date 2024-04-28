@@ -35,7 +35,7 @@ export default function DetailsStateIndicator() {
     }
 
     return (
-        <div className={"flex items-center justify-center text-center " + stateStyles}>
+        <div className={"flex items-center justify-center text-center w-40 " + stateStyles}>
             {stateDisplayText}
         </div>
     )

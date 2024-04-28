@@ -124,8 +124,13 @@ export default function TimesheetTableBody({
                         <Tooltip content="Edit Entry">
                             <IconButton variant="text"
 								onClick={() => {
+									const dateString = data['weekending'];
+									const jsDate = new Date(dateString);
+									const luxonDateTime = DateTime.fromJSDate(jsDate);
+
 									context.setSelectedTimesheet(data['id']);
-									context.setSelectedTimesheetWeekEnding(data['weekending']);
+									context.setLocalTimesheetWeekEnding(luxonDateTime);
+									context.setDatabaseTimesheetWeekEnding(luxonDateTime);
 								}}
 							>
                                 <PencilIcon className="h-4 w-4"/>

@@ -19,7 +19,7 @@ import { IconButton, Tooltip } from '@/app/ui/material-tailwind-wrapper';
 import InputDetailsDesc from '@/app/ui/forms/general-helper-components/input-details-desc';
 import DeleteDetailButton from './delete-detail-button';
 import ControlledSelect from '@/app/ui/forms/general-helper-components/controlled-sel-w-desc';
-import { compareTimesheetDetailsExtended } from '@/app/lib/utils';
+import { compareTimesheetDetailsExtended, compareWeekEnding } from '@/app/lib/utils';
 import DoubleControlledSelect from '@/app/ui/forms/general-helper-components/double-controlled-sel-w-desc';
 
 export default function TimesheetDetailsEditForm({
@@ -97,13 +97,18 @@ export default function TimesheetDetailsEditForm({
 		} else {
 			timesheetDetailsState = "unsaved";
 		}
+
 		let newDbTimesheetDetails;
-		if (formState["success"] == false) {
+		let newDbWeekEnding;
+		if (formState.success == false) {
 			newDbTimesheetDetails = context.databaseTimesheetDetails;
+			newDbWeekEnding = context.databaseTimesheetWeekEnding;
 		} else {
 			newDbTimesheetDetails = context.localTimesheetDetails;
+			newDbWeekEnding = context.localTimesheetWeekEnding;
 		}
 		
+		context.setDatabaseTimesheetWeekEnding(newDbWeekEnding);
 		context.setDatabaseTimesheetDetails(newDbTimesheetDetails);
 		context.setTimesheetDetailsState(timesheetDetailsState);
 	},[formState])
@@ -111,19 +116,29 @@ export default function TimesheetDetailsEditForm({
 	useEffect(() => {
 		const localTSDs = context.localTimesheetDetails;
 		const dbTSDs = context.databaseTimesheetDetails;
+		const localWeekEnding = context.localTimesheetWeekEnding;
+		const databaseWeekEnding = context.databaseTimesheetWeekEnding;
 
 		let timesheetDetailsState: TimesheetDetailsState;
 		if (context.timesheetDetailsState === "signed") {
 			timesheetDetailsState = "signed";
 		} else if (context.timesheetDetailsState === null) {
 			timesheetDetailsState = null;
-		} else if (compareTimesheetDetailsExtended(localTSDs, dbTSDs)) {
+		} else if (
+			compareTimesheetDetailsExtended(localTSDs, dbTSDs) && 
+			compareWeekEnding(localWeekEnding, databaseWeekEnding)
+		) {
 			timesheetDetailsState = "saved";
 		} else {
 			timesheetDetailsState = "unsaved";
 		}
 		context.setTimesheetDetailsState(timesheetDetailsState);
-	}, [context.localTimesheetDetails]);
+	}, [
+		context.localTimesheetDetails,
+		context.databaseTimesheetDetails,
+		context.localTimesheetWeekEnding,
+		context.databaseTimesheetDetails
+	]);
 
 	if (!TSDDataAndOptions) {
 		console.log("Loading...")
@@ -246,7 +261,7 @@ export default function TimesheetDetailsEditForm({
             action={dispatchWrapper}
             className='w-full h-full'
 			key={"form" + timesheetID}
-			id={"form" + timesheetID + " " + TSDLen}
+			id={"form" + timesheetID}
         >
 			<table className='w-full'>
 				<thead>
@@ -516,7 +531,7 @@ export default function TimesheetDetailsEditForm({
 					)
 				}) : null}
 					<tr>
-						<td colSpan={4}>
+						<td colSpan={3}>
 							<p className='text-right'>
 								Total: 
 							</p>

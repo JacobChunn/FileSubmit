@@ -143,7 +143,14 @@ const EditTimesheetDetails = TimesheetDetailsSchema.omit({
 
 const SingleTimesheetID = z.object({
 	timesheetid: z.coerce.number()
-})
+});
+
+const WeekEndingSchema = z.object({
+    weekEnding: z.string().regex(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|([+-]\d{2}:\d{2}))$/,
+        "weekEnding must be in valid ISO 8601 format"
+    )
+});
 
 export type InvoiceState = {
     errors?: {
@@ -607,29 +614,72 @@ export async function editTimesheetDetails(
 		};
 	}
 
-  // Ensure that timesheet is not signed
-  try {
-    const timesheetIsSigned = await sql`
-      SELECT usercommitted
-      FROM timesheets
-      WHERE id = ${validatedTimesheetID};
-    `
-    console.log(timesheetIsSigned.rows[0]);
-    if (timesheetIsSigned.rows[0].usercommitted) {
-      return {
-        success: false,
-        message: 'Cannot edit a signed timesheet!'
-      }
-    }
+	// Ensure that timesheet is not signed
+	try {
+		const timesheetIsSigned = await sql`
+		SELECT usercommitted
+		FROM timesheets
+		WHERE id = ${validatedTimesheetID};
+		`
+		console.log(timesheetIsSigned.rows[0]);
+		if (timesheetIsSigned.rows[0].usercommitted) {
+		return {
+			success: false,
+			message: 'Cannot edit a signed timesheet!'
+		}
+		}
 
-  } catch(error) {
-    console.error(error);
-    return {
-      success: false,
-      errors: JSON.stringify(error),
-      message: 'Error checking if timesheet is signed!'
-    }
-  }
+	} catch(error) {
+		console.error(error);
+		return {
+			success: false,
+			errors: JSON.stringify(error),
+			message: 'Error checking if timesheet is signed!'
+		}
+	}
+
+	// Validate WeekEnding
+  	let validatedWeekEnding;
+	try {
+		validatedWeekEnding = WeekEndingSchema.safeParse({
+			weekEnding: formData.get('weekEnding')
+		})
+	} catch(error) {
+		console.error(error);
+		return {
+		  success: false,
+		  errors: JSON.stringify(error),
+		  message: 'Error validating Week Ending value!'
+		}
+	}
+
+	if (!validatedWeekEnding.success) {
+		console.error(validatedWeekEnding.error);
+		return {
+			success: false,
+			errors: validatedWeekEnding.error.flatten().fieldErrors,
+			message: 'Error validating Week Ending value!',
+		};
+	}
+
+	//console.log(validatedWeekEnding.data.weekEnding)
+
+	// Update WeekEnding for timesheet
+	try {
+		await sql`
+		UPDATE timesheets
+		SET weekEnding = ${validatedWeekEnding.data.weekEnding}
+		WHERE id = ${validatedTimesheetID};
+	  `;
+	} catch(error) {
+		console.error(error);
+		return {
+		  success: false,
+		  errors: JSON.stringify(error),
+		  message: 'Error entering Week Ending value into database!'
+		}
+	}
+
 
 	// Separate TDSs from formData
 	const separateTSDs = separateFormData(formData);
@@ -639,7 +689,7 @@ export async function editTimesheetDetails(
   type validatedTSDType = {
 		id: number;
 		project: number;
-    phase_costcode: string;
+    	phase_costcode: string;
 		// phase: number;
 		// costcode: number;
 		description: string;
@@ -665,7 +715,7 @@ export async function editTimesheetDetails(
 		const validatedTSD = EditTimesheetDetails.safeParse({
 			id: Number(separateTSDs[tsdkey]['id']),
 			project: Number(separateTSDs[tsdkey]['project']),
-      phase_costcode: separateTSDs[tsdkey]['phase_costcode'],
+      		phase_costcode: separateTSDs[tsdkey]['phase_costcode'],
 			// phase: Number(separateTSDs[tsdkey]['phase']),
 			// costcode: Number(separateTSDs[tsdkey]['costcode']),
 			description: separateTSDs[tsdkey]['description'],
@@ -689,7 +739,7 @@ export async function editTimesheetDetails(
 		if (!validatedTSD.success) {
 			console.error(validatedTSD.error);
 			return {
-        success: false,
+        		success: false,
 				errors: validatedTSD.error.flatten().fieldErrors,
 				message: 'Incorrect or Missing Fields. Failed to Validate timesheet ID.',
 			};

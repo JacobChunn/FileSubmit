@@ -1,6 +1,7 @@
 "use client"
 
-import { Timesheet, TimesheetDetails, TimesheetDetailsExtended, TimesheetDetailsState } from "@/app/lib/definitions";
+import { Timesheet, TimesheetDetailsExtended, TimesheetDetailsState } from "@/app/lib/definitions";
+import { DateTime } from "luxon";
 import { createContext, useState } from "react";
 
 type timesheetContextType = {
@@ -21,8 +22,11 @@ type timesheetContextType = {
     timesheetDetailsState: TimesheetDetailsState;
     setTimesheetDetailsState: React.Dispatch<React.SetStateAction<TimesheetDetailsState>>;
 
-	selectedTimesheetWeekEnding: string | null;
-	setSelectedTimesheetWeekEnding: React.Dispatch<React.SetStateAction<string | null>>;
+	localTimesheetWeekEnding: DateTime<true> | DateTime<false> | null;
+	setLocalTimesheetWeekEnding: React.Dispatch<React.SetStateAction<DateTime<true> | DateTime<false> | null>>;
+
+	databaseTimesheetWeekEnding: DateTime<true> | DateTime<false> | null;
+	setDatabaseTimesheetWeekEnding: React.Dispatch<React.SetStateAction<DateTime<true> | DateTime<false> | null>>;
 }
 
 export const TimesheetContext = createContext<timesheetContextType | null>(null)
@@ -40,7 +44,8 @@ export default function TimesheetContextWrapper({
     const [localTimesheetDetails, setLocalTimesheetDetails] = useState<TimesheetDetailsExtended[] | null>(null);
     const [databaseTimesheetDetails, setDatabaseTimesheetDetails] = useState<TimesheetDetailsExtended[] | null>(null);
     const [timesheetDetailsState, setTimesheetDetailsState] = useState<TimesheetDetailsState>(null);
-	const [selectedTimesheetWeekEnding, setSelectedTimesheetWeekEnding] = useState<string | null>(null);
+	const [localTimesheetWeekEnding, setLocalTimesheetWeekEnding] = useState<DateTime<true> | DateTime<false> | null>(null);
+	const [databaseTimesheetWeekEnding, setDatabaseTimesheetWeekEnding] = useState<DateTime<true> | DateTime<false> | null>(null);
 
     return (
         <TimesheetContext.Provider
@@ -51,7 +56,8 @@ export default function TimesheetContextWrapper({
                 localTimesheetDetails, setLocalTimesheetDetails,
                 databaseTimesheetDetails, setDatabaseTimesheetDetails,
                 timesheetDetailsState, setTimesheetDetailsState,
-				selectedTimesheetWeekEnding, setSelectedTimesheetWeekEnding,
+				localTimesheetWeekEnding, setLocalTimesheetWeekEnding,
+				databaseTimesheetWeekEnding, setDatabaseTimesheetWeekEnding,
             }}
         >
             {children}

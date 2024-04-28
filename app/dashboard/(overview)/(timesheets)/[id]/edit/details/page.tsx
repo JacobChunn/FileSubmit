@@ -1,5 +1,5 @@
 import { Breadcrumbs } from '@/app/ui/material-tailwind-wrapper';
-import { checkTimesheetOwnership, fetchOptions, fetchTimesheetDetailsByTimesheetID } from '@/app/lib/data';
+import { checkTimesheetOwnership, fetchTimesheetDetailsByTimesheetID } from '@/app/lib/data';
 import { notFound, redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -43,8 +43,6 @@ export default async function Page({ params }: { params: { id: any } }) {
 
 	const timesheetDetails = await timesheetDetailsRes.json();
 	if (timesheetDetails.length === 0) { notFound(); }
-
-	const options = await fetchOptions();
 
     return (
         <main>

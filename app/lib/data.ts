@@ -264,37 +264,6 @@ export async function fetchProjectByID(id: number) {
 	}
 }
 
-export async function fetchOptions() {
-  noStore();
-  try {
-	  const projectsData = await sql<ProjectOption>`
-      SELECT id, number, shortname, description FROM projects;
-	  `;
-  
-	  const phasesData = await sql<PhaseOption>`
-      SELECT id, description FROM phases;
-	  `;
-
-    const costCodesData = await sql<CostCodeOption>`
-      SELECT id, description FROM costcodes;
-	  `;
-
-	  const projects = projectsData.rows;
-    const phases = phasesData.rows;
-    const costcodes = costCodesData.rows;
-
-    const options: Options = {
-      projects,
-      phases,
-      costcodes,
-    }
-	  return options;
-	} catch (error) {
-	  console.error('Database Error:', error);
-	  throw new Error('Failed to fetch invoice.');
-	}
-}
-
 export async function fetchLatestInvoices() {
   noStore();
   try {
