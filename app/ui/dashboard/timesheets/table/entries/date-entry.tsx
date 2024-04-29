@@ -17,7 +17,7 @@ export default function DateEntry({
         <Typography
             variant={variant}
             color={color}
-            className={`font-normal text-blue-gray-900 text-xs`}
+            className={`font-normal text-xs`}
         >
             {formattedDate}
             

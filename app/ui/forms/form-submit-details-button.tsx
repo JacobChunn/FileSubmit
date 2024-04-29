@@ -2,6 +2,7 @@
 
 import { useContext } from "react";
 import { TimesheetContext } from "../dashboard/timesheets/timesheet-context-wrapper";
+import { Timesheet } from "@/app/lib/definitions";
 
 export type Props = {
 	submitDisabled: boolean,
@@ -27,31 +28,32 @@ export default function FormSubmitDetailsButton({
 		context.setTimesheetDetailsState(null);
 	}
 
-	const handleSubmitOnClick = () => {
-		context.setTimesheets(prev => {
-			if (!prev || !context.selectedTimesheet || !context.localTimesheetDetails) return null;
+	const setTimesheets = (prev: Timesheet[] | null) => {
+		if (!prev || !context.selectedTimesheet || !context.localTimesheetDetails) return null;
 			
+		const updatedTimesheets = [...prev];
+		const selectedTimesheet = updatedTimesheets.find(timesheet => timesheet.id === context.selectedTimesheet);
+		if (!selectedTimesheet) return null;
 
-			const updatedTimesheets = [...prev];
-			const selectedTimesheet = updatedTimesheets.find(timesheet => timesheet.id === context.selectedTimesheet);
-			if (!selectedTimesheet) return null;
+		const localTSDs = context.localTimesheetDetails;
 
-			const localTSDs = context.localTimesheetDetails;
+		let totalReg = 0.0;
+		let totalOT = 0.0;
 
-			let totalReg = 0.0;
-			let totalOT = 0.0;
+		localTSDs.forEach(TSD => {
+			totalReg += (Number(TSD.mon) + Number(TSD.tues) + Number(TSD.wed) + Number(TSD.thurs) + Number(TSD.fri) + Number(TSD.sat) + Number(TSD.sun));
+			totalOT += (Number(TSD.monot) + Number(TSD.tuesot) + Number(TSD.wedot) + Number(TSD.thursot) + Number(TSD.friot) + Number(TSD.satot) + Number(TSD.sunot));
+		});
 
-			localTSDs.forEach(TSD => {
-				totalReg += (Number(TSD.mon) + Number(TSD.tues) + Number(TSD.wed) + Number(TSD.thurs) + Number(TSD.fri) + Number(TSD.sat) + Number(TSD.sun));
-				totalOT += (Number(TSD.monot) + Number(TSD.tuesot) + Number(TSD.wedot) + Number(TSD.thursot) + Number(TSD.friot) + Number(TSD.satot) + Number(TSD.sunot));
-			});
+		selectedTimesheet.totalreghours = totalReg;
+		selectedTimesheet.totalovertime = totalOT;
 
-			selectedTimesheet.totalreghours = totalReg;
-			selectedTimesheet.totalovertime = totalOT;
+		return updatedTimesheets;
+	}
 
-			return updatedTimesheets;
-		})
-		//context.setTimesheetDetailsState("saving");
+	const handleSubmitOnClick = () => {
+		context.setLocalTimesheets(setTimesheets);
+		context.setDatabaseTimesheets(setTimesheets);
 	}
 
 	return (

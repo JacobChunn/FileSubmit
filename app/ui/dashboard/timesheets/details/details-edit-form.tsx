@@ -43,11 +43,11 @@ export default function TimesheetDetailsEditForm({
 		);
 	}
 
-	if (context.timesheets == null) {
-		throw new Error(
-			"timesheets of TimesheetContext has not been set!"
-		);
-	}
+	// if (context.localTimesheets == null) {
+	// 	throw new Error(
+	// 		"timesheets of TimesheetContext has not been set!"
+	// 	);
+	// }
 
 	const [TSDDataAndOptions, setTSDDataAndOptions] = useState<{options: Options, timesheetDetails: TimesheetDetails[]} | null>(null);
 	const initialState = { message: null, errors: {} };
@@ -68,7 +68,7 @@ export default function TimesheetDetailsEditForm({
 				context.setDatabaseTimesheetDetails(TSDDataReturn.timesheetDetails);
 
 				let initialTimesheetDetailsState: TimesheetDetailsState;
-				if (context.timesheets?.find(timesheet => timesheet.id == timesheetID)?.usercommitted) {
+				if (context.databaseTimesheets?.find(timesheet => timesheet.id == timesheetID)?.usercommitted) {
 					initialTimesheetDetailsState = "signed";
 				} else {
 					initialTimesheetDetailsState = "saved";

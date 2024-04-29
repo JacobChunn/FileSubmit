@@ -33,7 +33,7 @@ export default function TimesheetDetailsHeader({
 		);
 	}
 
-	if (context.timesheets == null) {
+	if (context.localTimesheets == null) {
 		throw new Error(
 			"timesheets of TimesheetContext has not been set!"
 		);

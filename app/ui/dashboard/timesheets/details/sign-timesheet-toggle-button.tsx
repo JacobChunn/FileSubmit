@@ -3,7 +3,7 @@
 import { useContext } from "react";
 import { TimesheetContext } from "../timesheet-context-wrapper";
 import { toggleTimesheetSignedValue } from "@/app/lib/actions";
-import { TimesheetDetailsState } from "@/app/lib/definitions";
+import { Timesheet, TimesheetDetailsState } from "@/app/lib/definitions";
 
 export default function SignTimesheetToggleButton({
 
@@ -18,23 +18,26 @@ export default function SignTimesheetToggleButton({
 		);
 	}
 
+	const setTimesheets = (prev: Timesheet[] | null) => {
+		if (!prev || !context.selectedTimesheet) return null;
+
+		const updatedTimesheets = [...prev];
+
+		const selectedTimesheet = updatedTimesheets.find(timesheet => timesheet.id === context.selectedTimesheet);
+		if (!selectedTimesheet) return null;
+
+		selectedTimesheet.usercommitted = !selectedTimesheet.usercommitted;
+
+		return updatedTimesheets;
+	}
+
 	const toggleTimesheetSigned = async () => {
 		if (context.selectedTimesheet == null) return;
 
 		try {
 			await toggleTimesheetSignedValue(context.selectedTimesheet);
-			context.setTimesheets(prev => {
-				if (!prev || !context.selectedTimesheet) return null;
-
-				const updatedTimesheets = [...prev];
-
-				const selectedTimesheet = updatedTimesheets.find(timesheet => timesheet.id === context.selectedTimesheet);
-				if (!selectedTimesheet) return null;
-
-				selectedTimesheet.usercommitted = !selectedTimesheet.usercommitted;
-
-				return updatedTimesheets;
-			})
+			context.setLocalTimesheets(setTimesheets);
+			context.setDatabaseTimesheets(setTimesheets);
 			const newTSDState: TimesheetDetailsState = context.timesheetDetailsState == "signed" ? "saved" : "signed";
 			context.setTimesheetDetailsState(newTSDState);
 			
@@ -43,7 +46,7 @@ export default function SignTimesheetToggleButton({
 		}
 	}
 
-	const selectedTimesheet = context.timesheets?.find(timesheet => timesheet.id === context.selectedTimesheet);
+	const selectedTimesheet = context.databaseTimesheets?.find(timesheet => timesheet.id === context.selectedTimesheet);
 	if (!selectedTimesheet) return null;
 
 	const isTogglable = context.timesheetDetailsState == "saved" || context.timesheetDetailsState == "signed";
