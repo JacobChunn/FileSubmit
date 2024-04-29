@@ -345,65 +345,86 @@ export async function addTimesheet(
     weekending, usercommitted, totalreghours, totalovertime, message
   } = validatedFields.data;
 
+  const processed = false;
+  const mgrapproved = false;
+  const approvedby = null;
+  const processedby = null;
+  const dateprocessed = null;
+
+  const addSuccess = await addTimesheetHelper(
+    weekending,
+    usercommitted,
+    processed,
+    mgrapproved,
+    approvedby,
+    processedby,
+    totalreghours,
+    totalovertime,
+    message,
+    dateprocessed,
+  )
+
+  revalidatePath('/dashboard');
+  redirect('/dashboard');
+}
+
+async function addTimesheetHelper(
+  weekending: Date,
+  usercommitted: boolean,
+  processed: boolean,
+  mgrapproved: boolean,
+  approvedby: string | null,
+  processedby: string | null,
+  totalreghours: number,
+  totalovertime: number,
+  message: string,
+  dateprocessed: Date | null,
+) {
   // Prepare data for insertion into the database
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    console.log("Session was unable to be retrieved!");
-    return {
-      message: 'Session was unable to be retrieved!',
-    };
-
+    console.error("Session was unable to be retrieved!");
+    return false;
   }
 
   const employeeid = Number(session.user.id);
-
   const user = await fetchEmployeeByID(employeeid)
-
-  const processed = false;
-  const mgrapproved = false;
-  const approvedby = null;
   const submittedby = user.username;
-  const processedby = null;
-  const dateprocessed = null;
+
+  const dateprocessedString = dateprocessed ? dateprocessed.toLocaleDateString('en-us') : null
 
   // Add a timesheet entry
   try {
     const timesheetIDData = await sql`
-    INSERT INTO timesheets (
-      employeeid, weekending, processed, mgrapproved, usercommitted, totalreghours,
-      totalovertime, approvedby, submittedby, processedby, dateprocessed, message
-    )
-    VALUES (
-      ${employeeid}, ${weekending.toLocaleDateString('en-us')}, ${processed ? 1 : 0},
-      ${mgrapproved ? 1 : 0}, ${usercommitted ? 1 : 0}, ${totalreghours}, ${totalovertime},
-      ${approvedby}, ${submittedby}, ${processedby}, ${dateprocessed}, ${message}
-    )
-	RETURNING id;
+      INSERT INTO timesheets (
+        employeeid, weekending, processed, mgrapproved, usercommitted, totalreghours,
+        totalovertime, approvedby, submittedby, processedby, dateprocessed, message
+      )
+      VALUES (
+        ${employeeid}, ${weekending.toLocaleDateString('en-us')}, ${processed ? 1 : 0},
+        ${mgrapproved ? 1 : 0}, ${usercommitted ? 1 : 0}, ${totalreghours}, ${totalovertime},
+        ${approvedby}, ${submittedby}, ${processedby}, ${dateprocessedString}, ${message}
+      )
+      RETURNING id;
     `;
 	
-	const timesheetID: number = timesheetIDData.rows[0].id;
+    const timesheetID: number = timesheetIDData.rows[0].id;
 
-	const addSuccess = await addTimesheetDetailsHelper({
-		timesheetid: timesheetID,
-		employeeid: employeeid,
-	});
-	
-	if(!addSuccess) {
-		return {
-			message: 'Database Error: Failed to Create TimesheetDetails.',
-		};
-	}
+    const addSuccess = await addTimesheetDetailsHelper({
+      timesheetid: timesheetID,
+      employeeid: employeeid,
+    });
+    
+    if(!addSuccess) {
+      console.error('Database Error: Failed to Create TimesheetDetails.');
+      return false;
+    }
 
   } catch (error) {
-    console.log(error);
-    return {
-      message: 'Database Error: Failed to Create Timesheet.',
-    };
+    console.error(error);
+    return false;
   }
-
-  revalidatePath('/dashboard');
-  redirect('/dashboard');
 }
 
 export async function fetchTimesheetsWithAuth() {
