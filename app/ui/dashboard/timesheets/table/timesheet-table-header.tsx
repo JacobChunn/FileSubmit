@@ -27,7 +27,7 @@ export default function TimesheetTableHeader({
     const TABLE_HEAD = [
 		"End Date",
 		signedIcon, approvedIcon, processedIcon,
-		"Signatory", "Reg", "OT", "Total", "Edit", "Delete",
+		"Signatory", "Reg", "OT", "Total", "Delete",
 	] as const;
 
     return (
@@ -39,7 +39,7 @@ export default function TimesheetTableHeader({
 						className="w-min h-min border-y border-blue-gray-100 bg-blue-gray-50/50 py-4 px-2"
 					>
 						<div
-							className="w-min h-min font-normal leading-none text-blue-gray-900 opacity-80 text-xs"
+							className="h-min font-normal leading-none text-blue-gray-900 opacity-80 text-xs"
 						>
 							{head}
 						</div>

@@ -8,6 +8,7 @@ import DateEntry from "./entries/date-entry";
 import BoolEntry from "./entries/bool-entry";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { Timesheet } from "@/app/lib/definitions";
 
 export default function TimesheetTableBody({
     children
@@ -23,15 +24,21 @@ export default function TimesheetTableBody({
 		);
 	}
 
-    //const rowStyles = '';
     const rowStyles = 'p-2 align-middle border-b border-blue-gray-50';
-    const variant = 'small';
-    const color = 'blue-gray';
-    const addonStyles = '';
-    
+
     const databaseWE = context.databaseTimesheetWeekEnding;
     const localWE = context.localTimesheetWeekEnding;
     console.log(databaseWE && localWE && databaseWE.equals(localWE));
+
+    const handleEditDetails = (data: Timesheet) => {
+        const dateString = data['weekending'];
+        const jsDate = new Date(dateString);
+        const luxonDateTime = DateTime.fromJSDate(jsDate);
+
+        context.setSelectedTimesheet(data['id']);
+        context.setLocalTimesheetWeekEnding(luxonDateTime);
+        context.setDatabaseTimesheetWeekEnding(luxonDateTime);
+    }
 
     return (
         <tbody className="w-full h-full">
@@ -60,9 +67,16 @@ export default function TimesheetTableBody({
 
                             {/* End Date */}
                             <td className={rowStyles + ` ${selectedTSUnsavedDateStyles}`}>
-                                <DateEntry>
-                                    {timesheetIsSelected ? localWE?.toLocaleString() : data['weekending']}
-                                </DateEntry>
+                                <Tooltip content="Edit Entry">
+                                    <button
+                                        className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-900/10 active:bg-gray-900/20"
+                                        onClick={() => handleEditDetails(data)}
+                                    >
+                                        <DateEntry>
+                                            {timesheetIsSelected ? localWE?.toLocaleString() : data['weekending']}
+                                        </DateEntry>
+                                    </button>
+                                </Tooltip>
                             </td>
 
                             {/* Comment */}
@@ -127,25 +141,6 @@ export default function TimesheetTableBody({
                                     {data['id']}
                                 </Typography>
                             </td> */}
-
-                            {/* Edit Details */}
-                            <td className={rowStyles}>
-                                <Tooltip content="Edit Entry">
-                                    <IconButton variant="text"
-                                        onClick={() => {
-                                            const dateString = data['weekending'];
-                                            const jsDate = new Date(dateString);
-                                            const luxonDateTime = DateTime.fromJSDate(jsDate);
-
-                                            context.setSelectedTimesheet(data['id']);
-                                            context.setLocalTimesheetWeekEnding(luxonDateTime);
-                                            context.setDatabaseTimesheetWeekEnding(luxonDateTime);
-                                        }}
-                                    >
-                                        <PencilIcon className="h-4 w-4"/>
-                                    </IconButton>
-                                </Tooltip>
-                            </td>
 
                             {/* Delete */}
                             <td className={rowStyles}>
