@@ -37,11 +37,6 @@ export default function TimesheetTableBody({
         <tbody className="w-full h-full">
             {context.localTimesheets !== null ?
                 context.localTimesheets.map((data, index) => {
-                    if (context.databaseTimesheets == null) {
-                        return (
-                            <tr className="bg-red-600">ERROR! - Discrepancy in local and database timesheets.</tr>
-                        )
-                    }
                     
                     const timesheetIsSelected = data['id'] == context.selectedTimesheet;
 

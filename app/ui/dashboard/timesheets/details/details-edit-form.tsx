@@ -68,7 +68,7 @@ export default function TimesheetDetailsEditForm({
 				context.setDatabaseTimesheetDetails(TSDDataReturn.timesheetDetails);
 
 				let initialTimesheetDetailsState: TimesheetDetailsState;
-				if (context.databaseTimesheets?.find(timesheet => timesheet.id == timesheetID)?.usercommitted) {
+				if (context.localTimesheets?.find(timesheet => timesheet.id == timesheetID)?.usercommitted) {
 					initialTimesheetDetailsState = "signed";
 				} else {
 					initialTimesheetDetailsState = "saved";

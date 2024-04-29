@@ -5,7 +5,7 @@ import { DateTime } from "luxon";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
 
 
-export default function WeekEditor2({
+export default function WeekEditor({
 	children
 }: {
 	children?: React.ReactNode,
@@ -38,12 +38,14 @@ export default function WeekEditor2({
 	}
 
 	const savedWeekEnding = context.databaseTimesheetWeekEnding.equals(context.localTimesheetWeekEnding);
+	const hideButtons = context.timesheetDetailsState == "signed";
 
 	return (
 		<div className="flex items-center justify-center">
 			<button
 				className="bg-white p-2 rounded-2xl transition-colors duration-150 hover:bg-blue-gray-50 focus-visible:bg-blue-gray-50 active:bg-blue-gray-100"
 				onClick={() => handleAddOnClick(-7)}
+				hidden={hideButtons}
 			>
 				<MinusIcon className="w-4 h-4"/>
 			</button>	
@@ -64,6 +66,7 @@ export default function WeekEditor2({
 			<button 
 				className="bg-white p-2 rounded-2xl transition-colors duration-150 hover:bg-blue-gray-50 focus-visible:bg-blue-gray-50 active:bg-blue-gray-100"
 				onClick={() => handleAddOnClick(7)}
+				hidden={hideButtons}
 			>
 				<PlusIcon className="w-4 h-4"/>
 			</button>

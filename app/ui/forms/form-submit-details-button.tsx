@@ -20,7 +20,7 @@ export default function FormSubmitDetailsButton({
 		);
 	}
 
-	const handleCancelOnClick = () => {
+	const handleCloseOnClick = () => {
 		context.setLocalTimesheetDetails(null);
 		context.setSelectedTimesheet(null);
 		context.setLocalTimesheetWeekEnding(null);
@@ -53,16 +53,15 @@ export default function FormSubmitDetailsButton({
 
 	const handleSubmitOnClick = () => {
 		context.setLocalTimesheets(setTimesheets);
-		context.setDatabaseTimesheets(setTimesheets);
 	}
 
 	return (
 		<div className="mt-6 flex justify-end gap-4">
 			<button
 				className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
-				onClick={handleCancelOnClick}
+				onClick={handleCloseOnClick}
 			>
-				Cancel
+				Close
 			</button>
 			<button 
 				type="submit"
@@ -71,7 +70,7 @@ export default function FormSubmitDetailsButton({
 				onClick={handleSubmitOnClick}
 				disabled={submitDisabled}
 			>
-				Submit Edits
+				Save
 			</button>
 		</div>
 	)

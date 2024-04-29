@@ -23,7 +23,6 @@ export default function TimesheetTableWrapper({
 		const handleDataPromise = async() => {
 			const data = await fetchTimesheetsWithAuth();
 			context.setLocalTimesheets(data);
-			context.setDatabaseTimesheets(data);
 		}
 		
 		handleDataPromise();

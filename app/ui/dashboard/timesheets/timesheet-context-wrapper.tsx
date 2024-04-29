@@ -13,9 +13,6 @@ type timesheetContextType = {
     localTimesheets: Timesheet[] | null;
     setLocalTimesheets: React.Dispatch<React.SetStateAction<Timesheet[] | null>>;
 
-    databaseTimesheets: Timesheet[] | null;
-    setDatabaseTimesheets: React.Dispatch<React.SetStateAction<Timesheet[] | null>>;
-
     localTimesheetDetails: TimesheetDetailsExtended[] | null;
     setLocalTimesheetDetails: React.Dispatch<React.SetStateAction<TimesheetDetailsExtended[] | null>>;
 
@@ -44,7 +41,6 @@ export default function TimesheetContextWrapper({
 
 	const [selectedTimesheet, setSelectedTimesheet] = useState<number | null>(null);
     const [localTimesheets, setLocalTimesheets] = useState<Timesheet[] | null>(null);
-    const [databaseTimesheets, setDatabaseTimesheets] = useState<Timesheet[] | null>(null);
     const [localTimesheetDetails, setLocalTimesheetDetails] = useState<TimesheetDetailsExtended[] | null>(null);
     const [databaseTimesheetDetails, setDatabaseTimesheetDetails] = useState<TimesheetDetailsExtended[] | null>(null);
     const [timesheetDetailsState, setTimesheetDetailsState] = useState<TimesheetDetailsState>(null);
@@ -57,7 +53,6 @@ export default function TimesheetContextWrapper({
                 employeeid,
                 selectedTimesheet, setSelectedTimesheet,
                 localTimesheets, setLocalTimesheets,
-                databaseTimesheets, setDatabaseTimesheets,
                 localTimesheetDetails, setLocalTimesheetDetails,
                 databaseTimesheetDetails, setDatabaseTimesheetDetails,
                 timesheetDetailsState, setTimesheetDetailsState,

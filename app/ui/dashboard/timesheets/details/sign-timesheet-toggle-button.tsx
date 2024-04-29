@@ -37,7 +37,6 @@ export default function SignTimesheetToggleButton({
 		try {
 			await toggleTimesheetSignedValue(context.selectedTimesheet);
 			context.setLocalTimesheets(setTimesheets);
-			context.setDatabaseTimesheets(setTimesheets);
 			const newTSDState: TimesheetDetailsState = context.timesheetDetailsState == "signed" ? "saved" : "signed";
 			context.setTimesheetDetailsState(newTSDState);
 			
@@ -46,18 +45,18 @@ export default function SignTimesheetToggleButton({
 		}
 	}
 
-	const selectedTimesheet = context.databaseTimesheets?.find(timesheet => timesheet.id === context.selectedTimesheet);
+	const selectedTimesheet = context.localTimesheets?.find(timesheet => timesheet.id === context.selectedTimesheet);
 	if (!selectedTimesheet) return null;
 
 	const isTogglable = context.timesheetDetailsState == "saved" || context.timesheetDetailsState == "signed";
 
 	return (
 		<button
-			className={`flex h-10 items-center rounded-lg px-4 text-sm font-medium text-white transition-colors
+			className={`flex h-10 items-center justify-center w-20 rounded-lg px-4 text-sm font-medium text-white transition-colors
 				${isTogglable ? 'bg-blue-500 hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600' : 'bg-gray-400 cursor-not-allowed opacity-50'}`}
 			onClick={toggleTimesheetSigned}
 		>
-			{selectedTimesheet.usercommitted ? 'Unsign Timesheet' : 'Sign Timesheet' }
+			{selectedTimesheet.usercommitted ? 'Unsign' : 'Sign' }
 		</button>
 	)
 }

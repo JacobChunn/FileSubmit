@@ -83,7 +83,7 @@ export default function TimesheetDetailsHeader({
 						${canAddTSD ? 'bg-blue-500 hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600' : 'bg-gray-400 cursor-not-allowed opacity-50'}`}
 						onClick={addTSD}
 					>
-						Add Timesheet Details
+						Add Row
 					</button>
 				</div>
 			</div>
