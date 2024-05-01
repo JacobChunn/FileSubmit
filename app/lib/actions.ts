@@ -365,9 +365,11 @@ export async function addTimesheetFromForm(
   )
 	if (addSuccess) {
 		revalidatePath('/dashboard');
-		redirect('/dashboard');
 	}
+
+	return addSuccess;
 }
+
 
 export async function addEmptyTimesheet() {
 	const today = DateTime.now();
