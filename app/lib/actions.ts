@@ -370,8 +370,10 @@ export async function addTimesheetFromForm(
 }
 
 export async function addEmptyTimesheet() {
+	const today = DateTime.now();
+	const weekday = today.weekday;
+	const weekending = today.plus({days: 7 - weekday}).toLocaleString();
 
-	const weekending = DateTime.now().toLocaleString();
 	const usercommitted = false;
 	const totalreghours = 0.0;
 	const totalovertime = 0.0;
@@ -383,7 +385,7 @@ export async function addEmptyTimesheet() {
 	const processedby = null;
 	const dateprocessed = null;
 
-	const addSuccess = addTimesheetHelper(
+	const addSuccess = await addTimesheetHelper(
 		weekending,
 		usercommitted,
 		processed,
@@ -396,19 +398,7 @@ export async function addEmptyTimesheet() {
 		dateprocessed,
 	)
 
-	if (!addSuccess) {
-		return {
-			success: false,
-			message: "Timesheet was not added successfully!"
-		}
-	}
-
-	return {
-		success: true,
-		message: "Empty Timesheet was added successfully!",
-		weekending: weekending,
-
-	}
+	return addSuccess;
 }
 
 async function addTimesheetHelper(
@@ -477,7 +467,9 @@ async function addTimesheetHelper(
   }
   return {
 	success: true,
-	message: "Timesheet was added successfully!"
+	message: "Timesheet was added successfully!",
+	submittedby: submittedby,
+	weekending: weekending
   };
 }
 

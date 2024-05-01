@@ -27,19 +27,19 @@ export default function AddTimesheetButton({
 			setIsSaving(false);
 
 			let timesheets;
-			if (res.success) {
+			if (res.success && res.weekending && res.submittedby) {
 				timesheets = context.localTimesheets || [];
 				const newTimesheet: Timesheet = {
 					id: 0,
 					employeeid: 0,
-					weekending: "",
+					weekending: res.weekending,
 					processed: false,
 					mgrapproved: false,
 					usercommitted: false,
 					totalreghours: 0,
 					totalovertime: 0,
 					approvedby: "",
-					submittedby: "",
+					submittedby: res.submittedby,
 					processedby: "",
 					dateprocessed: "",
 					message: null
