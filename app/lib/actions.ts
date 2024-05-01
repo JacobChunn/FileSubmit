@@ -321,8 +321,8 @@ export async function addProject( // make it not break when project table doesnt
   redirect('/dashboard/projects');
 }
 
-export async function addTimesheet(
-  prevState: ProjectState,
+export async function addTimesheetFromForm(
+	prevState: ProjectState,
 	formData: FormData,
 ) {
   const validatedFields = AddTimesheet.safeParse({
@@ -352,7 +352,7 @@ export async function addTimesheet(
   const dateprocessed = null;
 
   const addSuccess = await addTimesheetHelper(
-    weekending,
+    weekending.toLocaleDateString('en-us'),
     usercommitted,
     processed,
     mgrapproved,
@@ -363,13 +363,56 @@ export async function addTimesheet(
     message,
     dateprocessed,
   )
+	if (addSuccess) {
+		revalidatePath('/dashboard');
+		redirect('/dashboard');
+	}
+}
 
-  revalidatePath('/dashboard');
-  redirect('/dashboard');
+export async function addEmptyTimesheet() {
+
+	const weekending = DateTime.now().toLocaleString();
+	const usercommitted = false;
+	const totalreghours = 0.0;
+	const totalovertime = 0.0;
+	const message = null;
+
+	const processed = false;
+	const mgrapproved = false;
+	const approvedby = null;
+	const processedby = null;
+	const dateprocessed = null;
+
+	const addSuccess = addTimesheetHelper(
+		weekending,
+		usercommitted,
+		processed,
+		mgrapproved,
+		approvedby,
+		processedby,
+		totalreghours,
+		totalovertime,
+		message,
+		dateprocessed,
+	)
+
+	if (!addSuccess) {
+		return {
+			success: false,
+			message: "Timesheet was not added successfully!"
+		}
+	}
+
+	return {
+		success: true,
+		message: "Empty Timesheet was added successfully!",
+		weekending: weekending,
+
+	}
 }
 
 async function addTimesheetHelper(
-  weekending: Date,
+  weekending: string,
   usercommitted: boolean,
   processed: boolean,
   mgrapproved: boolean,
@@ -377,22 +420,23 @@ async function addTimesheetHelper(
   processedby: string | null,
   totalreghours: number,
   totalovertime: number,
-  message: string,
-  dateprocessed: Date | null,
+  message: string | null,
+  dateprocessed: string | null,
 ) {
   // Prepare data for insertion into the database
   const session = await getServerSession(authOptions);
 
   if (!session) {
     console.error("Session was unable to be retrieved!");
-    return false;
+    return {
+		success: false,
+		message: "Session was unable to be retrieved!",
+	};
   }
 
   const employeeid = Number(session.user.id);
   const user = await fetchEmployeeByID(employeeid)
   const submittedby = user.username;
-
-  const dateprocessedString = dateprocessed ? dateprocessed.toLocaleDateString('en-us') : null
 
   // Add a timesheet entry
   try {
@@ -402,9 +446,9 @@ async function addTimesheetHelper(
         totalovertime, approvedby, submittedby, processedby, dateprocessed, message
       )
       VALUES (
-        ${employeeid}, ${weekending.toLocaleDateString('en-us')}, ${processed ? 1 : 0},
+        ${employeeid}, ${weekending}, ${processed ? 1 : 0},
         ${mgrapproved ? 1 : 0}, ${usercommitted ? 1 : 0}, ${totalreghours}, ${totalovertime},
-        ${approvedby}, ${submittedby}, ${processedby}, ${dateprocessedString}, ${message}
+        ${approvedby}, ${submittedby}, ${processedby}, ${dateprocessed}, ${message}
       )
       RETURNING id;
     `;
@@ -418,13 +462,23 @@ async function addTimesheetHelper(
     
     if(!addSuccess) {
       console.error('Database Error: Failed to Create TimesheetDetails.');
-      return false;
+      return {
+		success: false,
+		message: "Database Error: Failed to Create TimesheetDetails."
+	  };
     }
 
   } catch (error) {
     console.error(error);
-    return false;
+	return {
+		success: false,
+		message: JSON.stringify(error),
+	  };
   }
+  return {
+	success: true,
+	message: "Timesheet was added successfully!"
+  };
 }
 
 export async function fetchTimesheetsWithAuth() {

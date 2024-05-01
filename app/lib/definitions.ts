@@ -188,7 +188,7 @@ export type Timesheet = {
   submittedby: string;
   processedby: string;
   dateprocessed: string;
-  message: string;
+  message: string | null;
 };
 
 export type TimesheetEditInfo = {

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
-import { addEmployee, addTimesheet } from '@/app/lib/actions';
+import { addEmployee, addTimesheetFromForm } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
 import FormEntry from '../../../forms/add-form/form-entry';
 import FormErrorHandling from '../../../forms/form-error-handling';
@@ -10,7 +10,7 @@ import FormSubmitButton from '../../../forms/form-submit-button';
 
 export default function TimesheetAddForm() {
 	const initialState = { message: null, errors: {} };
-	const [state, dispatch] = useFormState(addTimesheet, initialState);
+	const [state, dispatch] = useFormState(addTimesheetFromForm, initialState);
 
 	return (
 		<form action={dispatch}>
