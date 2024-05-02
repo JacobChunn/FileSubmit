@@ -11,40 +11,17 @@ const users = [
 
 const employees = [
   {
-    id: '3958dc9e-712f-4377-85e9-fec4b6a6442a',
+    id: 0,
     number: 0,
-    username: 'jchunn',
-    password: '123456',
-    firstName: 'Jake',
-    lastName: 'Chunn',
-    cellPhone: '248-403-4642',
-    homePhone: '248-403-4642',
-    email: 'jchunn@encoreautomation.com',
-    managerID: 0,
-    accessLevel: 0,
-    timeSheetRequired: 1,
-    overtimeEligible: 1,
-    TABNavigateOT: 0,
-    emailExpenseCopy: 0,
-    activeEmployee: 1,
-    iEnterTimeData: 0,
-    numTimeSheetSummaries: 4,
-    numExpenseSummaries: 1,
-    numDefaultTimeRows: 1,
-    contractor: 0
-  },
-  {
-    id: '3958dc9e-742f-4377-85e9-fec4b6a6442a',
-    number: 1,
-    username: 'abhagat',
-    password: '123456',
-    firstName: 'Aeijaz',
-    lastName: 'Bhagat',
-    cellPhone: '248-866-8596',
-    homePhone: '248-866-8596',
-    email: 'abhagat@encoreautomation.com',
-    managerID: 0,
-    accessLevel: 0,
+    username: 'boss',
+    password: 'boss',
+    firstName: 'boss',
+    lastName: 'boss',
+    cellPhone: '555-555-5555',
+    homePhone: '555-555-5555',
+    email: 'boss@email.com',
+    managerID: null,
+    accessLevel: 200,
     timeSheetRequired: 1,
     overtimeEligible: 0,
     TABNavigateOT: 0,
@@ -55,7 +32,7 @@ const employees = [
     numExpenseSummaries: 1,
     numDefaultTimeRows: 1,
     contractor: 0
-  },
+  }
 ];
 
 const customers = [
