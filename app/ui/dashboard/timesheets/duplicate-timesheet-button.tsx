@@ -1,11 +1,11 @@
 'use client'
-import { addEmptyTimesheet } from "@/app/lib/actions";
-import { DocumentPlusIcon } from "@heroicons/react/24/outline";
+import { duplicateTimesheet } from "@/app/lib/actions";
+import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 import { useContext } from "react";
 import { TimesheetContext } from "./timesheet-context-wrapper";
 import { Timesheet } from "@/app/lib/definitions";
 
-export default function AddTimesheetButton({
+export default function DuplicateTimesheetButton({
 	className = "",
 }: {
 	className?: string,
@@ -21,19 +21,15 @@ export default function AddTimesheetButton({
 	const handleOnClick = () => {
 		const addTimesheet = async () => {
 			context.setTimesheetIsSaving(true);
-			const res = await addEmptyTimesheet();
+			const res = await duplicateTimesheet();
 			context.setTimesheetIsSaving(false);
 
 			let timesheets;
-			if (res.success && 
-				'id' in res &&
-				res.id &&
-				'weekending' in res
-			) {
+			if (res.success && res.weekending) {
 				timesheets = context.localTimesheets || [];
 				const newTimesheet: Timesheet = {
 					id: res.id,
-					employeeid: -1,
+					employeeid: res.employeeid,
 					weekending: res.weekending,
 					processed: false,
 					mgrapproved: false,
@@ -65,8 +61,8 @@ export default function AddTimesheetButton({
 					${!context.timesheetIsSaving ? 'bg-blue-500 hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600' : 'bg-gray-400 cursor-not-allowed opacity-50'}`}
 				onClick={handleOnClick}
 			>
-				<DocumentPlusIcon strokeWidth={2} className="h-4 w-4" />
-				Add
+				<DocumentDuplicateIcon strokeWidth={2} className="h-4 w-4" />
+				Duplicate
 			</button>
 		</div>
 	)

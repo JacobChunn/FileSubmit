@@ -12,6 +12,7 @@ import TimesheetTableHeader from '@/app/ui/dashboard/timesheets/table/timesheet-
 import TimesheetTableBody from '@/app/ui/dashboard/timesheets/table/timesheet-table-body';
 import TimesheetWrapper from '@/app/ui/dashboard/timesheets/timesheet-wrapper';
 import AddTimesheetButton from '@/app/ui/dashboard/timesheets/add-timesheet-button';
+import DuplicateTimesheetButton from '@/app/ui/dashboard/timesheets/duplicate-timesheet-button';
 
 export const metadata: Metadata = {
 	title: 'Dashboard',
@@ -41,7 +42,10 @@ export default async function Page() {
 			<div className='flex space-x-6'>
 				<TimesheetContextWrapper employeeid={employeeID}>
 					<TimesheetWrapper>
-						<AddTimesheetButton className = "pb-2"/>
+						<div className='flex items-center justify-end gap-3'>
+							<AddTimesheetButton className = "pb-2"/>
+							<DuplicateTimesheetButton className = "pb-2"/>
+						</div>
 						<TimesheetTableWrapper>
 							<TimesheetTableHeader/>
 							<TimesheetTableBody/>

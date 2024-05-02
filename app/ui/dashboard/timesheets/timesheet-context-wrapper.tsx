@@ -27,6 +27,9 @@ type timesheetContextType = {
 
 	databaseTimesheetWeekEnding: DateTime<true> | DateTime<false> | null;
 	setDatabaseTimesheetWeekEnding: React.Dispatch<React.SetStateAction<DateTime<true> | DateTime<false> | null>>;
+
+    timesheetIsSaving: boolean;
+    setTimesheetIsSaving: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const TimesheetContext = createContext<timesheetContextType | null>(null)
@@ -46,6 +49,7 @@ export default function TimesheetContextWrapper({
     const [timesheetDetailsState, setTimesheetDetailsState] = useState<TimesheetDetailsState>(null);
 	const [localTimesheetWeekEnding, setLocalTimesheetWeekEnding] = useState<DateTime<true> | DateTime<false> | null>(null);
 	const [databaseTimesheetWeekEnding, setDatabaseTimesheetWeekEnding] = useState<DateTime<true> | DateTime<false> | null>(null);
+    const [timesheetIsSaving, setTimesheetIsSaving] = useState<boolean>(false);
 
     return (
         <TimesheetContext.Provider
@@ -58,6 +62,7 @@ export default function TimesheetContextWrapper({
                 timesheetDetailsState, setTimesheetDetailsState,
 				localTimesheetWeekEnding, setLocalTimesheetWeekEnding,
 				databaseTimesheetWeekEnding, setDatabaseTimesheetWeekEnding,
+                timesheetIsSaving, setTimesheetIsSaving,
             }}
         >
             {children}

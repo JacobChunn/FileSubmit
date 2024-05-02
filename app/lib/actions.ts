@@ -351,7 +351,7 @@ export async function addTimesheetFromForm(
   const processedby = null;
   const dateprocessed = null;
 
-  const addSuccess = await addTimesheetHelper(
+  const res = await addTimesheetHelper(
     weekending.toLocaleDateString('en-us'),
     usercommitted,
     processed,
@@ -363,15 +363,189 @@ export async function addTimesheetFromForm(
     message,
     dateprocessed,
   )
-	if (addSuccess) {
+	if (res) {
 		revalidatePath('/dashboard');
 	}
 
-	return addSuccess;
+	return res;
 }
 
+export async function duplicateTimesheet() {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    console.error("Session was unable to be retrieved!");
+    return {
+      success: false,
+      message: "Session was unable to be retrieved!",
+    };
+  }
+
+  const employeeid = Number(session.user.id);
+  const user = await fetchEmployeeByID(employeeid)
+  const submittedby = user.username;
+
+	const today = DateTime.now();
+	const weekday = today.weekday;
+	const weekending = today.plus({days: 7 - weekday}).toLocaleString();
+
+	const usercommitted = false;
+
+	const processed = false;
+	const mgrapproved = false;
+	const approvedby = null;
+	const processedby = null;
+	const dateprocessed = null;
+
+	const timesheetHelperRes = await duplicateTimesheetHelper(
+    employeeid,
+    submittedby,
+		weekending,
+		usercommitted,
+		processed,
+		mgrapproved,
+		approvedby,
+		processedby,
+		dateprocessed,
+	)
+
+  if (!timesheetHelperRes.success || !timesheetHelperRes.employeeid) {
+    return timesheetHelperRes;
+  }
+
+  const recentTimesheetRes = await getRecentTimesheet(timesheetHelperRes.employeeid);
+
+  return {
+    timesheetHelperRes,
+    recentTimesheetRes
+  };
+}
+
+async function duplicateTimesheetHelper(
+  employeeid: number,
+  submittedby: string,
+  weekending: string,
+  usercommitted: boolean,
+  processed: boolean,
+  mgrapproved: boolean,
+  approvedby: string | null,
+  processedby: string | null,
+  dateprocessed: string | null,
+) {
+  // Get recent timesheet
+  const recentTimesheetRes = await getRecentTimesheet(employeeid);
+  if (!recentTimesheetRes.success || !recentTimesheetRes.recentTimesheet) return recentTimesheetRes;
+
+  // Parse recent timesheet
+  const recentTimesheet = recentTimesheetRes.recentTimesheet;
+  const timesheetID = recentTimesheet.id;
+  const recentTotalreghours = recentTimesheet.totalreghours;
+  const recentTotalovertime = recentTimesheet.totalovertime;
+  const recentMessage = recentTimesheet.message;
+
+  // Get recent timesheet details
+  const recentTimesheetDetailsRes = await getTimesheetDetails(timesheetID, employeeid);
+  if (!recentTimesheetDetailsRes.success || !recentTimesheetDetailsRes.timesheetDetails) return recentTimesheetDetailsRes;
+
+  // Parse recent timesheet details
+  const recentTimesheetDetails = recentTimesheetDetailsRes.timesheetDetails;
+
+  // Create new timesheet with recent totalreghours and totalovertime
+  const addTimesheetHelperRes = await addTimesheetHelper(
+    employeeid,
+    submittedby,
+		weekending,
+		usercommitted,
+		processed,
+		mgrapproved,
+		approvedby,
+		processedby,
+		recentTotalreghours,
+		recentTotalovertime,
+		recentMessage,
+		dateprocessed,
+  );
+
+  // Parse the newly created timesheet response
+  if (!addTimesheetHelperRes.success || !addTimesheetHelperRes.id) return addTimesheetHelperRes;
+  const newTimesheetID = addTimesheetHelperRes.id;
+
+  // Create new timesheet details with recent timesheet details' data but references newly created timesheet
+  for (const tsd of recentTimesheetDetails) {
+    const addTimesheetDetailsRes = await addTimesheetDetailsHelper(
+      
+    );
+  }
+}
+
+// Only call this funciton if session is verified, and the recipiant of the recent timesheet for the given
+// employee has been authorized to recieve it.
+async function getRecentTimesheet(employeeID: number) {
+  try {
+    const recentTimesheetData = await sql`
+      SELECT *
+      FROM timesheets
+      WHERE employeeid = ${employeeID}
+      ORDER BY weekending DESC
+      LIMIT 1;    
+    `;
+
+    const recentTimesheet = recentTimesheetData.rows[0];
+
+    return {
+      success: true,
+      recentTimesheet: recentTimesheet
+    }
+  } catch(error) {
+    console.error(error);
+    return {
+      success: false,
+      message: JSON.stringify(error)
+    }
+  }
+}
+
+// Only call this funciton if session is verified, and the recipiant of the timesheet details for the given
+// employee + timesheet has been authorized to recieve it.
+async function getTimesheetDetails(timesheetID: number, employeeID: number) {
+  try {
+    const timesheetDetailsData = await sql`
+      SELECT *
+      FROM timesheetdetails
+      WHERE timesheetid = ${timesheetID}
+        AND employeeid = ${employeeID};
+    `;
+
+    const timesheetDetails = timesheetDetailsData.rows;
+
+    return {
+      success: true,
+      timesheetDetails: timesheetDetails
+    }
+  } catch(error) {
+    console.error(error);
+    return {
+      success: false,
+      message: JSON.stringify(error)
+    }
+  }
+}
 
 export async function addEmptyTimesheet() {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    console.error("Session was unable to be retrieved!");
+    return {
+      success: false,
+      message: "Session was unable to be retrieved!",
+    };
+  }
+
+  const employeeid = Number(session.user.id);
+  const user = await fetchEmployeeByID(employeeid)
+  const submittedby = user.username;
+
 	const today = DateTime.now();
 	const weekday = today.weekday;
 	const weekending = today.plus({days: 7 - weekday}).toLocaleString();
@@ -388,6 +562,8 @@ export async function addEmptyTimesheet() {
 	const dateprocessed = null;
 
 	const addSuccess = await addTimesheetHelper(
+    employeeid,
+    submittedby,
 		weekending,
 		usercommitted,
 		processed,
@@ -400,10 +576,18 @@ export async function addEmptyTimesheet() {
 		dateprocessed,
 	)
 
-	return addSuccess;
+	return {
+    ...addSuccess,
+    weekending,
+    submittedby
+  };
 }
 
+// Only call this funciton if session and employee ID is verified, 
+// and the recipiant of the returned values has been authorized to recieve them.
 async function addTimesheetHelper(
+  employeeid: number,
+  submittedby: string,
   weekending: string,
   usercommitted: boolean,
   processed: boolean,
@@ -415,22 +599,8 @@ async function addTimesheetHelper(
   message: string | null,
   dateprocessed: string | null,
 ) {
-  // Prepare data for insertion into the database
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    console.error("Session was unable to be retrieved!");
-    return {
-		success: false,
-		message: "Session was unable to be retrieved!",
-	};
-  }
-
-  const employeeid = Number(session.user.id);
-  const user = await fetchEmployeeByID(employeeid)
-  const submittedby = user.username;
-
   // Add a timesheet entry
+  let timesheetID: number;
   try {
     const timesheetIDData = await sql`
       INSERT INTO timesheets (
@@ -445,14 +615,14 @@ async function addTimesheetHelper(
       RETURNING id;
     `;
 	
-    const timesheetID: number = timesheetIDData.rows[0].id;
+    timesheetID = timesheetIDData.rows[0].id;
 
-    const addSuccess = await addTimesheetDetailsHelper({
+    const addTimesheetDetailsRes = await addTimesheetDetailsHelper({
       timesheetid: timesheetID,
       employeeid: employeeid,
     });
     
-    if(!addSuccess) {
+    if(!addTimesheetDetailsRes.success) {
       console.error('Database Error: Failed to Create TimesheetDetails.');
       return {
 		success: false,
@@ -468,10 +638,9 @@ async function addTimesheetHelper(
 	  };
   }
   return {
-	success: true,
-	message: "Timesheet was added successfully!",
-	submittedby: submittedby,
-	weekending: weekending
+    success: true,
+    message: "Timesheet was added successfully!",
+    id: timesheetID
   };
 }
 
@@ -494,12 +663,12 @@ export async function fetchTimesheetsWithAuth() {
 
   try {
 	  const data = await sql<Timesheet>`
-		SELECT
-    id, employeeid, weekending, processed, mgrapproved,
-    usercommitted, totalreghours, totalovertime, approvedby,
-    submittedby, processedby, dateprocessed, message
-		FROM timesheets
-    WHERE timesheets.employeeid = ${employeeid};
+      SELECT
+      id, employeeid, weekending, processed, mgrapproved,
+      usercommitted, totalreghours, totalovertime, approvedby,
+      submittedby, processedby, dateprocessed, message
+      FROM timesheets
+      WHERE timesheets.employeeid = ${employeeid};
 	  `;
 	  const dataRows = data.rows;
     //console.log(dataRows);
@@ -565,11 +734,18 @@ async function addTimesheetDetailsHelper({
 	  ${currentDate}
     )
     `;
+
+    return {
+      success: true,
+      message: "Successfully added timesheet details!"
+    }
   } catch (error) {
     console.log(error);
-    return false;
+    return {
+      success: false,
+      message: JSON.stringify(error)
+    };
   }
-  return true;
 }
 
 export async function addTimesheetDetails(timesheetID: number) {
@@ -607,12 +783,12 @@ export async function addTimesheetDetails(timesheetID: number) {
 	}
 
 	try{
-		const addSuccess = await addTimesheetDetailsHelper({
+		const addTimesheetDetailsRes = await addTimesheetDetailsHelper({
 			timesheetid: validatedTimesheetID,
 			employeeid: employeeID,
 		});
 	
-		if(!addSuccess) {
+		if(!addTimesheetDetailsRes.success) {
 			return {
 				message: 'Failed to Create TimesheetDetails.',
 			};
@@ -846,7 +1022,7 @@ export async function editTimesheetDetails(
     const costcode = Number(phase_costcode_split[1]);
 
     try{
-      const addSuccess = await addTimesheetDetailsHelper({
+      const addTimesheetDetailsRes = await addTimesheetDetailsHelper({
         timesheetid: validatedTimesheetID,
         employeeid: employeeID,
         projectid: project,
@@ -872,7 +1048,7 @@ export async function editTimesheetDetails(
       totalReg += (mon + tues + wed + thurs + fri + sat + sun);
       totalOT += (monot + tuesot + wedot + thursot + friot + satot + sunot);
     
-      if(!addSuccess) {
+      if(!addTimesheetDetailsRes.success) {
         return {
           success: false,
           message: 'Failed to Create Timesheet Details.',
@@ -991,7 +1167,7 @@ export async function fetchTimesheetDetailsEditFormData(
 	const session = await getServerSession(authOptions);
 
 	if (!session) {
-		throw new Error('Failed to Validate TimesheetID.');
+		throw new Error('Failed to user Session.');
 	}
 	
 	const employeeID = Number(session.user.id);
