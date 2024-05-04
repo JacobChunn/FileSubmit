@@ -321,48 +321,65 @@ export async function addProject( // make it not break when project table doesnt
   redirect('/dashboard/projects');
 }
 
+// Deprecated in favor of addEmptyTimesheet and duplicateTimesheet
 export async function addTimesheetFromForm(
 	prevState: ProjectState,
 	formData: FormData,
 ) {
-  const validatedFields = AddTimesheet.safeParse({
-    weekending: formData.get('weekending'),
-    usercommitted: formData.get('usercommitted'),
-    totalreghours: formData.get('totalreghours'),
-    totalovertime: formData.get('totalovertime'),
-    message: formData.get('message'),
-  });
+	const session = await getServerSession(authOptions);
 
-  // If form validation fails, return errors early. Otherwise, continue.
-  if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Create Project.',
-    };
-  }
+	if (!session) {
+		console.error("Session was unable to be retrieved!");
+		return {
+			success: false,
+			message: "Session was unable to be retrieved!",
+		};
+	}
+  
+	const employeeid = Number(session.user.id);
+	const user = await fetchEmployeeByID(employeeid)
+	const submittedby = user.username;
 
-  const {
-    weekending, usercommitted, totalreghours, totalovertime, message
-  } = validatedFields.data;
+	const validatedFields = AddTimesheet.safeParse({
+		weekending: formData.get('weekending'),
+		usercommitted: formData.get('usercommitted'),
+		totalreghours: formData.get('totalreghours'),
+		totalovertime: formData.get('totalovertime'),
+		message: formData.get('message'),
+	});
 
-  const processed = false;
-  const mgrapproved = false;
-  const approvedby = null;
-  const processedby = null;
-  const dateprocessed = null;
+	// If form validation fails, return errors early. Otherwise, continue.
+	if (!validatedFields.success) {
+		return {
+		errors: validatedFields.error.flatten().fieldErrors,
+		message: 'Missing Fields. Failed to Create Project.',
+		};
+	}
 
-  const res = await addTimesheetHelper(
-    weekending.toLocaleDateString('en-us'),
-    usercommitted,
-    processed,
-    mgrapproved,
-    approvedby,
-    processedby,
-    totalreghours,
-    totalovertime,
-    message,
-    dateprocessed,
-  )
+	const {
+		weekending, usercommitted, totalreghours, totalovertime, message
+	} = validatedFields.data;
+
+	const processed = false;
+	const mgrapproved = false;
+	const approvedby = null;
+	const processedby = null;
+	const dateprocessed = null;
+
+	const res = await addTimesheetHelper(
+		employeeid,
+		submittedby,
+		weekending.toLocaleDateString('en-us'),
+		usercommitted,
+		processed,
+		mgrapproved,
+		approvedby,
+		processedby,
+		totalreghours,
+		totalovertime,
+		message,
+		dateprocessed,
+	)
 	if (res) {
 		revalidatePath('/dashboard');
 	}
@@ -398,27 +415,22 @@ export async function duplicateTimesheet() {
 	const dateprocessed = null;
 
 	const timesheetHelperRes = await duplicateTimesheetHelper(
-    employeeid,
-    submittedby,
+		employeeid,
+		submittedby,
 		weekending,
 		usercommitted,
 		processed,
 		mgrapproved,
 		approvedby,
 		processedby,
-		dateprocessed,
-	)
+		dateprocessed
+	);
 
-  if (!timesheetHelperRes.success || !timesheetHelperRes.employeeid) {
-    return timesheetHelperRes;
-  }
-
-  const recentTimesheetRes = await getRecentTimesheet(timesheetHelperRes.employeeid);
-
-  return {
-    timesheetHelperRes,
-    recentTimesheetRes
-  };
+	return {
+		...timesheetHelperRes,
+		weekending,
+		submittedby,
+	};
 }
 
 async function duplicateTimesheetHelper(
@@ -452,8 +464,8 @@ async function duplicateTimesheetHelper(
 
   // Create new timesheet with recent totalreghours and totalovertime
   const addTimesheetHelperRes = await addTimesheetHelper(
-    employeeid,
-    submittedby,
+		employeeid,
+		submittedby,
 		weekending,
 		usercommitted,
 		processed,
@@ -472,9 +484,28 @@ async function duplicateTimesheetHelper(
 
   // Create new timesheet details with recent timesheet details' data but references newly created timesheet
   for (const tsd of recentTimesheetDetails) {
-    const addTimesheetDetailsRes = await addTimesheetDetailsHelper(
-      
-    );
+    const addTimesheetDetailsRes = await addTimesheetDetailsHelper({
+		timesheetid: newTimesheetID, // Newly created timesheet
+		employeeid: employeeid,
+		projectid: tsd.projectid,
+		phase: tsd.phase,
+		costcode: tsd.costcode,
+		description: tsd.description,
+		mon: tsd.mon, monot: tsd.monot, tues: tsd.tues, tuesot: tsd.tuesot,
+		wed: tsd.wed, wedot: tsd.wedot, thurs: tsd.thurs, thursot: tsd.thursot,
+		fri: tsd.fri, friot: tsd.friot, sat: tsd.sat, satot: tsd.satot,
+		sun: tsd.sun, sunot: tsd.sunot,
+		
+		
+	});
+
+	if (!addTimesheetDetailsRes.success) return addTimesheetDetailsRes;
+  }
+
+  return {
+	success: true,
+	message: "Recent timesheet has been successfully duplicated!",
+	id: newTimesheetID,
   }
 }
 
@@ -562,8 +593,8 @@ export async function addEmptyTimesheet() {
 	const dateprocessed = null;
 
 	const addSuccess = await addTimesheetHelper(
-    employeeid,
-    submittedby,
+		employeeid,
+		submittedby,
 		weekending,
 		usercommitted,
 		processed,
