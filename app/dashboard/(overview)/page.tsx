@@ -31,7 +31,7 @@ export default async function Page() {
 	}
 
 
-	const employeeID = Number(session.user.id);
+	//const employeeID = Number(session.user.id);
 
 	//const timesheetPromise = (await fetchTimesheetsByEmployeeID(employeeID)).json()
 	return (
@@ -40,7 +40,7 @@ export default async function Page() {
 				Dashboard
 			</h1>
 			<div className='flex space-x-6'>
-				<TimesheetContextWrapper employeeid={employeeID}>
+				<TimesheetContextWrapper>
 					<TimesheetWrapper>
 						<div className='flex items-center justify-end gap-3'>
 							<AddTimesheetButton className = "pb-2"/>

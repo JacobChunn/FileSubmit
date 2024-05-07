@@ -100,14 +100,25 @@ export default function TimesheetDetailsEditForm({
 
 		let newDbTimesheetDetails;
 		let newDbWeekEnding;
+		let newLocalTimesheets;
 		if (formState.success == false) {
 			newDbTimesheetDetails = context.databaseTimesheetDetails;
 			newDbWeekEnding = context.databaseTimesheetWeekEnding;
+			newLocalTimesheets = context.localTimesheets;
 		} else {
 			newDbTimesheetDetails = context.localTimesheetDetails;
 			newDbWeekEnding = context.localTimesheetWeekEnding;
+			// Update selected timesheet weekending
+			newLocalTimesheets = context.localTimesheets;
+			if (newLocalTimesheets && newDbWeekEnding) {
+				let toBeChangedTimesheet = newLocalTimesheets.find((ts) => ts.id == context.selectedTimesheet);
+				if (toBeChangedTimesheet) {
+					toBeChangedTimesheet.weekending = newDbWeekEnding.toLocaleString();
+				}
+			}
 		}
 		
+		context.setLocalTimesheets(newLocalTimesheets);
 		context.setDatabaseTimesheetWeekEnding(newDbWeekEnding);
 		context.setDatabaseTimesheetDetails(newDbTimesheetDetails);
 		context.setTimesheetDetailsState(timesheetDetailsState);

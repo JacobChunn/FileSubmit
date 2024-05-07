@@ -5,8 +5,6 @@ import { DateTime } from "luxon";
 import { createContext, useState } from "react";
 
 type timesheetContextType = {
-    employeeid: number;
-
     selectedTimesheet: number | null;
     setSelectedTimesheet: React.Dispatch<React.SetStateAction<number | null>>;
 
@@ -35,10 +33,8 @@ type timesheetContextType = {
 export const TimesheetContext = createContext<timesheetContextType | null>(null)
 
 export default function TimesheetContextWrapper({
-    employeeid,
     children,
 }: {
-    employeeid: number,
     children: React.ReactNode,
 }) {
 
@@ -54,7 +50,6 @@ export default function TimesheetContextWrapper({
     return (
         <TimesheetContext.Provider
             value={{
-                employeeid,
                 selectedTimesheet, setSelectedTimesheet,
                 localTimesheets, setLocalTimesheets,
                 localTimesheetDetails, setLocalTimesheetDetails,

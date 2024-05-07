@@ -47,7 +47,7 @@ export default function AddTimesheetButton({
 					message: null
 				}
 
-				timesheets = [...timesheets, newTimesheet]
+				timesheets = [newTimesheet, ...timesheets]
 			} else {
 				timesheets = context.localTimesheets;
 			}

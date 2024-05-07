@@ -5,11 +5,7 @@ import { DateTime } from "luxon";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
 
 
-export default function WeekEditor({
-	children
-}: {
-	children?: React.ReactNode,
-}) {
+export default function WeekEditor() {
 	const context = useContext(TimesheetContext);
 	if (context == null) {
 		throw new Error(

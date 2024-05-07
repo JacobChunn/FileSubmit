@@ -46,7 +46,7 @@ export default function TimesheetDetailsHeader({
 		const newTSD: TimesheetDetails = {
 			id: 0,
 			timesheetid: timesheetID,
-			employeeid: context.employeeid,
+			employeeid: -1,
 			projectid: 0,
 			phase: 0,
 			costcode: 0,

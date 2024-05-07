@@ -43,7 +43,7 @@ export default function DuplicateTimesheetButton({
 					message: null
 				}
 
-				timesheets = [...timesheets, newTimesheet]
+				timesheets = [newTimesheet, ...timesheets]
 			} else {
 				timesheets = context.localTimesheets;
 			}

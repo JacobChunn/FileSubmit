@@ -721,11 +721,12 @@ export async function fetchTimesheetsWithAuth() {
   try {
 	  const data = await sql<Timesheet>`
       SELECT
-      id, employeeid, weekending, processed, mgrapproved,
-      usercommitted, totalreghours, totalovertime, approvedby,
-      submittedby, processedby, dateprocessed, message
+		id, employeeid, weekending, processed, mgrapproved,
+		usercommitted, totalreghours, totalovertime, approvedby,
+		submittedby, processedby, dateprocessed, message
       FROM timesheets
-      WHERE timesheets.employeeid = ${employeeid};
+      WHERE timesheets.employeeid = ${employeeid}
+	  ORDER BY weekending DESC;
 	  `;
 	  const dataRows = data.rows;
     //console.log(dataRows);
