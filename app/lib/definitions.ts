@@ -301,7 +301,7 @@ export const timesheetDetailsLabels = {
 	project: 'project',
 	phase: 'phase',
 	costcode: 'costcode',
-  phase_costcode: 'phase_costcode',
+	phase_costcode: 'phase_costcode',
 	description: 'description',
 	mon: 'mon',
 	monot: 'monOT',
@@ -319,7 +319,7 @@ export const timesheetDetailsLabels = {
 	sunot: 'sunOT',
 };
 
-export type TimesheetDetailsState = "signed" | "unsaved" | "saving" | "saved" | null;
+export type SavingState = "signed" | "unsaved" | "saving" | "saved" | null;
 
 export type ProjectOption = {
   id: number;

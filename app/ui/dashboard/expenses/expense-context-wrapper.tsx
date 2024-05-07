@@ -1,12 +1,12 @@
 "use client"
 
-import { SavingState, Timesheet, TimesheetDetailsExtended } from "@/app/lib/definitions";
+import { SavingState, Timesheet, TimesheetDetailsExtended,  } from "@/app/lib/definitions";
 import { DateTime } from "luxon";
 import { createContext, useState } from "react";
 
-type timesheetContextType = {
-    selectedTimesheet: number | null;
-    setSelectedTimesheet: React.Dispatch<React.SetStateAction<number | null>>;
+type expenseContextType = {
+    selectedExpense: number | null;
+    setSelectedExpense: React.Dispatch<React.SetStateAction<number | null>>;
 
     localTimesheets: Timesheet[] | null;
     setLocalTimesheets: React.Dispatch<React.SetStateAction<Timesheet[] | null>>;
@@ -30,9 +30,9 @@ type timesheetContextType = {
     setTimesheetIsSaving: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const TimesheetContext = createContext<timesheetContextType | null>(null)
+export const ExpenseContext = createContext<expenseContextType | null>(null)
 
-export default function TimesheetContextWrapper({
+export default function ExpenseContextWrapper({
     children,
 }: {
     children: React.ReactNode,
@@ -48,7 +48,7 @@ export default function TimesheetContextWrapper({
     const [timesheetIsSaving, setTimesheetIsSaving] = useState<boolean>(false);
 
     return (
-        <TimesheetContext.Provider
+        <ExpenseContext.Provider
             value={{
                 selectedTimesheet, setSelectedTimesheet,
                 localTimesheets, setLocalTimesheets,
@@ -61,6 +61,6 @@ export default function TimesheetContextWrapper({
             }}
         >
             {children}
-        </TimesheetContext.Provider>
+        </ExpenseContext.Provider>
     )
 }

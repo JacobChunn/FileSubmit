@@ -16,11 +16,11 @@ export default function TextEntry({
             color={color}
             className={`font-normal text-blue-gray-900 text-xs`}
         >
-        {childType === 'string' || childType == 'number' ?
-            children
-            :
-            null
-        }
-    </Typography>
+			{childType === 'string' || childType == 'number' ?
+				children
+				:
+				null
+			}
+		</Typography>
     )
 }

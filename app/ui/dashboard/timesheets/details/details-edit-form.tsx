@@ -2,7 +2,7 @@
 
 import { deleteTimesheetDetails, editTimesheetDetails, fetchTimesheetDetailsEditFormData } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
-import { Options, TimesheetDetails, TimesheetDetailsEditInfo, TimesheetDetailsState, timesheetDetailsLabels } from '@/app/lib/definitions';
+import { Options, TimesheetDetails, SavingState, timesheetDetailsLabels } from '@/app/lib/definitions';
 import FormTextEntry from '@/app/ui/forms/edit-form/form-entry';
 import FormBoolEntry from '@/app/ui/forms/edit-form/form-bool-entry';
 import FormErrorHandling from '@/app/ui/forms/form-error-handling';
@@ -67,7 +67,7 @@ export default function TimesheetDetailsEditForm({
 				context.setLocalTimesheetDetails(TSDDataReturn.timesheetDetails);
 				context.setDatabaseTimesheetDetails(TSDDataReturn.timesheetDetails);
 
-				let initialTimesheetDetailsState: TimesheetDetailsState;
+				let initialTimesheetDetailsState: SavingState;
 				if (context.localTimesheets?.find(timesheet => timesheet.id == timesheetID)?.usercommitted) {
 					initialTimesheetDetailsState = "signed";
 				} else {
@@ -87,7 +87,7 @@ export default function TimesheetDetailsEditForm({
 	useEffect(() => {
 		console.log("formState: " + JSON.stringify(formState));
 
-		let timesheetDetailsState: TimesheetDetailsState;
+		let timesheetDetailsState: SavingState;
 		if (context.timesheetDetailsState === "signed") {
 			timesheetDetailsState = "signed";
 		} else if (context.timesheetDetailsState === null) {
@@ -130,7 +130,7 @@ export default function TimesheetDetailsEditForm({
 		const localWeekEnding = context.localTimesheetWeekEnding;
 		const databaseWeekEnding = context.databaseTimesheetWeekEnding;
 
-		let timesheetDetailsState: TimesheetDetailsState;
+		let timesheetDetailsState: SavingState;
 		if (context.timesheetDetailsState === "signed") {
 			timesheetDetailsState = "signed";
 		} else if (context.timesheetDetailsState === null) {

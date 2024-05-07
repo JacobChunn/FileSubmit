@@ -15,7 +15,7 @@ import AddTimesheetButton from '@/app/ui/dashboard/timesheets/add-timesheet-butt
 import DuplicateTimesheetButton from '@/app/ui/dashboard/timesheets/duplicate-timesheet-button';
 
 export const metadata: Metadata = {
-	title: 'Dashboard',
+	title: 'Timesheets',
 };
 
 export default async function Page() {
@@ -37,7 +37,7 @@ export default async function Page() {
 	return (
 		<main>
 			<h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
-				Dashboard
+				Timesheets
 			</h1>
 			<div className='flex space-x-6'>
 				<TimesheetContextWrapper>

@@ -3,7 +3,7 @@
 import { useContext } from "react";
 import { TimesheetContext } from "../timesheet-context-wrapper";
 import { toggleTimesheetSignedValue } from "@/app/lib/actions";
-import { Timesheet, TimesheetDetailsState } from "@/app/lib/definitions";
+import { Timesheet, SavingState } from "@/app/lib/definitions";
 
 export default function SignTimesheetToggleButton({
 
@@ -37,7 +37,7 @@ export default function SignTimesheetToggleButton({
 		try {
 			await toggleTimesheetSignedValue(context.selectedTimesheet);
 			context.setLocalTimesheets(setTimesheets);
-			const newTSDState: TimesheetDetailsState = context.timesheetDetailsState == "signed" ? "saved" : "signed";
+			const newTSDState: SavingState = context.timesheetDetailsState == "signed" ? "saved" : "signed";
 			context.setTimesheetDetailsState(newTSDState);
 			
 		} catch (error) {
