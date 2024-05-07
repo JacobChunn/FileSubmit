@@ -25,17 +25,17 @@ export default function DuplicateTimesheetButton({
 			context.setTimesheetIsSaving(false);
 
 			let timesheets;
-			if (res.success && res.weekending) {
+			if (res.success && 'id' in res && res.id) {
 				timesheets = context.localTimesheets || [];
 				const newTimesheet: Timesheet = {
 					id: res.id,
-					employeeid: res.employeeid,
+					employeeid: -1,
 					weekending: res.weekending,
 					processed: false,
 					mgrapproved: false,
 					usercommitted: false,
-					totalreghours: 0,
-					totalovertime: 0,
+					totalreghours: res.totalreghours,
+					totalovertime: res.totalovertime,
 					approvedby: "",
 					submittedby: res.submittedby,
 					processedby: "",

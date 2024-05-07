@@ -367,6 +367,7 @@ export async function addTimesheetFromForm(
 	const dateprocessed = null;
 
 	const res = await addTimesheetHelper(
+		true,
 		employeeid,
 		submittedby,
 		weekending.toLocaleDateString('en-us'),
@@ -434,36 +435,47 @@ export async function duplicateTimesheet() {
 }
 
 async function duplicateTimesheetHelper(
-  employeeid: number,
-  submittedby: string,
-  weekending: string,
-  usercommitted: boolean,
-  processed: boolean,
-  mgrapproved: boolean,
-  approvedby: string | null,
-  processedby: string | null,
-  dateprocessed: string | null,
+	employeeid: number,
+	submittedby: string,
+	weekending: string,
+	usercommitted: boolean,
+	processed: boolean,
+	mgrapproved: boolean,
+	approvedby: string | null,
+	processedby: string | null,
+	dateprocessed: string | null,
 ) {
-  // Get recent timesheet
-  const recentTimesheetRes = await getRecentTimesheet(employeeid);
-  if (!recentTimesheetRes.success || !recentTimesheetRes.recentTimesheet) return recentTimesheetRes;
+	// Get recent timesheet
+	const recentTimesheetRes = await getRecentTimesheet(employeeid);
+	if (!recentTimesheetRes.success || !recentTimesheetRes.recentTimesheet){
+		return {
+			success: false,
+			message: "Failed to get recent timesheet"
+		}
+	}
 
-  // Parse recent timesheet
-  const recentTimesheet = recentTimesheetRes.recentTimesheet;
-  const timesheetID = recentTimesheet.id;
-  const recentTotalreghours = recentTimesheet.totalreghours;
-  const recentTotalovertime = recentTimesheet.totalovertime;
-  const recentMessage = recentTimesheet.message;
+	// Parse recent timesheet
+	const recentTimesheet = recentTimesheetRes.recentTimesheet;
+	const timesheetID = recentTimesheet.id;
+	const recentTotalreghours = recentTimesheet.totalreghours;
+	const recentTotalovertime = recentTimesheet.totalovertime;
+	const recentMessage = recentTimesheet.message;
 
-  // Get recent timesheet details
-  const recentTimesheetDetailsRes = await getTimesheetDetails(timesheetID, employeeid);
-  if (!recentTimesheetDetailsRes.success || !recentTimesheetDetailsRes.timesheetDetails) return recentTimesheetDetailsRes;
+	// Get recent timesheet details
+	const recentTimesheetDetailsRes = await getTimesheetDetails(timesheetID, employeeid);
+	if (!recentTimesheetDetailsRes.success || !recentTimesheetDetailsRes.timesheetDetails) {
+		return {
+			success: false,
+			message: "Failed to get recent timesheet details"
+		}
+	}
 
-  // Parse recent timesheet details
-  const recentTimesheetDetails = recentTimesheetDetailsRes.timesheetDetails;
+	// Parse recent timesheet details
+	const recentTimesheetDetails = recentTimesheetDetailsRes.timesheetDetails;
 
-  // Create new timesheet with recent totalreghours and totalovertime
-  const addTimesheetHelperRes = await addTimesheetHelper(
+	// Create new timesheet with recent totalreghours and totalovertime
+	const addTimesheetHelperRes = await addTimesheetHelper(
+		false,
 		employeeid,
 		submittedby,
 		weekending,
@@ -476,37 +488,47 @@ async function duplicateTimesheetHelper(
 		recentTotalovertime,
 		recentMessage,
 		dateprocessed,
-  );
+	);
 
-  // Parse the newly created timesheet response
-  if (!addTimesheetHelperRes.success || !addTimesheetHelperRes.id) return addTimesheetHelperRes;
-  const newTimesheetID = addTimesheetHelperRes.id;
+	// Parse the newly created timesheet response
+	if (!addTimesheetHelperRes.success || !addTimesheetHelperRes.id) {
+		return {
+			success: false,
+			message: "Failed to get create a new recent timesheet"
+		}
+	}
+	const newTimesheetID = addTimesheetHelperRes.id;
 
-  // Create new timesheet details with recent timesheet details' data but references newly created timesheet
-  for (const tsd of recentTimesheetDetails) {
-    const addTimesheetDetailsRes = await addTimesheetDetailsHelper({
-		timesheetid: newTimesheetID, // Newly created timesheet
-		employeeid: employeeid,
-		projectid: tsd.projectid,
-		phase: tsd.phase,
-		costcode: tsd.costcode,
-		description: tsd.description,
-		mon: tsd.mon, monot: tsd.monot, tues: tsd.tues, tuesot: tsd.tuesot,
-		wed: tsd.wed, wedot: tsd.wedot, thurs: tsd.thurs, thursot: tsd.thursot,
-		fri: tsd.fri, friot: tsd.friot, sat: tsd.sat, satot: tsd.satot,
-		sun: tsd.sun, sunot: tsd.sunot,
-		
-		
-	});
+	// Create new timesheet details with recent timesheet details' data but references newly created timesheet
+	console.log("recentTSDs: ", recentTimesheetDetails);
+	for (const tsd of recentTimesheetDetails) {
+		console.log("TSD")
+		const addTimesheetDetailsRes = await addTimesheetDetailsHelper({
+			timesheetid: newTimesheetID, // Newly created timesheet
+			employeeid: employeeid,
+			projectid: tsd.projectid,
+			phase: tsd.phase,
+			costcode: tsd.costcode,
+			description: tsd.description,
+			mon: tsd.mon, monot: tsd.monot, tues: tsd.tues, tuesot: tsd.tuesot,
+			wed: tsd.wed, wedot: tsd.wedot, thurs: tsd.thurs, thursot: tsd.thursot,
+			fri: tsd.fri, friot: tsd.friot, sat: tsd.sat, satot: tsd.satot,
+			sun: tsd.sun, sunot: tsd.sunot,
+			
+			
+		});
 
-	if (!addTimesheetDetailsRes.success) return addTimesheetDetailsRes;
-  }
+		if (!addTimesheetDetailsRes.success) return addTimesheetDetailsRes;
+	}
 
-  return {
-	success: true,
-	message: "Recent timesheet has been successfully duplicated!",
-	id: newTimesheetID,
-  }
+	return {
+		success: true,
+		message: "Recent timesheet has been successfully duplicated!",
+		id: newTimesheetID,
+		totalreghours: recentTotalreghours,
+		totalovertime: recentTotalovertime,
+		timesheetMessage: recentMessage
+	}
 }
 
 // Only call this funciton if session is verified, and the recipiant of the recent timesheet for the given
@@ -593,6 +615,7 @@ export async function addEmptyTimesheet() {
 	const dateprocessed = null;
 
 	const addSuccess = await addTimesheetHelper(
+		true,
 		employeeid,
 		submittedby,
 		weekending,
@@ -617,18 +640,19 @@ export async function addEmptyTimesheet() {
 // Only call this funciton if session and employee ID is verified, 
 // and the recipiant of the returned values has been authorized to recieve them.
 async function addTimesheetHelper(
-  employeeid: number,
-  submittedby: string,
-  weekending: string,
-  usercommitted: boolean,
-  processed: boolean,
-  mgrapproved: boolean,
-  approvedby: string | null,
-  processedby: string | null,
-  totalreghours: number,
-  totalovertime: number,
-  message: string | null,
-  dateprocessed: string | null,
+	addBlankDetails: boolean,
+	employeeid: number,
+	submittedby: string,
+	weekending: string,
+	usercommitted: boolean,
+	processed: boolean,
+	mgrapproved: boolean,
+	approvedby: string | null,
+	processedby: string | null,
+	totalreghours: number,
+	totalovertime: number,
+	message: string | null,
+	dateprocessed: string | null,
 ) {
   // Add a timesheet entry
   let timesheetID: number;
@@ -648,18 +672,20 @@ async function addTimesheetHelper(
 	
     timesheetID = timesheetIDData.rows[0].id;
 
-    const addTimesheetDetailsRes = await addTimesheetDetailsHelper({
-      timesheetid: timesheetID,
-      employeeid: employeeid,
-    });
-    
-    if(!addTimesheetDetailsRes.success) {
-      console.error('Database Error: Failed to Create TimesheetDetails.');
-      return {
-		success: false,
-		message: "Database Error: Failed to Create TimesheetDetails."
-	  };
-    }
+	if (addBlankDetails) {
+		const addTimesheetDetailsRes = await addTimesheetDetailsHelper({
+			timesheetid: timesheetID,
+			employeeid: employeeid,
+		});
+		  
+		if(!addTimesheetDetailsRes.success) {
+			console.error('Database Error: Failed to Create TimesheetDetails.');
+			return {
+				success: false,
+				message: "Database Error: Failed to Create TimesheetDetails."
+			};
+		}
+	}
 
   } catch (error) {
     console.error(error);
