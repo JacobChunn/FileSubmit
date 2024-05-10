@@ -1,6 +1,6 @@
 'use client';
 
-import { deleteTimesheetDetails, editTimesheetDetails, fetchTimesheetDetailsEditFormData } from '@/app/lib/actions';
+import { editTimesheetDetails, fetchTimesheetDetailsEditFormData } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
 import { Options, TimesheetDetails, SavingState } from '@/app/lib/definitions';
 import FormTextEntry from '@/app/ui/forms/edit-form/form-entry';

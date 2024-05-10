@@ -184,10 +184,10 @@ export type Expense = {
 	mgrapproved: boolean;
 	paid: boolean;
 	totalexpenses: number;
-	submittedby: string;
-	approvedby: string;
-	processedby: string;
-	datepaid: string;
+	submittedby: string | null;
+	approvedby: string | null;
+	processedby: string | null;
+	datepaid: string | null;
 	mileagerate: number;
 }
 

@@ -27,24 +27,23 @@ export default function AddExpenseButton({
 			let expenses;
 			if (res.success && 
 				'id' in res &&
-				res.id &&
-				'weekending' in res
+				res.id
 			) {
 				expenses = context.localExpenses || [];
 				const newExpense: Expense = {
                     id: res.id,
                     employeeid: -1,
                     datestart: res.datestart,
-                    numdays: 0,
+                    numdays: res.numdays,
                     usercommitted: false,
                     mgrapproved: false,
                     paid: false,
                     totalexpenses: 0,
-                    submittedby: "",
+                    submittedby: res.submittedby,
                     approvedby: "",
                     processedby: "",
                     datepaid: "",
-                    mileagerate: 0
+                    mileagerate: res.mileagerate
                 }
 
 				expenses = [newExpense, ...expenses]

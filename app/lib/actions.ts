@@ -321,6 +321,217 @@ export async function addProject( // make it not break when project table doesnt
   redirect('/dashboard/projects');
 }
 
+export async function addEmptyExpense() {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    console.error("Session was unable to be retrieved!");
+    return {
+      success: false,
+      message: "Session was unable to be retrieved!",
+    };
+  }
+
+  const employeeid = Number(session.user.id);
+  const user = await fetchEmployeeByID(employeeid)
+  const submittedby = user.username;
+
+  const datestartObj = DateTime.now().startOf('month')
+
+  const datestart = datestartObj.toLocaleString();
+  const numdays = datestartObj.endOf('month').day;
+
+  const usercommitted = false;
+	const mgrapproved = false;
+	const approvedby = null;
+	const processedby = null;
+  const paid = false;
+  const totalexpenses = 0.00;
+	const datepaid = null;
+
+  const addSuccess = await addExpenseHelper(
+    true,
+    employeeid,
+    submittedby,
+    datestart,
+    numdays,
+    usercommitted,
+		mgrapproved,
+		approvedby,
+		processedby,
+    paid,
+    totalexpenses,
+    datepaid
+  );
+
+  return {
+    ...addSuccess,
+    datestart,
+    numdays,
+    submittedby
+  }
+}
+
+// Only call this funciton if session and employee ID is verified, 
+// and the recipiant of the returned values has been authorized to recieve them.
+async function addExpenseHelper(
+  addBlankDetails: boolean,
+	employeeid: number,
+	submittedby: string,
+  datestart: string,
+  numdays: number,
+  usercommitted: boolean,
+  mgrapproved: boolean,
+  approvedby: string | null,
+	processedby: string | null,
+  paid: boolean,
+  totalexpenses: number,
+  datepaid: string | null
+) {
+  // Get Milage Rate
+  let milagerate: number;
+  try {
+    const mileagerateData = await sql`
+      SELECT rate
+      FROM mileagerates
+      ORDER BY DateStart DESC
+      LIMIT 1;
+    `;
+
+    milagerate = mileagerateData.rows[0].rate;
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      message: JSON.stringify(error),
+    };
+  }
+
+  // Add a expense entry
+  let expenseID: number;
+  try {
+    const expenseIDData = await sql`
+      INSERT INTO expenses (
+        employeeid, datestart, usercommitted, mgrapproved, paid, totalexpenses,
+        approvedby, submittedby, processedby, datepaid, milagerate
+      )
+      VALUES (
+        ${employeeid}, ${datestart}, ${numdays}, ${usercommitted ? 1 : 0},
+        ${mgrapproved ? 1 : 0}, ${paid ? 1 : 0}, ${totalexpenses},
+        ${approvedby}, ${submittedby}, ${processedby}, ${datepaid}, ${milagerate}
+      )
+      RETURNING id;
+    `;
+	
+    expenseID = expenseIDData.rows[0].id;
+
+    // Add details if indicated in parameter
+	  if (addBlankDetails) {
+      const addExpenseDetailsRes = await addExpenseDetailsHelper({
+        expenseid: expenseID,
+        employeeid: employeeid,
+      });
+		  
+      if(!addExpenseDetailsRes.success) {
+        console.error('Database Error: Failed to Create Expense Details.');
+        return {
+          success: false,
+          message: "Database Error: Failed to Create Expense Details."
+        };
+      }
+	  }
+
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      message: JSON.stringify(error),
+    };
+  }
+  return {
+    success: true,
+    message: "Expense was added successfully!",
+    id: expenseID,
+    mileagerate: milagerate
+  };
+}
+
+async function addExpenseDetailsHelper({
+	expenseid,
+	employeeid,
+	jobid = 0,
+	purpose=null,
+	transportwhere=null,
+	transportation=null,
+	lodging = null,
+	cabsparking = null,
+	carrental = null,
+	miles = null,
+	mileage = null,
+	perdiem = null,
+	entertainment = null,
+	miscid = 0,
+	miscvalue = null,
+	total = null,
+	miscdetail = null,
+	entlocation = null,
+	entactivity = null,
+	entwho = null,
+	entpurpose = null,
+}: {
+	expenseid: number,
+	employeeid: number,
+	jobid?: number,
+	purpose?: string | null,
+	transportwhere?: string | null,
+	transportation?: number | null,
+	lodging?: number | null,
+	cabsparking?: number | null,
+	carrental?: number | null,
+	miles?: number | null,
+	mileage?: number | null,
+	perdiem?: number | null,
+	entertainment?: number | null,
+	miscid?: number,
+	miscvalue?: number | null,
+	total?: number | null,
+	miscdetail?: string | null,
+	entlocation?: string | null,
+	entactivity?: string | null,
+	entwho?: string | null,
+	entpurpose?: string | null,
+}) {
+	try {
+		await sql`
+			INSERT INTO expensedetails (
+			expenseid, employeeid, jobid,
+			purpose, transportwhere, transportation,
+			lodging, cabsparking, carrental, miles, mileage,
+			perdiem, entertainment, miscid, miscvalue, total,
+			miscdetail, entlocation, entactivity, entwho, entpurpose
+			)
+			VALUES (
+			${expenseid}, ${employeeid}, ${jobid},
+			${purpose}, ${transportwhere}, ${transportation},
+			${lodging}, ${cabsparking}, ${carrental}, ${miles}, ${mileage},
+			${perdiem}, ${entertainment}, ${miscid}, ${miscvalue}, ${total},
+			${miscdetail}, ${entlocation}, ${entactivity}, ${entwho}, ${entpurpose}
+			)
+		`;
+
+		return {
+			success: true,
+			message: "Successfully added Expense Details!"
+		}
+	} catch (error) {
+		console.log(error);
+		return {
+			success: false,
+			message: JSON.stringify(error)
+		};
+	}
+}
+
 export async function fetchExpensesWithAuth() {
 
 	const session = await getServerSession(authOptions);
@@ -719,27 +930,28 @@ async function addTimesheetHelper(
 	
     timesheetID = timesheetIDData.rows[0].id;
 
-	if (addBlankDetails) {
-		const addTimesheetDetailsRes = await addTimesheetDetailsHelper({
-			timesheetid: timesheetID,
-			employeeid: employeeid,
-		});
+    // Add details if indicated in parameter
+	  if (addBlankDetails) {
+      const addTimesheetDetailsRes = await addTimesheetDetailsHelper({
+        timesheetid: timesheetID,
+        employeeid: employeeid,
+      });
 		  
-		if(!addTimesheetDetailsRes.success) {
-			console.error('Database Error: Failed to Create TimesheetDetails.');
-			return {
-				success: false,
-				message: "Database Error: Failed to Create TimesheetDetails."
-			};
-		}
-	}
+      if(!addTimesheetDetailsRes.success) {
+        console.error('Database Error: Failed to Create TimesheetDetails.');
+        return {
+          success: false,
+          message: "Database Error: Failed to Create TimesheetDetails."
+        };
+      }
+	  }
 
   } catch (error) {
     console.error(error);
-	return {
-		success: false,
-		message: JSON.stringify(error),
-	  };
+    return {
+      success: false,
+      message: JSON.stringify(error),
+    };
   }
   return {
     success: true,
@@ -816,7 +1028,7 @@ async function addTimesheetDetailsHelper({
     await sql`
     INSERT INTO timesheetdetails (
       timesheetid, employeeid, projectid,
-	  phase, costcode, description,
+      phase, costcode, description,
       mon, monot,
       tues, tuesot,
       wed, wedot,
@@ -824,11 +1036,11 @@ async function addTimesheetDetailsHelper({
       fri, friot,
       sat, satot,
       sun, sunot,
-	  lasteditdate
+	    lasteditdate
     )
     VALUES (
       ${timesheetid}, ${employeeid}, ${projectid},
-	  ${phase}, ${costcode}, ${description},
+      ${phase}, ${costcode}, ${description},
       ${mon}, ${monot},
       ${tues}, ${tuesot},
       ${wed}, ${wedot},
@@ -836,13 +1048,13 @@ async function addTimesheetDetailsHelper({
       ${fri}, ${friot},
       ${sat}, ${satot},
       ${sun}, ${sunot},
-	  ${currentDate}
+	    ${currentDate}
     )
     `;
 
     return {
       success: true,
-      message: "Successfully added timesheet details!"
+      message: "Successfully added Timesheet Details!"
     }
   } catch (error) {
     console.log(error);
@@ -1195,6 +1407,7 @@ export async function editTimesheetDetails(
 
 }
 
+// Deprecated
 async function timesheetDetailsBelongsToTimesheet(timesheetDetailsID: number, timesheetID: number) {
 	try{
 		const belongsData = await sql`
@@ -1338,6 +1551,7 @@ export async function fetchTimesheetDetailsEditFormData(
 
 }
 
+// Deprecated
 export async function deleteTimesheetDetails(
 	timesheetDetailsID: number,
 ) {
@@ -1422,6 +1636,7 @@ export async function deleteTimesheetDetails(
 	redirect('/dashboard/' + timesheetid + '/edit/details');
 }
 
+// Deprecated
 export async function editTimesheet( // Check if user has permissions to edit
 	timesheetid: number,
 	prevState: EmployeeState,
