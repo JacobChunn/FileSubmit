@@ -2,7 +2,7 @@
 
 import { deleteTimesheetDetails, editTimesheetDetails, fetchTimesheetDetailsEditFormData } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
-import { Options, TimesheetDetails, SavingState, timesheetDetailsLabels } from '@/app/lib/definitions';
+import { Options, TimesheetDetails, SavingState } from '@/app/lib/definitions';
 import FormTextEntry from '@/app/ui/forms/edit-form/form-entry';
 import FormBoolEntry from '@/app/ui/forms/edit-form/form-bool-entry';
 import FormErrorHandling from '@/app/ui/forms/form-error-handling';
@@ -163,11 +163,11 @@ export default function TimesheetDetailsEditForm({
 		notFound();
 	}
 
-    const {
-        id, project, phase, costcode, phase_costcode, description, mon, monot, 
-        tues, tuesot, wed, wedot, thurs, thursot, 
-        fri, friot, sat, satot, sun, sunot 
-    } = timesheetDetailsLabels;
+    // const {
+    //     id, project, phase, costcode, phase_costcode, description, mon, monot, 
+    //     tues, tuesot, wed, wedot, thurs, thursot, 
+    //     fri, friot, sat, satot, sun, sunot 
+    // } = timesheetDetailsLabels;
 
 	const tableHeaders = [
 		"Project", "Phase - Cost Code", "Description",
@@ -302,9 +302,9 @@ export default function TimesheetDetailsEditForm({
 							<td className={projectRowStyle}>
 								{/* Hidden TSD id */}
 								<input
-									id={"TSD" + index + "[" + id + "]"}
-									key={"TSD" + index + "[" + id + "]"}
-									name={"TSD" + index + "[" + id + "]"}
+									id={"TSD" + index + "[" + "id" + "]"}
+									key={"TSD" + index + "[" + "id" + "]"}
+									name={"TSD" + index + "[" + "id" + "]"}
 									value={val.id}
 									className='w-0'
 									readOnly
@@ -315,7 +315,7 @@ export default function TimesheetDetailsEditForm({
 								<ControlledSelect
 									index={index}
 									attr='projectid'
-									info={"TSD" + index + "[" + project + "]"}
+									info={"TSD" + index + "[" + "project" + "]"}
 									value={val.projectid}
 									dbValue={dbVal?.projectid}
 									className = {selectStyle}
@@ -331,7 +331,7 @@ export default function TimesheetDetailsEditForm({
 									index={index}
 									phaseAttr='phase'
 									costcodeAttr='costcode'
-									info={"TSD" + index + "[" + phase_costcode + "]"}
+									info={"TSD" + index + "[" + "phase_costcode" + "]"}
 									phaseValue={val.phase}
 									costcodeValue={val.costcode}
 									phaseDbValue={dbVal?.phase}
@@ -348,7 +348,7 @@ export default function TimesheetDetailsEditForm({
 								<InputDetailsDesc
 									index={index}
 									attr='description'
-									info={"TSD" + index + "[" + description + "]"}
+									info={"TSD" + index + "[" + "description" + "]"}
 									value={val.description}
 									dbValue={dbVal?.description}
 									readOnly={isNotEditable}
@@ -360,7 +360,7 @@ export default function TimesheetDetailsEditForm({
 								<InputDetailsNumber
 									index={index}
 									attr='mon'
-									info={"TSD" + index + "[" + mon + "]"}
+									info={"TSD" + index + "[" + "mon" + "]"}
 									className={dayStyle}
 									value={val.mon}
 									dbValue={dbVal?.mon}
@@ -369,7 +369,7 @@ export default function TimesheetDetailsEditForm({
 								<InputDetailsNumber
 									index={index}
 									attr='monot'
-									info={"TSD" + index + "[" + monot + "]"}
+									info={"TSD" + index + "[" + "monOT" + "]"}
 									className={dayStyle}
 									isOT={true}
 									value={val.monot}
@@ -383,7 +383,7 @@ export default function TimesheetDetailsEditForm({
 								<InputDetailsNumber
 									index={index}
 									attr='tues'
-									info={"TSD" + index + "[" + tues + "]"}
+									info={"TSD" + index + "[" + "tues" + "]"}
 									className={dayStyle}
 									value={val.tues}
 									dbValue={dbVal?.tues}
@@ -392,7 +392,7 @@ export default function TimesheetDetailsEditForm({
 								<InputDetailsNumber
 									index={index}
 									attr='tuesot'
-									info={"TSD" + index + "[" + tuesot + "]"}
+									info={"TSD" + index + "[" + "tuesOT" + "]"}
 									className={dayStyle}
 									isOT={true}
 									value={val.tuesot}
@@ -406,7 +406,7 @@ export default function TimesheetDetailsEditForm({
 								<InputDetailsNumber
 									index={index}
 									attr='wed'
-									info={"TSD" + index + "[" + wed + "]"}
+									info={"TSD" + index + "[" + "wed" + "]"}
 									className={dayStyle}
 									value={val.wed}
 									dbValue={dbVal?.wed}
@@ -415,7 +415,7 @@ export default function TimesheetDetailsEditForm({
 								<InputDetailsNumber
 									index={index}
 									attr='wedot'
-									info={"TSD" + index + "[" + wedot + "]"}
+									info={"TSD" + index + "[" + "wedOT" + "]"}
 									className={dayStyle}
 									isOT={true}
 									value={val.wedot}
@@ -429,7 +429,7 @@ export default function TimesheetDetailsEditForm({
 								<InputDetailsNumber
 									index={index}
 									attr='thurs'
-									info={"TSD" + index + "[" + thurs + "]"}
+									info={"TSD" + index + "[" + "thurs" + "]"}
 									className={dayStyle}
 									value={val.thurs}
 									dbValue={dbVal?.thurs}
@@ -438,7 +438,7 @@ export default function TimesheetDetailsEditForm({
 								<InputDetailsNumber
 									index={index}
 									attr='thursot'
-									info={"TSD" + index + "[" + thursot + "]"}
+									info={"TSD" + index + "[" + "thursOT" + "]"}
 									className={dayStyle}
 									isOT={true}
 									value={val.thursot}
@@ -452,7 +452,7 @@ export default function TimesheetDetailsEditForm({
 								<InputDetailsNumber
 									index={index}
 									attr='fri'
-									info={"TSD" + index + "[" + fri + "]"}
+									info={"TSD" + index + "[" + "fri" + "]"}
 									className={dayStyle}
 									value={val.fri}
 									dbValue={dbVal?.fri}
@@ -461,7 +461,7 @@ export default function TimesheetDetailsEditForm({
 								<InputDetailsNumber
 									index={index}
 									attr='friot'
-									info={"TSD" + index + "[" + friot + "]"}
+									info={"TSD" + index + "[" + "friOT" + "]"}
 									className={dayStyle}
 									isOT={true}
 									value={val.friot}
@@ -475,7 +475,7 @@ export default function TimesheetDetailsEditForm({
 								<InputDetailsNumber
 									index={index}
 									attr='sat'
-									info={"TSD" + index + "[" + sat + "]"}
+									info={"TSD" + index + "[" + "sat" + "]"}
 									className={dayStyle}
 									value={val.sat}
 									dbValue={dbVal?.sat}
@@ -484,7 +484,7 @@ export default function TimesheetDetailsEditForm({
 								<InputDetailsNumber
 									index={index}
 									attr='satot'
-									info={"TSD" + index + "[" + satot + "]"}
+									info={"TSD" + index + "[" + "satOT" + "]"}
 									className={dayStyle}
 									isOT={true}
 									value={val.satot}
@@ -498,7 +498,7 @@ export default function TimesheetDetailsEditForm({
 								<InputDetailsNumber
 									index={index}
 									attr='sun'
-									info={"TSD" + index + "[" + sun + "]"}
+									info={"TSD" + index + "[" + "sun" + "]"}
 									className={dayStyle}
 									value={val.sun}
 									dbValue={dbVal?.sun}
@@ -507,7 +507,7 @@ export default function TimesheetDetailsEditForm({
 								<InputDetailsNumber
 									index={index}
 									attr='sunot'
-									info={"TSD" + index + "[" + sunot + "]"}
+									info={"TSD" + index + "[" + "sunOT" + "]"}
 									className={dayStyle}
 									isOT={true}
 									value={val.sunot}

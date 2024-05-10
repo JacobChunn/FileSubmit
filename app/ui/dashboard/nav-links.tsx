@@ -14,7 +14,7 @@ import { usePathname } from 'next/navigation';
 // Depending on the size of the application, this would be stored in a database.
 const links = [
 	{ name: 'Timesheets', href: '/dashboard', icon: DocumentIcon },
-	{ name: 'Expenses', href: '/expenses', icon: BanknotesIcon },
+	{ name: 'Expenses', href: '/dashboard/expenses', icon: BanknotesIcon },
 	{ name: 'Employees', href: '/dashboard/employees', icon: UserGroupIcon },
 	{ name: 'Projects', href: '/dashboard/projects', icon: BriefcaseIcon },
 ];

@@ -6,7 +6,7 @@ import { revalidatePath, unstable_noStore } from 'next/cache';
 import { redirect } from 'next/navigation';
 //import { signIn } from '@/auth';
 //import { AuthError } from 'next-auth';
-import { CostCodeOption, EmployeeState, Options, PhaseCostCodeOption, PhaseOption, ProjectOption, ProjectState, Timesheet, TimesheetDetails } from './definitions';
+import { CostCodeOption, EmployeeState, Expense, Options, PhaseCostCodeOption, PhaseOption, ProjectOption, ProjectState, Timesheet, TimesheetDetails } from './definitions';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../api/auth/[...nextauth]/options';
 import { fetchEmployeeByID, fetchTimesheetsByEmployeeID } from './data';
@@ -319,6 +319,53 @@ export async function addProject( // make it not break when project table doesnt
 
   revalidatePath('/dashboard/projects');
   redirect('/dashboard/projects');
+}
+
+export async function fetchExpensesWithAuth() {
+
+	const session = await getServerSession(authOptions);
+  
+	if (!session) {
+		console.log("Session was unable to be retrieved!");
+		return null;
+	
+	}
+  
+	const employeeid = Number(session.user.id);
+
+	if (isNaN(employeeid)) {
+		console.error('id is not a number');
+		return null;
+	}
+  
+	try {
+		const data = await sql<Expense>`
+			SELECT
+				id,
+				employeeid,
+				datestart,
+				numdays,
+				usercommitted,
+				mgrapproved,
+				paid,
+				totalexpenses,
+				submittedby,
+				approvedby,
+				processedby,
+				datepaid,
+				mileagerate
+			FROM expenses
+			WHERE employeeid = ${employeeid}
+			ORDER BY datestart DESC;
+		`;
+		const dataRows = data.rows;
+		//console.log(employeeid, dataRows);
+		return dataRows;
+	} catch (error) {
+		console.error('Database Error:', error);
+		return null;
+	}
+  
 }
 
 // Deprecated in favor of addEmptyTimesheet and duplicateTimesheet

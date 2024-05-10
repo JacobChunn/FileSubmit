@@ -175,22 +175,90 @@ export type ProjectState = {
   message?: string | null;
 };
 
+export type Expense = {
+	id: number;
+	employeeid: number;
+	datestart: string;
+	numdays: number;
+	usercommitted: boolean;
+	mgrapproved: boolean;
+	paid: boolean;
+	totalexpenses: number;
+	submittedby: string;
+	approvedby: string;
+	processedby: string;
+	datepaid: string;
+	mileagerate: number;
+}
+
+// Will need to be edited
+export type ExpenseDetailsExtended = {
+	id: number;
+	expenseid: number;
+	employeeid: number;
+	jobid: number;
+	purpose: string | null;
+	transportwhere: string | null;
+	transportation: number | null;
+	lodging: number | null;
+	cabsparking: number | null;
+	carrental: number | null;
+	miles: number | null;
+	mileage: number | null;
+	perdiem: number | null;
+	entertainment: number | null;
+	miscid: number;
+	miscvalue: number | null;
+	total: number | null;
+	miscdetail: string | null;
+	entlocation: string | null;
+	entactivity: string | null;
+	entwho: string | null;
+	entpurpose: string | null;
+}
+
+export type ExpenseDetails = {
+	id: number;
+	expenseid: number;
+	employeeid: number;
+	jobid: number;
+	purpose: string | null;
+	transportwhere: string | null;
+	transportation: number | null;
+	lodging: number | null;
+	cabsparking: number | null;
+	carrental: number | null;
+	miles: number | null;
+	mileage: number | null;
+	perdiem: number | null;
+	entertainment: number | null;
+	miscid: number;
+	miscvalue: number | null;
+	total: number | null;
+	miscdetail: string | null;
+	entlocation: string | null;
+	entactivity: string | null;
+	entwho: string | null;
+	entpurpose: string | null;
+}
+
 export type Timesheet = {
-  id: number;
-  employeeid: number;
-  weekending: string;
-  processed: boolean;
-  mgrapproved: boolean;
-  usercommitted: boolean;
-  totalreghours: number;
-  totalovertime: number;
-  approvedby: string;
-  submittedby: string;
-  processedby: string;
-  dateprocessed: string;
-  message: string | null;
+	id: number;
+	employeeid: number;
+	weekending: string;
+	processed: boolean;
+	mgrapproved: boolean;
+	usercommitted: boolean;
+	totalreghours: number;
+	totalovertime: number;
+	approvedby: string;
+	submittedby: string;
+	processedby: string;
+	dateprocessed: string;
+	message: string | null;
 };
 
+// Usages are deprecated
 export type TimesheetEditInfo = {
   weekending: string;
   usercommitted: boolean;
@@ -199,28 +267,7 @@ export type TimesheetEditInfo = {
   message: string;
 };
 
-export type TimesheetState = {
-  errors?:
-    | {
-        [key: string]: string[] | undefined;
-        id?: string[];
-        employeeid?: string[];
-        weekending?: string[];
-        processed?: string[];
-        mgrapproved?: string[];
-        usercommitted?: string[];
-        totalreghours?: string[];
-        totalovertime?: string[];
-        approvedby?: string[];
-        submittedby?: string[];
-        processedby?: string[];
-        dateprocessed?: string[];
-        message?: string[];
-      }
-    | undefined;
-  message?: string | null;
-};
-
+// Used for allowing empty values to be entered in for work hours
 export type TimesheetDetailsExtended = {
 	id: number;
 	timesheetid: number;
@@ -269,54 +316,6 @@ export type TimesheetDetails = {
   sun: number;
   sunot: number;
   lasteditdate: string;
-};
-
-export type TimesheetDetailsEditInfo = {
-  id: number;
-  timesheetid: number;
-  employeeid: number;
-  projectid: number;
-  phase: number;
-  costcode: number;
-  description: string | null ;
-  mon: number;
-  monot: number;
-  tues: number;
-  tuesot: number;
-  wed: number;
-  wedot: number;
-  thurs: number;
-  thursot: number;
-  fri: number;
-  friot: number;
-  sat: number;
-  satot: number;
-  sun: number;
-  sunot: number;
-  lasteditdate: string;
-};
-
-export const timesheetDetailsLabels = {
-	id: "id",
-	project: 'project',
-	phase: 'phase',
-	costcode: 'costcode',
-	phase_costcode: 'phase_costcode',
-	description: 'description',
-	mon: 'mon',
-	monot: 'monOT',
-	tues: 'tues',
-	tuesot: 'tuesOT',
-	wed: 'wed',
-	wedot: 'wedOT',
-	thurs: 'thurs',
-	thursot: 'thursOT',
-	fri: 'fri',
-	friot: 'friOT',
-	sat: 'sat',
-	satot: 'satOT',
-	sun: 'sun',
-	sunot: 'sunOT',
 };
 
 export type SavingState = "signed" | "unsaved" | "saving" | "saved" | null;

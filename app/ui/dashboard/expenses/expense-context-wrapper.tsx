@@ -1,6 +1,6 @@
 "use client"
 
-import { SavingState, Timesheet, TimesheetDetailsExtended,  } from "@/app/lib/definitions";
+import { Expense, ExpenseDetailsExtended, SavingState } from "@/app/lib/definitions";
 import { DateTime } from "luxon";
 import { createContext, useState } from "react";
 
@@ -8,26 +8,26 @@ type expenseContextType = {
     selectedExpense: number | null;
     setSelectedExpense: React.Dispatch<React.SetStateAction<number | null>>;
 
-    localTimesheets: Timesheet[] | null;
-    setLocalTimesheets: React.Dispatch<React.SetStateAction<Timesheet[] | null>>;
+    localExpenses: Expense[] | null;
+    setLocalExpenses: React.Dispatch<React.SetStateAction<Expense[] | null>>;
 
-    localTimesheetDetails: TimesheetDetailsExtended[] | null;
-    setLocalTimesheetDetails: React.Dispatch<React.SetStateAction<TimesheetDetailsExtended[] | null>>;
+    localExpenseDetails: ExpenseDetailsExtended[] | null;
+    setLocalExpenseDetails: React.Dispatch<React.SetStateAction<ExpenseDetailsExtended[] | null>>;
 
-    databaseTimesheetDetails: TimesheetDetailsExtended[] | null;
-    setDatabaseTimesheetDetails: React.Dispatch<React.SetStateAction<TimesheetDetailsExtended[] | null>>;
+    databaseExpenseDetails: ExpenseDetailsExtended[] | null;
+    setDatabaseExpenseDetails: React.Dispatch<React.SetStateAction<ExpenseDetailsExtended[] | null>>;
 
-    timesheetDetailsState: SavingState;
-    setTimesheetDetailsState: React.Dispatch<React.SetStateAction<SavingState>>;
+    expenseDetailsState: SavingState;
+    setExpenseDetailsState: React.Dispatch<React.SetStateAction<SavingState>>;
 
-	localTimesheetWeekEnding: DateTime<true> | DateTime<false> | null;
-	setLocalTimesheetWeekEnding: React.Dispatch<React.SetStateAction<DateTime<true> | DateTime<false> | null>>;
+	localExpenseDateStart: DateTime<true> | DateTime<false> | null;
+	setLocalExpenseDateStart: React.Dispatch<React.SetStateAction<DateTime<true> | DateTime<false> | null>>;
 
-	databaseTimesheetWeekEnding: DateTime<true> | DateTime<false> | null;
-	setDatabaseTimesheetWeekEnding: React.Dispatch<React.SetStateAction<DateTime<true> | DateTime<false> | null>>;
+	databaseExpenseDateStart: DateTime<true> | DateTime<false> | null;
+	setDatabaseExpenseDateStart: React.Dispatch<React.SetStateAction<DateTime<true> | DateTime<false> | null>>;
 
-    timesheetIsSaving: boolean;
-    setTimesheetIsSaving: React.Dispatch<React.SetStateAction<boolean>>;
+    expenseIsSaving: boolean;
+    setExpenseIsSaving: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const ExpenseContext = createContext<expenseContextType | null>(null)
@@ -38,26 +38,26 @@ export default function ExpenseContextWrapper({
     children: React.ReactNode,
 }) {
 
-	const [selectedTimesheet, setSelectedTimesheet] = useState<number | null>(null);
-    const [localTimesheets, setLocalTimesheets] = useState<Timesheet[] | null>(null);
-    const [localTimesheetDetails, setLocalTimesheetDetails] = useState<TimesheetDetailsExtended[] | null>(null);
-    const [databaseTimesheetDetails, setDatabaseTimesheetDetails] = useState<TimesheetDetailsExtended[] | null>(null);
-    const [timesheetDetailsState, setTimesheetDetailsState] = useState<SavingState>(null);
-	const [localTimesheetWeekEnding, setLocalTimesheetWeekEnding] = useState<DateTime<true> | DateTime<false> | null>(null);
-	const [databaseTimesheetWeekEnding, setDatabaseTimesheetWeekEnding] = useState<DateTime<true> | DateTime<false> | null>(null);
-    const [timesheetIsSaving, setTimesheetIsSaving] = useState<boolean>(false);
+	const [selectedExpense, setSelectedExpense] = useState<number | null>(null);
+    const [localExpenses, setLocalExpenses] = useState<Expense[] | null>(null);
+    const [localExpenseDetails, setLocalExpenseDetails] = useState<ExpenseDetailsExtended[] | null>(null);
+    const [databaseExpenseDetails, setDatabaseExpenseDetails] = useState<ExpenseDetailsExtended[] | null>(null);
+    const [expenseDetailsState, setExpenseDetailsState] = useState<SavingState>(null);
+	const [localExpenseDateStart, setLocalExpenseDateStart] = useState<DateTime<true> | DateTime<false> | null>(null);
+	const [databaseExpenseDateStart, setDatabaseExpenseDateStart] = useState<DateTime<true> | DateTime<false> | null>(null);
+    const [expenseIsSaving, setExpenseIsSaving] = useState<boolean>(false);
 
     return (
         <ExpenseContext.Provider
             value={{
-                selectedTimesheet, setSelectedTimesheet,
-                localTimesheets, setLocalTimesheets,
-                localTimesheetDetails, setLocalTimesheetDetails,
-                databaseTimesheetDetails, setDatabaseTimesheetDetails,
-                timesheetDetailsState, setTimesheetDetailsState,
-				localTimesheetWeekEnding, setLocalTimesheetWeekEnding,
-				databaseTimesheetWeekEnding, setDatabaseTimesheetWeekEnding,
-                timesheetIsSaving, setTimesheetIsSaving,
+                selectedExpense, setSelectedExpense,
+                localExpenses, setLocalExpenses,
+                localExpenseDetails, setLocalExpenseDetails,
+                databaseExpenseDetails, setDatabaseExpenseDetails,
+                expenseDetailsState, setExpenseDetailsState,
+				localExpenseDateStart, setLocalExpenseDateStart,
+				databaseExpenseDateStart, setDatabaseExpenseDateStart,
+                expenseIsSaving, setExpenseIsSaving,
             }}
         >
             {children}
