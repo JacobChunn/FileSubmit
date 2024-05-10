@@ -1,4 +1,5 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+import AddExpenseButton from "@/app/ui/dashboard/expenses/add-expense-button";
 import ExpenseContextWrapper from "@/app/ui/dashboard/expenses/expense-context-wrapper";
 import ExpenseWrapper from "@/app/ui/dashboard/expenses/expense-wrapper";
 import ExpenseTableBody from "@/app/ui/dashboard/expenses/table/expense-table-body";
@@ -29,10 +30,10 @@ export default async function Page() {
 			<div className='flex space-x-6'>
 				<ExpenseContextWrapper>
 					<ExpenseWrapper>
-						{/* <div className='flex items-center justify-end gap-3'>
+						<div className='flex items-center justify-end gap-3'>
 							<AddExpenseButton className = "pb-2"/>
-							<DuplicateExpenseButton className = "pb-2"/>
-						</div> */}
+							{/* <DuplicateExpenseButton className = "pb-2"/> */}
+						</div>
 						<ExpenseTableWrapper>
 							<ExpenseTableHeader/>
 							<ExpenseTableBody/>

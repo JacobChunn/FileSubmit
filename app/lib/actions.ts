@@ -389,7 +389,7 @@ async function addExpenseHelper(
   datepaid: string | null
 ) {
   // Get Milage Rate
-  let milagerate: number;
+  let mileagerate: number;
   try {
     const mileagerateData = await sql`
       SELECT rate
@@ -398,7 +398,7 @@ async function addExpenseHelper(
       LIMIT 1;
     `;
 
-    milagerate = mileagerateData.rows[0].rate;
+    mileagerate = mileagerateData.rows[0].rate;
   } catch (error) {
     console.error(error);
     return {
@@ -412,13 +412,14 @@ async function addExpenseHelper(
   try {
     const expenseIDData = await sql`
       INSERT INTO expenses (
-        employeeid, datestart, usercommitted, mgrapproved, paid, totalexpenses,
-        approvedby, submittedby, processedby, datepaid, milagerate
+        employeeid, datestart, numdays, usercommitted,
+		mgrapproved, paid, totalexpenses,
+        approvedby, submittedby, processedby, datepaid, mileagerate
       )
       VALUES (
         ${employeeid}, ${datestart}, ${numdays}, ${usercommitted ? 1 : 0},
         ${mgrapproved ? 1 : 0}, ${paid ? 1 : 0}, ${totalexpenses},
-        ${approvedby}, ${submittedby}, ${processedby}, ${datepaid}, ${milagerate}
+        ${approvedby}, ${submittedby}, ${processedby}, ${datepaid}, ${mileagerate}
       )
       RETURNING id;
     `;
@@ -452,7 +453,7 @@ async function addExpenseHelper(
     success: true,
     message: "Expense was added successfully!",
     id: expenseID,
-    mileagerate: milagerate
+    mileagerate: mileagerate
   };
 }
 
