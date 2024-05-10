@@ -1,10 +1,9 @@
 "use client"
-import { Button } from "@/app/ui/button"
-import { useContext, useEffect, useState } from "react"
+import { useContext } from "react"
 import { TimesheetContext } from "../timesheet-context-wrapper"
 import { TimesheetDetails } from "@/app/lib/definitions"
 import SignTimesheetToggleButton from "./sign-timesheet-toggle-button"
-import DetailsStateIndicator from "./details-state-indicator"
+import TimesheetDetailsStateIndicator from "./details-state-indicator"
 import WeekEditor from "./week-editor"
 
 export default function TimesheetDetailsHeader({
@@ -13,11 +12,6 @@ export default function TimesheetDetailsHeader({
 	children?: React.ReactNode
 }) {
 	const context = useContext(TimesheetContext)
-	const [changedTSD, setChangedTSD] = useState<number>(0);
-
-	// useEffect(() => {
-		
-	// }, [changedTSD]);
 
 	if (context == null) {
 		throw new Error(
@@ -73,7 +67,7 @@ export default function TimesheetDetailsHeader({
 	return (
 		<div className="w-full h-full">
 			<div className="flex justify-between pb-2">
-				<DetailsStateIndicator/>
+				<TimesheetDetailsStateIndicator/>
 				<WeekEditor/>
 				<div className="flex items-center space-x-1">
 					<SignTimesheetToggleButton/>

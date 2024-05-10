@@ -1,17 +1,17 @@
 import { useContext } from "react";
-import { TimesheetContext } from "../timesheet-context-wrapper";
+import { ExpenseContext } from "../expense-context-wrapper";
 
-export default function TimesheetDetailsStateIndicator() {
-	const context = useContext(TimesheetContext);
+export default function ExpenseDetailsStateIndicator() {
+	const context = useContext(ExpenseContext);
     if (context == null) {
 		throw new Error(
-			"context has to be used within <TimesheetContext.Provider>"
+			"context has to be used within <ExpenseContext.Provider>"
 		);
 	}
 
     let stateDisplayText = "";
     let stateStyles = "";
-    switch (context.timesheetDetailsState) {
+    switch (context.expenseDetailsState) {
         case "saved":
             stateDisplayText = "Saved!"
             stateStyles = "text-blue-500"

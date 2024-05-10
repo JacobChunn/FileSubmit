@@ -75,6 +75,56 @@ const ProjectSchema = z.object({
 const AddProject = ProjectSchema.omit({ id: true });
 const EditProject = ProjectSchema.omit({ id: true });
 
+const ExpenseSchema = z.object({
+	id: z.coerce.number(),
+	employeeid: z.coerce.number(),
+	datestart: z.coerce.date(),
+	numdays: z.coerce.number(),
+	usercommitted: z.coerce.boolean(),
+	mgrapproved: z.coerce.boolean(),
+	paid: z.coerce.boolean(),
+	totalexpenses: z.coerce.number(),
+    submittedby: z.string().max(32).nullable(),
+    approvedby: z.string().max(32).nullable(),
+    processedby: z.string().max(32).nullable(),
+    datepaid: z.coerce.date().nullable(),
+	mileagerate: z.coerce.number(),
+})
+
+const OnlyExpenseID = ExpenseSchema.pick({ id: true });
+
+const ExpenseDetailsSchema = z.object({
+    id: z.number(),
+    expenseid: z.number(),
+    employeeid: z.number(),
+    jobid: z.number(),
+    purpose: z.string().nullable(),
+    transportwhere: z.string().max(1024).nullable(),
+    transportation: z.number().min(0.0).nullable(),
+    lodging: z.number().min(0.0).nullable(),
+    cabsparking: z.number().min(0.0).nullable(),
+    carrental: z.number().min(0.0).nullable(),
+    miles: z.number().min(0.0).nullable(),
+    mileage: z.number().min(0.0).nullable(),
+    perdiem: z.number().min(0.0).nullable(),
+    entertainment: z.number().min(0.0).nullable(),
+    miscid: z.number(),
+    miscvalue: z.number().min(0.0).nullable(),
+    total: z.number().min(0.0).nullable(),
+    miscdetail: z.string().max(1024).nullable(),
+    entlocation: z.string().max(1024).nullable(),
+    entactivity: z.string().max(1024).nullable(),
+    entwho: z.string().max(1024).nullable(),
+    entpurpose: z.string().max(1024).nullable(),
+});
+
+const EditExpenseDetails = ExpenseDetailsSchema.omit({
+	expenseid: true,
+	employeeid: true,
+	total: true,
+	mileage: true,
+});
+
 const TimesheetSchema = z.object({
   id: z.coerce.number(),
   employeeid: z.coerce.number(),
@@ -82,8 +132,8 @@ const TimesheetSchema = z.object({
   processed: z.coerce.boolean(),
   mgrapproved: z.coerce.boolean(),
   usercommitted: z.coerce.boolean(),
-  totalreghours: z.coerce.number(),
-  totalovertime: z.coerce.number(),
+  totalreghours: z.coerce.number().min(0.0),
+  totalovertime: z.coerce.number().min(0.0),
   approvedby: z.string().max(32),
   submittedby: z.string().max(32),
   processedby: z.string().max(32),
@@ -91,6 +141,9 @@ const TimesheetSchema = z.object({
   message: z.string().max(4096),
 });
 
+const OnlyTimesheetID = TimesheetSchema.pick({ id: true });
+
+// Usages are deprecated
 const AddTimesheet = TimesheetSchema.pick({
   weekending: true,
   usercommitted: true,
@@ -98,6 +151,8 @@ const AddTimesheet = TimesheetSchema.pick({
   totalovertime: true,
   message: true,
 })
+
+// Usages are deprecated
 const EditTimesheet = TimesheetSchema.pick({
   id: true,
   weekending: true,
@@ -106,7 +161,7 @@ const EditTimesheet = TimesheetSchema.pick({
   totalovertime: true,
   message: true,
 })
-const DeleteTimesheet = TimesheetSchema.pick({ id: true })
+
 
 const TimesheetDetailsSchema = z.object({
   id: z.coerce.number(),
@@ -134,15 +189,10 @@ const TimesheetDetailsSchema = z.object({
   lasteditdate: z.coerce.date(),
 });
 
-//const EditTimesheetDetails = z.array(TimesheetDetailsSchema.omit({employeeid: true}));
 const EditTimesheetDetails = TimesheetDetailsSchema.omit({
 	timesheetid: true,
 	employeeid: true,
 	lasteditdate: true,
-});
-
-const SingleTimesheetID = z.object({
-	timesheetid: z.coerce.number()
 });
 
 const WeekEndingSchema = z.object({
@@ -375,18 +425,18 @@ export async function addEmptyExpense() {
 // Only call this funciton if session and employee ID is verified, 
 // and the recipiant of the returned values has been authorized to recieve them.
 async function addExpenseHelper(
-  addBlankDetails: boolean,
+	addBlankDetails: boolean,
 	employeeid: number,
 	submittedby: string,
-  datestart: string,
-  numdays: number,
-  usercommitted: boolean,
-  mgrapproved: boolean,
-  approvedby: string | null,
+	datestart: string,
+	numdays: number,
+	usercommitted: boolean,
+	mgrapproved: boolean,
+	approvedby: string | null,
 	processedby: string | null,
-  paid: boolean,
-  totalexpenses: number,
-  datepaid: string | null
+	paid: boolean,
+	totalexpenses: number,
+	datepaid: string | null
 ) {
   // Get Milage Rate
   let mileagerate: number;
@@ -578,6 +628,47 @@ export async function fetchExpensesWithAuth() {
 		return null;
 	}
   
+}
+
+export async function toggleExpenseSignedValue(expenseid: number) {
+	const validatedFields = OnlyExpenseID.safeParse({
+		id: expenseid,
+	});
+	
+	  // If form validation fails, return errors early. Otherwise, continue.
+	if (!validatedFields.success) {
+		return {
+			errors: validatedFields.error.flatten().fieldErrors,
+			message: 'Missing fields. Failed to validate expense ID.',
+		};
+	}
+	
+	const { id } = validatedFields.data;
+
+	// Get the user session to ensure they are who they say they are
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		console.log("Session was unable to be retrieved!");
+		return {
+			message: 'Session was unable to be retrieved!',
+		};
+	}
+	
+	const employeeid = Number(session.user.id);
+
+	try {
+		await sql`
+			UPDATE expenses
+			SET usercommitted = NOT usercommitted
+			WHERE id = ${id} AND employeeid = ${employeeid};
+		`;
+	} catch(error) {
+		console.error(error);
+		return {
+			message: 'Failed to toggle signed value!',
+		};
+	}
 }
 
 // Deprecated in favor of addEmptyTimesheet and duplicateTimesheet
@@ -1936,7 +2027,7 @@ export async function editProject(
 export async function deleteTimesheet(
   timesheetid: number
 ) {
-  const validatedFields = DeleteTimesheet.safeParse({
+  const validatedFields = OnlyTimesheetID.safeParse({
     id: timesheetid,
   });
 
@@ -2027,7 +2118,7 @@ async function deleteTimesheetDetailsByTimesheet(timesheetid: number) {
 }
 
 export async function toggleTimesheetSignedValue(timesheetid: number) {
-	const validatedFields = DeleteTimesheet.safeParse({
+	const validatedFields = OnlyTimesheetID.safeParse({
 		id: timesheetid,
 	});
 	
@@ -2035,7 +2126,7 @@ export async function toggleTimesheetSignedValue(timesheetid: number) {
 	if (!validatedFields.success) {
 		return {
 			errors: validatedFields.error.flatten().fieldErrors,
-			message: 'Missing Fields. Failed to Create Project.',
+			message: 'Missing fields. Failed to validate timesheet ID.',
 		};
 	}
 	
@@ -2065,7 +2156,6 @@ export async function toggleTimesheetSignedValue(timesheetid: number) {
 			message: 'Failed to toggle signed value!',
 		};
 	}
-
 }
 
 export async function createInvoice(prevState: InvoiceState, formData: FormData) {
