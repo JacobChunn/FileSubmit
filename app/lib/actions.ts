@@ -6,7 +6,7 @@ import { revalidatePath, unstable_noStore } from 'next/cache';
 import { redirect } from 'next/navigation';
 //import { signIn } from '@/auth';
 //import { AuthError } from 'next-auth';
-import { CostCodeOption, EmployeeState, Expense, Options, PhaseCostCodeOption, PhaseOption, ProjectOption, ProjectState, Timesheet, TimesheetDetails } from './definitions';
+import { CostCodeOption, EditDetailsType, EmployeeState, Expense, ExpenseDetails, ExpenseOptions, MiscOption, Options, PhaseCostCodeOption, PhaseOption, ProjectOption, ProjectState, Timesheet, TimesheetDetails } from './definitions';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../api/auth/[...nextauth]/options';
 import { fetchEmployeeByID, fetchTimesheetsByEmployeeID } from './data';
@@ -195,10 +195,10 @@ const EditTimesheetDetails = TimesheetDetailsSchema.omit({
 	lasteditdate: true,
 });
 
-const WeekEndingSchema = z.object({
-    weekEnding: z.string().regex(
+const DateSchema = z.object({
+    date: z.string().regex(
         /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|([+-]\d{2}:\d{2}))$/,
-        "weekEnding must be in valid ISO 8601 format"
+        "date must be in valid ISO 8601 format"
     )
 });
 
@@ -555,11 +555,11 @@ async function addExpenseDetailsHelper({
 	try {
 		await sql`
 			INSERT INTO expensedetails (
-			expenseid, employeeid, jobid,
-			purpose, transportwhere, transportation,
-			lodging, cabsparking, carrental, miles, mileage,
-			perdiem, entertainment, miscid, miscvalue, total,
-			miscdetail, entlocation, entactivity, entwho, entpurpose
+				expenseid, employeeid, jobid,
+				purpose, transportwhere, transportation,
+				lodging, cabsparking, carrental, miles, mileage,
+				perdiem, entertainment, miscid, miscvalue, total,
+				miscdetail, entlocation, entactivity, entwho, entpurpose
 			)
 			VALUES (
 			${expenseid}, ${employeeid}, ${jobid},
@@ -669,6 +669,367 @@ export async function toggleExpenseSignedValue(expenseid: number) {
 			message: 'Failed to toggle signed value!',
 		};
 	}
+}
+
+export async function fetchExpenseDetailsEditFormData(
+	expenseID: number
+) {
+	unstable_noStore();
+
+	const validatedExpense = z.number().safeParse(expenseID);
+
+	if (!validatedExpense.success) {
+		console.error(validatedExpense.error.flatten().fieldErrors);
+		throw new Error('Failed to Validate ExpenseID.')
+	}
+
+	// Ensure user is logged in
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		throw new Error('Failed to user Session.');
+	}
+	
+	const employeeID = Number(session.user.id);
+	const validatedExpenseID = validatedExpense.data;
+
+	// Ensure expenseID belongs to employee
+	// const validOwnership = await employeeOwnsExpense(employeeID, validatedExpenseID);
+	// if (!validOwnership) {
+	// 	throw new Error("Employee does not own provided expense!")
+	// }
+
+	try {
+		const EXDData = await sql<ExpenseDetails>`
+			SELECT
+				id, expenseid, employeeid, jobid,
+				purpose, transportwhere, transportation,
+				lodging, cabsparking, carrental, miles, mileage,
+				perdiem, entertainment, miscid, miscvalue, total,
+				miscdetail, entlocation, entactivity, entwho, entpurpose
+			FROM expensedetails
+			WHERE expensedetails.expenseid = ${validatedExpenseID}
+				AND expensedetails.employeeid = ${employeeID}
+		`;
+		const expenseDetails = EXDData.rows;
+		const projectsData = await sql<ProjectOption>`
+			SELECT id, number, shortname, description FROM projects;
+		`;
+	
+		const miscData = await sql<MiscOption>`
+		  SELECT id, description FROM misc;
+		`;
+
+		const projects = projectsData.rows;
+		const misc = miscData.rows;
+
+		const options: ExpenseOptions = {
+			projects,
+			misc,
+		}
+		
+		return {options, expenseDetails};
+
+	} catch (error) {
+		console.error('Database Error:', error);
+		throw error;
+	}
+}
+
+export async function editExpenseDetails(
+	expenseID: number,
+	prevState: any,
+	formData: FormData
+): Promise<EditDetailsType> {
+	//console.log(formData);
+
+	const validatedExpense = z.number().safeParse(expenseID);
+
+	// If form validation fails, return errors early. Otherwise, continue.
+	if (!validatedExpense.success) {
+		return {
+      		success: false,
+			errors: validatedExpense.error.flatten().fieldErrors,
+			message: 'Failed to Validate expenseID.',
+		};
+	}
+
+  	const validatedExpenseID = validatedExpense.data;
+
+	// Get user session and id
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		console.log("Session was unable to be retrieved!");
+		return {
+    		success: false,
+			message: 'Session was unable to be retrieved!',
+		};
+
+	}
+
+	const employeeID = Number(session.user.id);
+
+	// Ensure expenseID belongs to employee
+	// const validOwnership = await employeeOwnsExpense(employeeID, validatedExpenseID);
+	// if (!validOwnership) {
+	// 	console.log("Employee does not own provided expense!");
+	// 	return {
+	// 		success: false,
+	// 		message: 'Employee does not own provided expense!',
+	// 	};
+	// }
+
+	// Ensure that expense is not signed
+	try {
+		const expenseIsSigned = await sql`
+			SELECT usercommitted
+			FROM expense
+			WHERE id = ${validatedExpenseID}
+				AND employeeid = ${employeeID};
+		`;
+		console.log(expenseIsSigned.rows[0]);
+		if (expenseIsSigned.rows[0].usercommitted) {
+			return {
+				success: false,
+				message: 'Cannot edit a signed expense!'
+			}
+		}
+
+	} catch(error) {
+		console.error(error);
+		return {
+			success: false,
+			errors: JSON.stringify(error),
+			message: 'Error checking if expense is signed!'
+		}
+	}
+
+	// Validate DateStart
+  	let validatedDateStart;
+	try {
+		validatedDateStart = DateSchema.safeParse({
+			date: formData.get('dateStart')
+		})
+	} catch(error) {
+		console.error(error);
+		return {
+			success: false,
+			errors: JSON.stringify(error),
+			message: 'Error validating Week Ending value!'
+		}
+	}
+
+	if (!validatedDateStart.success) {
+		console.error(validatedDateStart.error);
+		return {
+			success: false,
+			errors: validatedDateStart.error.flatten().fieldErrors,
+			message: 'Error validating Date Start value!',
+		};
+	}
+
+	//console.log(validatedWeekEnding.data.weekEnding)
+
+	// Update DateStart for expense
+	try {
+		await sql`
+			UPDATE expenses
+			SET datestart = ${validatedDateStart.data.date}
+			WHERE id = ${validatedExpenseID}
+				AND employeeid = ${employeeID};
+		`;
+	} catch(error) {
+		console.error(error);
+		return {
+			success: false,
+			errors: JSON.stringify(error),
+			message: 'Error entering Date Start value into database!'
+		}
+	}
+
+	// Separate EXDs from formData
+	const separateEXDs = separateExpenseFormData(formData);
+
+	// Validate each EXD and add it to array
+
+  	type validatedEXDType = {
+		id: number;
+		jobid: number;
+		purpose: string | null;
+		transportwhere: string | null;
+		transportation: number | null;
+		lodging: number | null;
+		cabsparking: number | null;
+		carrental: number | null;
+		miles: number | null;
+		mileage: number | null;
+		perdiem: number | null;
+		entertainment: number | null;
+		miscid: number;
+		miscvalue: number | null;
+		total: number | null;
+		miscdetail: string | null;
+		entlocation: string | null;
+		entactivity: string | null;
+		entwho: string | null;
+		entpurpose: string | null;
+	};
+
+	const validatedTSDs: validatedEXDType[] = [];
+
+ 	for (const exdkey in separateEXDs) {
+		const validatedTSD = EditExpenseDetails.safeParse({
+			id: Number(separateEXDs[exdkey]['id']),
+			jobid: Number(separateEXDs[exdkey]['id']),
+			purpose: separateEXDs[exdkey]['id'],
+			transportwhere: separateEXDs[exdkey]['id'],
+			transportation: Number(separateEXDs[exdkey]['id']),
+			lodging: Number(separateEXDs[exdkey]['id']),
+			cabsparking: Number(separateEXDs[exdkey]['id']),
+			carrental: Number(separateEXDs[exdkey]['id']),
+			miles: Number(separateEXDs[exdkey]['id']),
+			perdiem: Number(separateEXDs[exdkey]['id']),
+			entertainment: Number(separateEXDs[exdkey]['id']),
+			miscid: Number(separateEXDs[exdkey]['id']),
+			miscvalue: Number(separateEXDs[exdkey]['id']),
+			miscdetail: separateEXDs[exdkey]['id'],
+			entlocation: separateEXDs[exdkey]['id'],
+			entactivity: separateEXDs[exdkey]['id'],
+			entwho: separateEXDs[exdkey]['id'],
+			entpurpose: separateEXDs[exdkey]['id']
+		});
+
+
+		if (!validatedTSD.success) {
+			console.error(validatedTSD.error);
+			return {
+        		success: false,
+				errors: validatedTSD.error.flatten().fieldErrors,
+				message: 'Incorrect or Missing Fields. Failed to Validate timesheet ID.',
+			};
+		}
+
+		validatedTSDs.push(validatedTSD.data);
+
+	}
+
+	// Delete all TSDs associated with the timesheet
+	try{ // Note - could make this more robost by temporarily storing the TSDs in DB before deletion
+		await sql`
+		DELETE FROM timesheetdetails
+		WHERE timesheetid = ${validatedTimesheetID};
+		`;
+	} catch(error) {
+		console.error(error);
+		return {
+		success: false,
+		errors: JSON.stringify(error),
+		message: 'Failed to delete old TSDs'
+		}
+	}
+
+	// Add all validated TSDs to Database
+	let totalReg = 0.0;
+	let totalOT = 0.0;
+	for (const TSD of validatedTSDs) {
+		const {
+			id, project, phase_costcode, description,
+			mon, tues, wed, thurs, fri, sat, sun,
+			monot, tuesot, wedot, thursot, friot, satot, sunot
+		} = TSD;
+
+    const phase_costcode_split = phase_costcode.split('-');
+    const phase = Number(phase_costcode_split[0]);
+    const costcode = Number(phase_costcode_split[1]);
+
+    try {
+		const addTimesheetDetailsRes = await addTimesheetDetailsHelper({
+			timesheetid: validatedTimesheetID,
+			employeeid: employeeID,
+			projectid: project,
+			phase: phase,
+			costcode: costcode,
+			description: description,
+			mon: mon,
+			monot: monot,
+			tues: tues,
+			tuesot: tuesot,
+			wed: wed,
+			wedot: wedot,
+			thurs: thurs,
+			thursot: thursot,
+			fri: fri,
+			friot: friot,
+			sat: sat,
+			satot: satot,
+			sun: sun,
+			sunot: sunot,
+		});
+
+		totalReg += (mon + tues + wed + thurs + fri + sat + sun);
+		totalOT += (monot + tuesot + wedot + thursot + friot + satot + sunot);
+		
+		if(!addTimesheetDetailsRes.success) {
+			return {
+			success: false,
+			message: 'Failed to Create Timesheet Details.',
+			};
+		}
+	
+		} catch(error) {
+			console.error(error);
+			return {
+				success: false,
+				errors: JSON.stringify(error),
+				message: 'Failed to Create Timesheet Details.',
+			};
+		}
+	}
+
+	// Update the associated timesheet's totalreghours and totalovertime
+	try {
+		await sql`
+		UPDATE timesheets
+		SET totalreghours = ${totalReg}, 
+			totalovertime =${totalOT}
+		WHERE id = ${validatedTimesheetID};    
+		`;
+	} catch(error) {
+		console.error(error);
+		return {
+		success: false,
+		errors: JSON.stringify(error),
+		message: 'Failed to Update Timesheet Details',
+		};
+	}
+
+	// Return success
+	return {
+		success: true,
+		message: 'Timesheet Details were successfully updated!'
+	}
+
+}
+
+function separateExpenseFormData(formData: FormData): SeparatedFormData {
+	const result: SeparatedFormData = {};
+	
+	formData.forEach((value, name) => {
+		const matches = name.match(/^EXD(\d+)\[([^]+)\]$/);
+		
+		if (matches) {
+			const [, index, key] = matches;
+			if (!result[`EXD${index}`]) {
+				result[`EXD${index}`] = {};
+			}
+			if (typeof value === 'string') {
+				result[`EXD${index}`][key] = value;
+			}
+		}
+	});
+	
+	return result;
 }
 
 // Deprecated in favor of addEmptyTimesheet and duplicateTimesheet
@@ -1214,21 +1575,13 @@ export async function addTimesheetDetails(timesheetID: number) {
 	// redirect(`/dashboard/${validatedTimesheetID}/edit/details`);
 }
 
-type FieldErrors = {
-  [key: string]: string[] | undefined;
-}
 
-type EditTimesheetDetailsType = {
-  success: boolean,
-  errors?: string | FieldErrors,
-  message: string,
-}
 
 export async function editTimesheetDetails(
 	timesheetID: number,
 	prevState: any,
 	formData: FormData
-): Promise<EditTimesheetDetailsType> {
+): Promise<EditDetailsType> {
 	//console.log(formData);
 
 	const validatedTimesheet = z.number().safeParse(timesheetID);
@@ -1295,8 +1648,8 @@ export async function editTimesheetDetails(
 	// Validate WeekEnding
   	let validatedWeekEnding;
 	try {
-		validatedWeekEnding = WeekEndingSchema.safeParse({
-			weekEnding: formData.get('weekEnding')
+		validatedWeekEnding = DateSchema.safeParse({
+			date: formData.get('weekEnding')
 		})
 	} catch(error) {
 		console.error(error);
@@ -1322,7 +1675,7 @@ export async function editTimesheetDetails(
 	try {
 		await sql`
 		UPDATE timesheets
-		SET weekEnding = ${validatedWeekEnding.data.weekEnding}
+		SET weekEnding = ${validatedWeekEnding.data.date}
 		WHERE id = ${validatedTimesheetID};
 	  `;
 	} catch(error) {
@@ -1336,7 +1689,7 @@ export async function editTimesheetDetails(
 
 
 	// Separate TDSs from formData
-	const separateTSDs = separateFormData(formData);
+	const separateTSDs = separateTimesheetFormData(formData);
 
 	// Validate each TSD and add it to array
 
@@ -1541,7 +1894,7 @@ interface SeparatedFormData {
   };
 }
 
-function separateFormData(formData: FormData): SeparatedFormData {
+function separateTimesheetFormData(formData: FormData): SeparatedFormData {
   const result: SeparatedFormData = {};
   
   formData.forEach((value, name) => {
@@ -1564,13 +1917,13 @@ function separateFormData(formData: FormData): SeparatedFormData {
 export async function fetchTimesheetDetailsEditFormData(
   timesheetID: number
 ) {
-  unstable_noStore();
+	unstable_noStore();
 
-  const validatedTimesheet = z.number().safeParse(timesheetID);
+	const validatedTimesheet = z.number().safeParse(timesheetID);
 
 	if (!validatedTimesheet.success) {
-    console.error(validatedTimesheet.error.flatten().fieldErrors);
-    throw new Error('Failed to Validate TimesheetID.')
+		console.error(validatedTimesheet.error.flatten().fieldErrors);
+		throw new Error('Failed to Validate TimesheetID.')
 	}
 
 	// Ensure user is logged in
@@ -1583,63 +1936,63 @@ export async function fetchTimesheetDetailsEditFormData(
 	const employeeID = Number(session.user.id);
 	const validatedTimesheetID = validatedTimesheet.data;
 
-  // Ensure timesheetID belongs to employee
+	// Ensure timesheetID belongs to employee
 	const validOwnership = await employeeOwnsTimesheet(employeeID, validatedTimesheetID);
 	if (!validOwnership) {
-    throw new Error("Employee does not own provided timesheet!")
+		throw new Error("Employee does not own provided timesheet!")
 	}
 
-  try {
-    const TSDData = await sql<TimesheetDetails>`
-        SELECT
-            id, timesheetid, employeeid, projectid,
-            phase, costcode, description,
-            mon, monot,
-            tues, tuesot,
-            wed, wedot,
-            thurs, thursot,
-            fri, friot,
-            sat, satot,
-            sun, sunot,
-            lasteditdate
-        FROM timesheetdetails
-        WHERE timesheetdetails.timesheetid = ${validatedTimesheetID}
-    `;
-    const timesheetDetails = TSDData.rows;
-    const projectsData = await sql<ProjectOption>`
-      SELECT id, number, shortname, description FROM projects;
-	  `;
-  
-	  // const phasesData = await sql<PhaseOption>`
-    //   SELECT id, description FROM phases;
-	  // `;
+	try {
+		const TSDData = await sql<TimesheetDetails>`
+			SELECT
+				id, timesheetid, employeeid, projectid,
+				phase, costcode, description,
+				mon, monot,
+				tues, tuesot,
+				wed, wedot,
+				thurs, thursot,
+				fri, friot,
+				sat, satot,
+				sun, sunot,
+				lasteditdate
+			FROM timesheetdetails
+			WHERE timesheetdetails.timesheetid = ${validatedTimesheetID}
+		`;
+		const timesheetDetails = TSDData.rows;
+		const projectsData = await sql<ProjectOption>`
+		SELECT id, number, shortname, description FROM projects;
+		`;
+	
+		// const phasesData = await sql<PhaseOption>`
+		//   SELECT id, description FROM phases;
+		// `;
 
-    // const costCodesData = await sql<CostCodeOption>`
-    //   SELECT id, description FROM costcodes;
-	  // `;
+		// const costCodesData = await sql<CostCodeOption>`
+		//   SELECT id, description FROM costcodes;
+		// `;
 
-    const phaseCostCodesData = await sql<PhaseCostCodeOption>`
-      SELECT phase, costcode, description FROM phase_costcodes;
-	  `;
+		const phaseCostCodesData = await sql<PhaseCostCodeOption>`
+		SELECT phase, costcode, description FROM phase_costcodes;
+		`;
 
-	  const projects = projectsData.rows;
-    const phaseCostCodes = phaseCostCodesData.rows;
-    // const phases = phasesData.rows;
-    // const costcodes = costCodesData.rows;
+		const projects = projectsData.rows;
+		const phaseCostCodes = phaseCostCodesData.rows;
+		// const phases = phasesData.rows;
+		// const costcodes = costCodesData.rows;
 
-    const options: Options = {
-      projects,
-      phaseCostCodes,
-      // phases,
-      // costcodes,
-    }
-	  
-    return {options, timesheetDetails};
+		const options: Options = {
+		projects,
+		phaseCostCodes,
+		// phases,
+		// costcodes,
+		}
+		
+		return {options, timesheetDetails};
 
-} catch (error) {
-    console.error('Database Error:', error);
-    throw error;
-}
+	} catch (error) {
+		console.error('Database Error:', error);
+		throw error;
+	}
 
 }
 

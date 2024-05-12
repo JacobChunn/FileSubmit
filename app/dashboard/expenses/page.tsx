@@ -1,5 +1,6 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import AddExpenseButton from "@/app/ui/dashboard/expenses/add-expense-button";
+import ExpenseDetailsEditForm from "@/app/ui/dashboard/expenses/details/details-edit-form";
 import ExpenseDetailsHeader from "@/app/ui/dashboard/expenses/details/details-header";
 import ExpenseDetailsWrapper from "@/app/ui/dashboard/expenses/details/details-wrapper";
 import ExpenseContextWrapper from "@/app/ui/dashboard/expenses/expense-context-wrapper";
@@ -44,7 +45,7 @@ export default async function Page() {
 					<ExpenseDetailsWrapper>
 						{/* TODO: fix details header, its not rendering */}
 						<ExpenseDetailsHeader/>
-						{/* <ExpenseDetailsEditForm/> */}
+						<ExpenseDetailsEditForm/>
 					</ExpenseDetailsWrapper>
 				</ExpenseContextWrapper>
 			</div>

@@ -191,7 +191,7 @@ export type Expense = {
 	mileagerate: number;
 }
 
-// Will need to be edited
+// Will likely need to be edited
 export type ExpenseDetailsExtended = {
 	id: number;
 	expenseid: number;
@@ -337,6 +337,11 @@ export type CostCodeOption = {
   description: string;
 };
 
+export type MiscOption = {
+	id: number;
+	description: string;
+}
+
 export type PhaseCostCodeOption = {
   phase: number;
   costcode: number;
@@ -349,6 +354,22 @@ export type Options = {
   // phases: PhaseOption[];
   // costcodes: CostCodeOption[];
 };
+
+// Expense version of Options type
+export type ExpenseOptions = {
+	projects: ProjectOption[];
+	misc : MiscOption[];
+}
+
+export type FieldErrors = {
+	[key: string]: string[] | undefined;
+  }
+  
+export type EditDetailsType = {
+	success: boolean,
+	errors?: string | FieldErrors,
+	message: string,
+}
 
 export type TabType = {
   label: string;
