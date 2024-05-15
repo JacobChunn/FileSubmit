@@ -848,6 +848,28 @@ export async function editExpenseDetails(
 		}
 	}
 
+	// Get mileage
+	let mileage;
+	try {
+		const mileageData = await sql`
+			SELECT rate
+			FROM mileagerates
+			WHERE datestart <= ${validatedDateStart.data.date}
+			ORDER BY datestart DESC
+			LIMIT 1;
+		`;
+		if (!mileageData.rows[0].rate) throw new Error("Error getting mileage data!");
+		
+		mileage = mileageData.rows[0].rate;
+	} catch(error) {
+		console.error(error);
+		return {
+			success: false,
+			errors: JSON.stringify(error),
+			message: 'Error getting mileage data!'
+		}
+	}
+
 	// Separate EXDs from formData
 	const separateEXDs = separateExpenseFormData(formData);
 
@@ -876,138 +898,150 @@ export async function editExpenseDetails(
 		entpurpose: string | null;
 	};
 
-	const validatedTSDs: validatedEXDType[] = [];
+	const validatedEXDs: validatedEXDType[] = [];
 
  	for (const exdkey in separateEXDs) {
-		const validatedTSD = EditExpenseDetails.safeParse({
+		const validatedEXD = EditExpenseDetails.safeParse({
 			id: Number(separateEXDs[exdkey]['id']),
-			jobid: Number(separateEXDs[exdkey]['id']),
-			purpose: separateEXDs[exdkey]['id'],
-			transportwhere: separateEXDs[exdkey]['id'],
-			transportation: Number(separateEXDs[exdkey]['id']),
-			lodging: Number(separateEXDs[exdkey]['id']),
-			cabsparking: Number(separateEXDs[exdkey]['id']),
-			carrental: Number(separateEXDs[exdkey]['id']),
-			miles: Number(separateEXDs[exdkey]['id']),
-			perdiem: Number(separateEXDs[exdkey]['id']),
-			entertainment: Number(separateEXDs[exdkey]['id']),
-			miscid: Number(separateEXDs[exdkey]['id']),
-			miscvalue: Number(separateEXDs[exdkey]['id']),
-			miscdetail: separateEXDs[exdkey]['id'],
-			entlocation: separateEXDs[exdkey]['id'],
-			entactivity: separateEXDs[exdkey]['id'],
-			entwho: separateEXDs[exdkey]['id'],
-			entpurpose: separateEXDs[exdkey]['id']
+			jobid: Number(separateEXDs[exdkey]['jobid']),
+			purpose: separateEXDs[exdkey]['purpose'],
+			transportwhere: separateEXDs[exdkey]['transportwhere'],
+			transportation: Number(separateEXDs[exdkey]['transportation']),
+			lodging: Number(separateEXDs[exdkey]['lodging']),
+			cabsparking: Number(separateEXDs[exdkey]['cabsparking']),
+			carrental: Number(separateEXDs[exdkey]['carrental']),
+			miles: Number(separateEXDs[exdkey]['miles']),
+			perdiem: Number(separateEXDs[exdkey]['perdiem']),
+			entertainment: Number(separateEXDs[exdkey]['entertainment']),
+			miscid: Number(separateEXDs[exdkey]['miscid']),
+			miscvalue: Number(separateEXDs[exdkey]['miscvalue']),
+			miscdetail: separateEXDs[exdkey]['miscdetail'],
+			entlocation: separateEXDs[exdkey]['entlocation'],
+			entactivity: separateEXDs[exdkey]['entactivity'],
+			entwho: separateEXDs[exdkey]['entwho'],
+			entpurpose: separateEXDs[exdkey]['entpurpose']
 		});
 
 
-		if (!validatedTSD.success) {
-			console.error(validatedTSD.error);
+		if (!validatedEXD.success) {
+			console.error(validatedEXD.error);
 			return {
         		success: false,
-				errors: validatedTSD.error.flatten().fieldErrors,
-				message: 'Incorrect or Missing Fields. Failed to Validate timesheet ID.',
+				errors: validatedEXD.error.flatten().fieldErrors,
+				message: 'Incorrect or Missing Fields. Failed to Validate expense.',
 			};
 		}
 
-		validatedTSDs.push(validatedTSD.data);
+		// Prep data to calculate total
+		const transportation = validatedEXD.data.transportation ? validatedEXD.data.transportation : 0;
+		const lodging = validatedEXD.data.lodging ? validatedEXD.data.lodging : 0;
+		const milesCost = validatedEXD.data.miles ? validatedEXD.data.miles * mileage : 0;
+		const perdiem = validatedEXD.data.perdiem ? validatedEXD.data.perdiem : 0;
+		const entertainment = validatedEXD.data.entertainment ? validatedEXD.data.entertainment : 0;
+		const misc = validatedEXD.data.miscvalue ? validatedEXD.data.miscvalue : 0;
+
+		// Calculate total. Add travel, parking/etc, miles * mileage, perdiem, entertainment, and misc
+		const total = transportation + lodging + milesCost + perdiem + entertainment + misc;
+
+
+		// Push validated Expense details with mileage and total
+		validatedEXDs.push({...validatedEXD.data, mileage, total});
 
 	}
 
-	// Delete all TSDs associated with the timesheet
-	try{ // Note - could make this more robost by temporarily storing the TSDs in DB before deletion
+	// Delete all EXDs associated with the timesheet
+	try{ // Note - could make this more robost by temporarily storing the EXDs in DB before deletion
 		await sql`
-		DELETE FROM timesheetdetails
-		WHERE timesheetid = ${validatedTimesheetID};
+		DELETE FROM expensedetails
+		WHERE expenseid = ${validatedExpenseID}
+			AND employeeid = ${employeeID};
 		`;
 	} catch(error) {
 		console.error(error);
 		return {
-		success: false,
-		errors: JSON.stringify(error),
-		message: 'Failed to delete old TSDs'
+			success: false,
+			errors: JSON.stringify(error),
+			message: 'Failed to delete old EXDs'
 		}
 	}
 
-	// Add all validated TSDs to Database
-	let totalReg = 0.0;
-	let totalOT = 0.0;
-	for (const TSD of validatedTSDs) {
+	// Add all validated EXDs to Database
+	let totalTotal = 0.0;
+	for (const EXD of validatedEXDs) {
 		const {
-			id, project, phase_costcode, description,
-			mon, tues, wed, thurs, fri, sat, sun,
-			monot, tuesot, wedot, thursot, friot, satot, sunot
-		} = TSD;
+			id, jobid, purpose, transportwhere, transportation, lodging, 
+			cabsparking, carrental, miles, mileage, perdiem, entertainment, 
+			miscid, miscvalue, total, miscdetail, entlocation, entactivity, 
+			entwho, entpurpose
 
-    const phase_costcode_split = phase_costcode.split('-');
-    const phase = Number(phase_costcode_split[0]);
-    const costcode = Number(phase_costcode_split[1]);
+		} = EXD;
 
-    try {
-		const addTimesheetDetailsRes = await addTimesheetDetailsHelper({
-			timesheetid: validatedTimesheetID,
-			employeeid: employeeID,
-			projectid: project,
-			phase: phase,
-			costcode: costcode,
-			description: description,
-			mon: mon,
-			monot: monot,
-			tues: tues,
-			tuesot: tuesot,
-			wed: wed,
-			wedot: wedot,
-			thurs: thurs,
-			thursot: thursot,
-			fri: fri,
-			friot: friot,
-			sat: sat,
-			satot: satot,
-			sun: sun,
-			sunot: sunot,
-		});
+		try {
+			const addExpenseDetailsRes = await addExpenseDetailsHelper({ // Do I need to ensure user is authorized?
+				expenseid: validatedExpenseID,
+				employeeid: employeeID,
+				jobid: jobid,
+				purpose: purpose,
+				transportwhere: transportwhere,
+				transportation: transportation,
+				lodging: lodging,
+				cabsparking: cabsparking,
+				carrental: carrental,
+				miles: miles,
+				mileage: mileage,
+				perdiem: perdiem,
+				entertainment: entertainment,
+				miscid: miscid,
+				miscvalue: miscvalue,
+				total: total,
+				miscdetail: miscdetail,
+				entlocation: entlocation,
+				entactivity: entactivity,
+				entwho: entwho,
+				entpurpose: entpurpose,
+			});
+			
+			if(!addExpenseDetailsRes.success) {
+				return {
+					success: false,
+					message: 'Failed to Create Expense Details.',
+				};
+			}
 
-		totalReg += (mon + tues + wed + thurs + fri + sat + sun);
-		totalOT += (monot + tuesot + wedot + thursot + friot + satot + sunot);
-		
-		if(!addTimesheetDetailsRes.success) {
-			return {
-			success: false,
-			message: 'Failed to Create Timesheet Details.',
-			};
-		}
+			totalTotal += (total ? total : 0);
 	
 		} catch(error) {
 			console.error(error);
 			return {
 				success: false,
 				errors: JSON.stringify(error),
-				message: 'Failed to Create Timesheet Details.',
+				message: 'Failed to Create Expense Details.',
 			};
 		}
 	}
 
-	// Update the associated timesheet's totalreghours and totalovertime
+	// Update the associated expense's totalexpenses and mileagerate
 	try {
 		await sql`
-		UPDATE timesheets
-		SET totalreghours = ${totalReg}, 
-			totalovertime =${totalOT}
-		WHERE id = ${validatedTimesheetID};    
+		UPDATE expenses
+		SET totalexpenses = ${totalTotal}, 
+		mileagerate =${mileage}
+		WHERE id = ${validatedExpenseID}
+			AND employeeid = ${employeeID};
 		`;
 	} catch(error) {
 		console.error(error);
 		return {
-		success: false,
-		errors: JSON.stringify(error),
-		message: 'Failed to Update Timesheet Details',
+			success: false,
+			errors: JSON.stringify(error),
+			message: 'Failed to Update Expense Details',
 		};
 	}
 
 	// Return success
 	return {
 		success: true,
-		message: 'Timesheet Details were successfully updated!'
+		message: 'Timesheet Expense were successfully updated!'
 	}
 
 }

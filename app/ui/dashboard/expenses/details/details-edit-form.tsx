@@ -11,7 +11,7 @@ import ControlledSelect from '@/app/ui/forms/general-helper-components/controlle
 import { compareExpenseDetailsExtended, compareDateStart } from '@/app/lib/utils';
 import DoubleControlledSelect from '@/app/ui/forms/general-helper-components/double-controlled-sel-w-desc';
 import { ExpenseContext } from '../expense-context-wrapper';
-import { fetchExpenseDetailsEditFormData } from '@/app/lib/actions';
+import { editExpenseDetails, fetchExpenseDetailsEditFormData } from '@/app/lib/actions';
 
 export default function ExpenseDetailsEditForm({
 
@@ -179,35 +179,28 @@ export default function ExpenseDetailsEditForm({
 
 	const EXDLen = context.localExpenseDetails?.length || 0;
 
-	type DayKey = 'mon' | 'tues' | 'wed' | 'thurs' | 'fri' | 'sat' | 'sun';
-	type OvertimeKey = 'monot' | 'tuesot' | 'wedot' | 'thursot' | 'friot' | 'satot' | 'sunot';
-	function calculateTotalHoursForDay(day: DayKey, overtime: OvertimeKey) {
-		const details = context?.localExpenseDetails;
-		return details ? 
-			details.reduce((accumulator, currentValue) => {
-				return accumulator + Number(currentValue[day]) + Number(currentValue[overtime]);
-			}, 0) :
-			0;
-	}
+	// function calculateTotal(
+	// 	travel: number, lodging: number,
+	// 	parkingTollsGas: number, carRental: number,
+	// 	mileCost: number, perdiem: number,
+	// 	entertainment: number, miscCost: number
+	// ) {
+	// 	const details = context?.localExpenseDetails;
+	// 	return details ? 
+	// 		details.reduce((accumulator, currentValue) => {
+	// 			return accumulator + Number(currentValue[day]) + Number(currentValue[overtime]);
+	// 		}, 0) :
+	// 		0;
+	// }
 
-	const monTot = calculateTotalHoursForDay('mon', 'monot');
-	const tuesTot = calculateTotalHoursForDay('tues', 'tuesot');
-	const wedTot = calculateTotalHoursForDay('wed', 'wedot');
-	const thursTot = calculateTotalHoursForDay('thurs', 'thursot');
-	const friTot = calculateTotalHoursForDay('fri', 'friot');
-	const satTot = calculateTotalHoursForDay('sat', 'satot');
-	const sunTot = calculateTotalHoursForDay('sun', 'sunot');
 
-	const totalTot = monTot + tuesTot + wedTot + thursTot + friTot + satTot + sunTot;
+	//const totalTot = monTot + tuesTot + wedTot + thursTot + friTot + satTot + sunTot;
 
 	const isNotEditable = !(context.expenseDetailsState == "saved" || context.expenseDetailsState == "unsaved");
 	const isNotSubmitable =
 		context.expenseDetailsState == "saving" || 
 		context.expenseDetailsState == "saved" ||
 		context.expenseDetailsState == "signed";
-
-	//const isNotEditable = false
-	//const isNotSubmitable = false
 
 	const dispatchWrapper = (payload: FormData) => {
 		context.setExpenseDetailsState("saving");
@@ -265,7 +258,7 @@ export default function ExpenseDetailsEditForm({
 									hidden
 								/>
 
-								{/* Project */}
+								{/* Job */}
 								<ControlledSelect
 									index={index}
 									attr='projectid'
@@ -279,7 +272,19 @@ export default function ExpenseDetailsEditForm({
 								</ControlledSelect>
 							</td>
 
-							{/* PhaseCostCode*/}
+							{/* Purpose */}
+							{/* Travel To/From */}
+							{/* Travel Amount */}
+							{/* Lodging */}
+							{/* Parking/Tolls/Gas */}
+							{/* Car Rental */}
+							{/* Mileage Miles */}
+							{/* Mileage Amount */}
+							{/* Perdiem */}
+							{/* Entertainment */}
+							{/* Misc Description */}
+							{/* Misc Amount */}
+							{/* Total */}
 							<td className={phaseCostCodeRowStyle}>
 								<DoubleControlledSelect
 									index={index}
