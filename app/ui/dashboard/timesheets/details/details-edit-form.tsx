@@ -9,18 +9,18 @@ import FormErrorHandling from '@/app/ui/forms/form-error-handling';
 import FormSubmitButton from '@/app/ui/forms/form-submit-button';
 import { getServerSession } from 'next-auth';
 import { useContext, useEffect, useState } from 'react';
-import SelectWithFocusControl from '@/app/ui/forms/general-helper-components/select-w-description';
+import SelectWithFocusControl from '@/app/ui/forms/timesheet-helper-components/select-w-description';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { notFound } from 'next/navigation';
 import { TimesheetContext } from '../timesheet-context-wrapper';
-import InputDetailsNumber from '@/app/ui/forms/general-helper-components/input-details-number';
+import InputDetailsNumber from '@/app/ui/forms/timesheet-helper-components/input-details-number';
 import FormSubmitDetailsButton from '@/app/ui/forms/form-submit-details-button';
 import { IconButton, Tooltip } from '@/app/ui/material-tailwind-wrapper';
-import InputDetailsDesc from '@/app/ui/forms/general-helper-components/input-details-desc';
+import InputDetailsDesc from '@/app/ui/forms/timesheet-helper-components/input-details-desc';
 import DeleteDetailButton from './delete-detail-button';
-import ControlledSelect from '@/app/ui/forms/general-helper-components/controlled-sel-w-desc';
+import ControlledSelect from '@/app/ui/forms/timesheet-helper-components/controlled-sel-w-desc';
 import { compareTimesheetDetailsExtended, compareWeekEnding } from '@/app/lib/utils';
-import DoubleControlledSelect from '@/app/ui/forms/general-helper-components/double-controlled-sel-w-desc';
+import DoubleControlledSelect from '@/app/ui/forms/timesheet-helper-components/double-controlled-sel-w-desc';
 
 export default function TimesheetDetailsEditForm({
 

@@ -4,14 +4,13 @@ import { useFormState } from 'react-dom';
 import { ExpenseDetails, ExpenseOptions, SavingState } from '@/app/lib/definitions';
 import { useContext, useEffect, useState } from 'react';
 import { notFound } from 'next/navigation';
-import InputDetailsNumber from '@/app/ui/forms/general-helper-components/input-details-number';
 import FormSubmitDetailsButton from '@/app/ui/forms/form-submit-details-button';
-import InputDetailsDesc from '@/app/ui/forms/general-helper-components/input-details-desc';
-import ControlledSelect from '@/app/ui/forms/general-helper-components/controlled-sel-w-desc';
 import { compareExpenseDetailsExtended, compareDateStart } from '@/app/lib/utils';
-import DoubleControlledSelect from '@/app/ui/forms/general-helper-components/double-controlled-sel-w-desc';
 import { ExpenseContext } from '../expense-context-wrapper';
 import { editExpenseDetails, fetchExpenseDetailsEditFormData } from '@/app/lib/actions';
+import ControlledSelect from '@/app/ui/forms/expense-helper-components.tsx/controlled-sel-w-desc';
+import InputDetailsDesc from '@/app/ui/forms/expense-helper-components.tsx/input-details-desc';
+import InputDetailsNumber from '@/app/ui/forms/expense-helper-components.tsx/input-details-number';
 
 export default function ExpenseDetailsEditForm({
 
@@ -261,10 +260,10 @@ export default function ExpenseDetailsEditForm({
 								{/* Job */}
 								<ControlledSelect
 									index={index}
-									attr='projectid'
-									info={"EXD" + index + "[" + "project" + "]"}
-									value={val.projectid}
-									dbValue={dbVal?.projectid}
+									attr='jobid'
+									info={"EXD" + index + "[" + "jobid" + "]"}
+									value={val.jobid}
+									dbValue={dbVal?.jobid}
 									className = {selectStyle}
 									disabled={isNotEditable}
 								>
@@ -273,206 +272,151 @@ export default function ExpenseDetailsEditForm({
 							</td>
 
 							{/* Purpose */}
-							{/* Travel To/From */}
-							{/* Travel Amount */}
-							{/* Lodging */}
-							{/* Parking/Tolls/Gas */}
-							{/* Car Rental */}
-							{/* Mileage Miles */}
-							{/* Mileage Amount */}
-							{/* Perdiem */}
-							{/* Entertainment */}
-							{/* Misc Description */}
-							{/* Misc Amount */}
-							{/* Total */}
-							<td className={phaseCostCodeRowStyle}>
-								<DoubleControlledSelect
-									index={index}
-									phaseAttr='phase'
-									costcodeAttr='costcode'
-									info={"EXD" + index + "[" + "phase_costcode" + "]"}
-									phaseValue={val.phase}
-									costcodeValue={val.costcode}
-									phaseDbValue={dbVal?.phase}
-									costcodeDbValue={dbVal?.costcode}
-									className = {selectStyle}
-									disabled={isNotEditable}
-								>
-									{phaseCostCodeOptions}
-								</DoubleControlledSelect>
-							</td>
-
-							{/* Description */}
-							<td className={descRowStyle}>
+							<td className={"w-11"}>
 								<InputDetailsDesc
 									index={index}
-									attr='description'
-									info={"EXD" + index + "[" + "description" + "]"}
-									value={val.description}
-									dbValue={dbVal?.description}
+									attr='purpose'
+									info={"EXD" + index + "[" + "purpose" + "]"}
+									value={val.purpose}
+									dbValue={dbVal?.purpose}
 									readOnly={isNotEditable}
 								/>
 							</td>
-							
-							{/* Monday */}
-							<td className={dayRowStyle}>
+
+							{/* Travel To/From */}
+							<td className={"w-11"}>
+								<InputDetailsDesc
+									index={index}
+									attr='transportwhere'
+									info={"EXD" + index + "[" + "transportwhere" + "]"}
+									value={val.transportwhere}
+									dbValue={dbVal?.transportwhere}
+									readOnly={isNotEditable}
+								/>
+							</td>
+
+							{/* Travel Amount */}
+							<td className={"w-11"}>
 								<InputDetailsNumber
 									index={index}
-									attr='mon'
-									info={"EXD" + index + "[" + "mon" + "]"}
-									className={dayStyle}
-									value={val.mon}
-									dbValue={dbVal?.mon}
+									attr='transportation'
+									info={"EXD" + index + "[" + "transportation" + "]"}
+									value={val.transportation}
+									dbValue={dbVal?.transportation}
 									disabled={isNotEditable}
 								/>
+							</td>
+							{/* Lodging */}
+							<td className={"w-11"}>
 								<InputDetailsNumber
 									index={index}
-									attr='monot'
-									info={"EXD" + index + "[" + "monOT" + "]"}
-									className={dayStyle}
-									isOT={true}
-									value={val.monot}
-									dbValue={dbVal?.monot}
+									attr='lodging'
+									info={"EXD" + index + "[" + "lodging" + "]"}
+									value={val.lodging}
+									dbValue={dbVal?.lodging}
 									disabled={isNotEditable}
 								/>
 							</td>
 
-							{/* Tuesday */}
-							<td className={dayRowStyle}>
+							{/* Parking/Tolls/Gas */}
+							<td className={"w-11"}>
 								<InputDetailsNumber
 									index={index}
-									attr='tues'
-									info={"EXD" + index + "[" + "tues" + "]"}
-									className={dayStyle}
-									value={val.tues}
-									dbValue={dbVal?.tues}
-									disabled={isNotEditable}
-								/>
-								<InputDetailsNumber
-									index={index}
-									attr='tuesot'
-									info={"EXD" + index + "[" + "tuesOT" + "]"}
-									className={dayStyle}
-									isOT={true}
-									value={val.tuesot}
-									dbValue={dbVal?.tuesot}
+									attr='cabsparking'
+									info={"EXD" + index + "[" + "cabsparking" + "]"}
+									value={val.cabsparking}
+									dbValue={dbVal?.cabsparking}
 									disabled={isNotEditable}
 								/>
 							</td>
 
-							{/* Wednesday */}
-							<td className={dayRowStyle}>
+							{/* Car Rental */}
+							<td className={"w-11"}>
 								<InputDetailsNumber
 									index={index}
-									attr='wed'
-									info={"EXD" + index + "[" + "wed" + "]"}
-									className={dayStyle}
-									value={val.wed}
-									dbValue={dbVal?.wed}
-									disabled={isNotEditable}
-								/>
-								<InputDetailsNumber
-									index={index}
-									attr='wedot'
-									info={"EXD" + index + "[" + "wedOT" + "]"}
-									className={dayStyle}
-									isOT={true}
-									value={val.wedot}
-									dbValue={dbVal?.wedot}
+									attr='carrental'
+									info={"EXD" + index + "[" + "carrental" + "]"}
+									value={val.carrental}
+									dbValue={dbVal?.carrental}
 									disabled={isNotEditable}
 								/>
 							</td>
 
-							{/* Thursday */}
-							<td className={dayRowStyle}>
+							{/* Mileage Miles */}
+							<td className={"w-11"}>
 								<InputDetailsNumber
 									index={index}
-									attr='thurs'
-									info={"EXD" + index + "[" + "thurs" + "]"}
-									className={dayStyle}
-									value={val.thurs}
-									dbValue={dbVal?.thurs}
-									disabled={isNotEditable}
-								/>
-								<InputDetailsNumber
-									index={index}
-									attr='thursot'
-									info={"EXD" + index + "[" + "thursOT" + "]"}
-									className={dayStyle}
-									isOT={true}
-									value={val.thursot}
-									dbValue={dbVal?.thursot}
+									attr='miles'
+									info={"EXD" + index + "[" + "miles" + "]"}
+									value={val.miles}
+									dbValue={dbVal?.miles}
 									disabled={isNotEditable}
 								/>
 							</td>
 
-							{/* Friday */}
-							<td className={dayRowStyle}>
+							{/* Mileage Amount - This is just a display*/}
+							<td className={"w-11"}>
+								<div>
+									{}
+								</div>
+							</td>
+
+							{/* Perdiem */}
+							<td className={"w-11"}>
 								<InputDetailsNumber
 									index={index}
-									attr='fri'
-									info={"EXD" + index + "[" + "fri" + "]"}
-									className={dayStyle}
-									value={val.fri}
-									dbValue={dbVal?.fri}
-									disabled={isNotEditable}
-								/>
-								<InputDetailsNumber
-									index={index}
-									attr='friot'
-									info={"EXD" + index + "[" + "friOT" + "]"}
-									className={dayStyle}
-									isOT={true}
-									value={val.friot}
-									dbValue={dbVal?.friot}
+									attr='perdiem'
+									info={"EXD" + index + "[" + "perdiem" + "]"}
+									value={val.perdiem}
+									dbValue={dbVal?.perdiem}
 									disabled={isNotEditable}
 								/>
 							</td>
 
-							{/* Saturday */}
-							<td className={dayRowStyle}>
+							{/* Entertainment */}
+							<td className={"w-11"}>
 								<InputDetailsNumber
 									index={index}
-									attr='sat'
-									info={"EXD" + index + "[" + "sat" + "]"}
-									className={dayStyle}
-									value={val.sat}
-									dbValue={dbVal?.sat}
-									disabled={isNotEditable}
-								/>
-								<InputDetailsNumber
-									index={index}
-									attr='satot'
-									info={"EXD" + index + "[" + "satOT" + "]"}
-									className={dayStyle}
-									isOT={true}
-									value={val.satot}
-									dbValue={dbVal?.satot}
+									attr='entertainment'
+									info={"EXD" + index + "[" + "entertainment" + "]"}
+									value={val.entertainment}
+									dbValue={dbVal?.entertainment}
 									disabled={isNotEditable}
 								/>
 							</td>
 
-							{/* Sunday */}
-							<td className={dayRowStyle}>
+							{/* Misc Description */}
+							<td className={"w-11"}>
+								<ControlledSelect
+									index={index}
+									attr='miscid'
+									info={"EXD" + index + "[" + "miscid" + "]"}
+									value={val.miscid}
+									dbValue={dbVal?.miscid}
+									className = {selectStyle}
+									disabled={isNotEditable}
+								>
+									{miscOptions}
+								</ControlledSelect>
+							</td>
+
+							{/* Misc Amount */}
+							<td className={"w-11"}>
 								<InputDetailsNumber
 									index={index}
-									attr='sun'
-									info={"EXD" + index + "[" + "sun" + "]"}
-									className={dayStyle}
-									value={val.sun}
-									dbValue={dbVal?.sun}
+									attr='miscvalue'
+									info={"EXD" + index + "[" + "miscvalue" + "]"}
+									value={val.miscvalue}
+									dbValue={dbVal?.miscvalue}
 									disabled={isNotEditable}
 								/>
-								<InputDetailsNumber
-									index={index}
-									attr='sunot'
-									info={"EXD" + index + "[" + "sunOT" + "]"}
-									className={dayStyle}
-									isOT={true}
-									value={val.sunot}
-									dbValue={dbVal?.sunot}
-									disabled={isNotEditable}
-								/>
+							</td>
+
+							{/* Total - this is just a display */}
+							<td className={"w-11"}>
+								<div>
+									{}
+								</div>
 							</td>
 
 							{/* Total */}
