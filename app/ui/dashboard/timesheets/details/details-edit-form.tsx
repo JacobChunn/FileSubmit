@@ -14,12 +14,12 @@ import { TrashIcon } from '@heroicons/react/24/outline';
 import { notFound } from 'next/navigation';
 import { TimesheetContext } from '../timesheet-context-wrapper';
 import InputDetailsNumber from '@/app/ui/forms/timesheet-helper-components/input-details-number';
-import FormSubmitDetailsButton from '@/app/ui/forms/form-submit-details-button';
+import FormSubmitDetailsButton from '@/app/ui/dashboard/timesheets/details/details-submit-button';
 import { IconButton, Tooltip } from '@/app/ui/material-tailwind-wrapper';
 import InputDetailsDesc from '@/app/ui/forms/timesheet-helper-components/input-details-desc';
 import DeleteDetailButton from './delete-detail-button';
 import ControlledSelect from '@/app/ui/forms/timesheet-helper-components/controlled-sel-w-desc';
-import { compareTimesheetDetailsExtended, compareWeekEnding } from '@/app/lib/utils';
+import { compareTimesheetDetailsExtended, compareDates } from '@/app/lib/utils';
 import DoubleControlledSelect from '@/app/ui/forms/timesheet-helper-components/double-controlled-sel-w-desc';
 
 export default function TimesheetDetailsEditForm({
@@ -137,7 +137,7 @@ export default function TimesheetDetailsEditForm({
 			timesheetDetailsState = null;
 		} else if (
 			compareTimesheetDetailsExtended(localTSDs, dbTSDs) && 
-			compareWeekEnding(localWeekEnding, databaseWeekEnding)
+			compareDates(localWeekEnding, databaseWeekEnding)
 		) {
 			timesheetDetailsState = "saved";
 		} else {

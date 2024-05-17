@@ -4,13 +4,14 @@ import { useFormState } from 'react-dom';
 import { ExpenseDetails, ExpenseOptions, SavingState } from '@/app/lib/definitions';
 import { useContext, useEffect, useState } from 'react';
 import { notFound } from 'next/navigation';
-import FormSubmitDetailsButton from '@/app/ui/forms/form-submit-details-button';
-import { compareExpenseDetailsExtended, compareDateStart } from '@/app/lib/utils';
+import { compareExpenseDetailsExtended, compareDates } from '@/app/lib/utils';
 import { ExpenseContext } from '../expense-context-wrapper';
 import { editExpenseDetails, fetchExpenseDetailsEditFormData } from '@/app/lib/actions';
 import ControlledSelect from '@/app/ui/forms/expense-helper-components.tsx/controlled-sel-w-desc';
 import InputDetailsDesc from '@/app/ui/forms/expense-helper-components.tsx/input-details-desc';
 import InputDetailsNumber from '@/app/ui/forms/expense-helper-components.tsx/input-details-number';
+import DeleteDetailButton from './delete-detail-button';
+import FormSubmitDetailsButton from './details-submit-button';
 
 export default function ExpenseDetailsEditForm({
 
@@ -121,7 +122,7 @@ export default function ExpenseDetailsEditForm({
 			expenseDetailsState = null;
 		} else if (
 			compareExpenseDetailsExtended(localEXDs, dbEXDs) && 
-			compareDateStart(localDateStart, databaseDateStart)
+			compareDates(localDateStart, databaseDateStart)
 		) {
 			expenseDetailsState = "saved";
 		} else {
@@ -178,22 +179,30 @@ export default function ExpenseDetailsEditForm({
 
 	const EXDLen = context.localExpenseDetails?.length || 0;
 
-	// function calculateTotal(
-	// 	travel: number, lodging: number,
-	// 	parkingTollsGas: number, carRental: number,
-	// 	mileCost: number, perdiem: number,
-	// 	entertainment: number, miscCost: number
-	// ) {
-	// 	const details = context?.localExpenseDetails;
-	// 	return details ? 
-	// 		details.reduce((accumulator, currentValue) => {
-	// 			return accumulator + Number(currentValue[day]) + Number(currentValue[overtime]);
-	// 		}, 0) :
-	// 		0;
-	// }
+	const mileage = context.localExpenseDetails?.[0]?.mileage ?? 0;
 
+	type ExpenseTotalKey = 'transportation' | 'lodging' | 'cabsparking' | 'carrental' | 'miles' | 'perdiem' | 'entertainment' | 'miscvalue';
+	function calculateTotal(key: ExpenseTotalKey) {
+		const details = context?.localExpenseDetails;
+		return details ? 
+			details.reduce((accumulator, currentValue) => {
+				return accumulator + Number(currentValue[key]);
+			}, 0) :
+			0;
+	}
 
-	//const totalTot = monTot + tuesTot + wedTot + thursTot + friTot + satTot + sunTot;
+	const transportationTot = calculateTotal('transportation');
+	const lodgingTot = calculateTotal('lodging');
+	const cabsparkingTot = calculateTotal('cabsparking');
+	const carrentalTot = calculateTotal('carrental');
+	const milesTot = calculateTotal('miles'); // Note - this is just miles, not mileage
+	const perdiemTot = calculateTotal('perdiem');
+	const entertainmentTot = calculateTotal('entertainment');
+	const miscvalueTot = calculateTotal('miscvalue');
+
+	
+	const mileageTot = milesTot * mileage;
+	const totalTot = transportationTot + lodgingTot + cabsparkingTot + carrentalTot + mileageTot + perdiemTot + entertainmentTot + miscvalueTot;
 
 	const isNotEditable = !(context.expenseDetailsState == "saved" || context.expenseDetailsState == "unsaved");
 	const isNotSubmitable =
@@ -423,13 +432,7 @@ export default function ExpenseDetailsEditForm({
 							<td className={dayRowStyle}>
 								<div className="max-w-sm mx-auto m-0.5 bg-white border border-black">
 									<p className='text-sm'>
-										{Number(val.mon) + Number(val.tues) + Number(val.wed) + Number(val.thurs) + Number(val.fri) + Number(val.sat) + Number(val.sun)}
-									</p>
-								</div>
-								<div className="max-w-sm mx-auto m-0.5 bg-zinc-200 border border-black">
-									<p className='text-sm'>
-										{Number(val.monot) + Number(val.tuesot) + Number(val.wedot) + Number(val.thursot) + Number(val.friot) + Number(val.satot) + Number(val.sunot)}
-
+										{Number(val.transportation) + Number(val.lodging) + Number(val.cabsparking) + Number(val.carrental) + (Number(val.miles) * Number(val.mileage)) + Number(val.perdiem) + Number(val.entertainment) + Number(val.miscvalue)}
 									</p>
 								</div>
 							</td>
@@ -451,25 +454,31 @@ export default function ExpenseDetailsEditForm({
 							</p>
 						</td>
 						<td>
-							{monTot}
+							{transportationTot}
 						</td>
 						<td>
-							{tuesTot}
+							{lodgingTot}
 						</td>
 						<td>
-							{wedTot}
+							{cabsparkingTot}
 						</td>
 						<td>
-							{thursTot}
+							{carrentalTot}
 						</td>
 						<td>
-							{friTot}
+							{milesTot}
 						</td>
 						<td>
-							{satTot}
+							{mileageTot}
 						</td>
 						<td>
-							{sunTot}
+							{perdiemTot}
+						</td>
+						<td>
+							{entertainmentTot}
+						</td>
+						<td colSpan={2}>
+							{miscvalueTot}
 						</td>
 						<td>
 							{totalTot}
@@ -481,7 +490,6 @@ export default function ExpenseDetailsEditForm({
 				submitDisabled={isNotSubmitable}
             /> 
         </form>
-		// Add "row was removed" text somewhere
     );
 }
 

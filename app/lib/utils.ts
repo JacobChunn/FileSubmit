@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { Revenue, TimesheetDetailsExtended } from './definitions';
+import { ExpenseDetailsExtended, Revenue, TimesheetDetailsExtended } from './definitions';
 
 export function compareTimesheetDetailsExtended(
     tsds1: TimesheetDetailsExtended[] | null,
@@ -24,7 +24,30 @@ export function compareTimesheetDetailsExtended(
     return true;
 }
 
-export function compareWeekEnding(
+export function compareExpenseDetailsExtended(
+    exds1: ExpenseDetailsExtended[] | null,
+    exds2: ExpenseDetailsExtended[] | null,
+): boolean {
+	if (!exds1 && !exds2) return true;
+	if (!exds1 || !exds2) return false;
+
+    if (exds1.length !== exds2.length) return false;
+
+    for (let index = 0; index < exds1.length; index++) {
+        const v1 = exds1[index];
+        const v2 = exds2[index];
+
+		for (const key of Object.keys(v1) as Array<keyof ExpenseDetailsExtended>) {
+			if (v1[key] !== v2[key]) {
+				return false;
+			}
+		}
+    }
+
+    return true;
+}
+
+export function compareDates(
 	local: DateTime<true> | DateTime<false> | null,
 	database: DateTime<true> | DateTime<false> | null,
 ): boolean {
