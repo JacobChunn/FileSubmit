@@ -43,7 +43,6 @@ export default async function Page() {
 						</ExpenseTableWrapper>
 					</ExpenseWrapper>
 					<ExpenseDetailsWrapper>
-						{/* TODO: fix details header, its not rendering */}
 						<ExpenseDetailsHeader/>
 						<ExpenseDetailsEditForm/>
 					</ExpenseDetailsWrapper>

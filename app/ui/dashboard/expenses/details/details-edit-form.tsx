@@ -148,9 +148,30 @@ export default function ExpenseDetailsEditForm({
 		notFound();
 	}
 
-	const tableHeaders = [
-		"Project", "Phase - Cost Code", "Description",
-		"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su", "Tot",
+	const topTableHeaders: [string, number][] = [
+		["", 1], ["", 1],
+		["Travel(Air/Train/Bus/Taxi)", 2],
+		["Lodging", 1],
+		["Parking/Tolls/Gas", 1],
+		["Car Rental", 1],
+		["Mileage", 2],
+		["Perdiem", 1],
+		["Entertainment", 1],
+		["Miscellaneous", 2],
+		["", 1],
+	];
+
+	const tableSubheaders = [
+		"Job", "Purpose", 
+		"To/From", "Amount",
+		"Amount",
+		"Amount",
+		"Amount",
+		"Miles", "Amount",
+		"Amount",
+		"Amount",
+		"Description", "Amount",
+		"Total"
 	];
 
     const {projects, misc} = options;
@@ -232,11 +253,31 @@ export default function ExpenseDetailsEditForm({
 			<table className='w-full'>
 				<thead>
 					<tr>
-						{tableHeaders.map((val, index) => (
+						{topTableHeaders.map((val, index) => (
 							<th
 								key={"header"+index}
+								colSpan={val[1]}
+								className={`w-min h-min border-t ${index != 0 ? "border-l" : ""} border-blue-gray-100 bg-blue-gray-50/50 pt-4 px-2`}
 							>
-								{val}
+								<div
+									className="h-min font-normal leading-none text-blue-gray-900 opacity-80 text-xs"
+								>
+									{val[0]}
+								</div>
+							</th>
+						))}
+					</tr>
+					<tr>
+						{tableSubheaders.map((val, index) => (
+							<th
+								key={"subheader"+index}
+								className={`w-min h-min border-b border-blue-gray-100 bg-blue-gray-50/50 pt-2 pb-4 px-2`}
+							>
+								<div
+									className="h-min font-normal leading-none text-blue-gray-900 opacity-80 text-xs"
+								>
+									{val}
+								</div>
 							</th>
 						))}
 					</tr>
