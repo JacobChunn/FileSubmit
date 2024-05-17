@@ -109,7 +109,7 @@ export default function ControlledSelect({
 			id={info}
 			key={info}
 			name={info}
-			className={editStyle + className}
+			className={editStyle + " text-xs " + className}
 			onChange={handleChange}
 			value={value}
 			disabled={disabled}

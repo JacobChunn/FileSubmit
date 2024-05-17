@@ -61,14 +61,16 @@ export default function InputDetailsNumber({
 	//console.log("compare: ", info, dbValue, typeof dbValue,  value, typeof value)
 
 	return (
-		<input
-			id={info+len}
-			key={info+len}
-			name={info}
-			className={bgCol + className}
-			value={formattedValue}
-			onChange={handleChange}
-			disabled={disabled}
-		/>
+		<div className="flex w-full h-full">
+			<input
+				id={info+len}
+				key={info+len}
+				name={info}
+				className={bgCol + " flex-grow w-full text-xs " + className}
+				value={formattedValue}
+				onChange={handleChange}
+				disabled={disabled}
+			/>
+		</div>
 	)
 }

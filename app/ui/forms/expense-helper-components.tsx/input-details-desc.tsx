@@ -48,12 +48,12 @@ export default function InputDetailsDesc({
 	const editStyle = dbValue !== value ? "bg-red-300 " : "bg-white";
 
 	return (
-        <div className="flex items-center justify-center h-max">
+        <div className="flex w-full h-full">
             <input
                 id={info+len}
                 key={info+len}
                 name={info}
-                className={`transition-all duration-300 ease-in-out text-sm resize-none ${editStyle} h-12 w-full`}
+                className={`flex-grow text-xs ${editStyle} w-full `}
                 value={formattedValue}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}

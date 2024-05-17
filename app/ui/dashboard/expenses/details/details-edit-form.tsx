@@ -251,8 +251,8 @@ export default function ExpenseDetailsEditForm({
 			id={"form" + expenseID}
         >
 			<table className='w-full'>
-				<thead>
-					<tr>
+				<thead className='w-full'>
+					<tr className='w-full'>
 						{topTableHeaders.map((val, index) => (
 							<th
 								key={"header"+index}
@@ -260,21 +260,21 @@ export default function ExpenseDetailsEditForm({
 								className={`w-min h-min border-t ${index != 0 ? "border-l" : ""} border-blue-gray-100 bg-blue-gray-50/50 pt-4 px-2`}
 							>
 								<div
-									className="h-min font-normal leading-none text-blue-gray-900 opacity-80 text-xs"
+									className="w-min h-min font-normal leading-none text-blue-gray-900 opacity-80 text-xs"
 								>
 									{val[0]}
 								</div>
 							</th>
 						))}
 					</tr>
-					<tr>
+					<tr className='w-full'>
 						{tableSubheaders.map((val, index) => (
 							<th
 								key={"subheader"+index}
 								className={`w-min h-min border-b border-blue-gray-100 bg-blue-gray-50/50 pt-2 pb-4 px-2`}
 							>
 								<div
-									className="h-min font-normal leading-none text-blue-gray-900 opacity-80 text-xs"
+									className="w-min h-min font-normal leading-none text-blue-gray-900 opacity-80 text-xs"
 								>
 									{val}
 								</div>
@@ -295,7 +295,7 @@ export default function ExpenseDetailsEditForm({
 							key={"k-" + index + expenseID}
 							className='w-full h-full'
 						>
-							<td className={projectRowStyle}>
+							<td className={'w-32'}>
 								{/* Hidden EXD id */}
 								<input
 									id={"EXD" + index + "[" + "id" + "]"}
@@ -322,7 +322,7 @@ export default function ExpenseDetailsEditForm({
 							</td>
 
 							{/* Purpose */}
-							<td className={"w-11"}>
+							<td className={"w-max"}>
 								<InputDetailsDesc
 									index={index}
 									attr='purpose'
@@ -356,6 +356,7 @@ export default function ExpenseDetailsEditForm({
 									disabled={isNotEditable}
 								/>
 							</td>
+
 							{/* Lodging */}
 							<td className={"w-11"}>
 								<InputDetailsNumber
@@ -488,7 +489,7 @@ export default function ExpenseDetailsEditForm({
 						</tr>
 					)
 				}) : null}
-					<tr>
+					{/* <tr>
 						<td colSpan={3}>
 							<p className='text-right'>
 								Total: 
@@ -524,7 +525,7 @@ export default function ExpenseDetailsEditForm({
 						<td>
 							{totalTot}
 						</td>
-					</tr>
+					</tr> */}
 				</tbody>
 			</table>
             <FormSubmitDetailsButton
