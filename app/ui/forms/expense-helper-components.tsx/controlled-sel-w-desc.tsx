@@ -3,7 +3,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { ExpenseDetailsExtended } from "@/app/lib/definitions";
 import { ExpenseContext } from "../../dashboard/expenses/expense-context-wrapper";
-
 interface ControlledSelectProps {
 	index: number,
 	attr: keyof ExpenseDetailsExtended,
@@ -109,7 +108,7 @@ export default function ControlledSelect({
 			id={info}
 			key={info}
 			name={info}
-			className={editStyle + " text-xs " + className}
+			className={editStyle + " text-xs px-1 " + className}
 			onChange={handleChange}
 			value={value}
 			disabled={disabled}

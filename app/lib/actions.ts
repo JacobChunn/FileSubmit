@@ -1041,7 +1041,7 @@ export async function editExpenseDetails(
 	// Return success
 	return {
 		success: true,
-		message: 'Timesheet Expense were successfully updated!'
+		message: 'Expense Details were successfully updated!'
 	}
 
 }

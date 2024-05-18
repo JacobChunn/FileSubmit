@@ -66,7 +66,7 @@ export default function InputDetailsNumber({
 				id={info+len}
 				key={info+len}
 				name={info}
-				className={bgCol + " flex-grow w-full text-xs " + className}
+				className={bgCol + " flex-grow w-full text-xs px-1 " + className}
 				value={formattedValue}
 				onChange={handleChange}
 				disabled={disabled}

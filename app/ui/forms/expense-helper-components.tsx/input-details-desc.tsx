@@ -53,7 +53,7 @@ export default function InputDetailsDesc({
                 id={info+len}
                 key={info+len}
                 name={info}
-                className={`flex-grow text-xs ${editStyle} w-full `}
+                className={`flex-grow text-xs px-1 ${editStyle} w-full `}
                 value={formattedValue}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}

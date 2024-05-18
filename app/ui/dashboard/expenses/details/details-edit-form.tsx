@@ -12,6 +12,8 @@ import InputDetailsDesc from '@/app/ui/forms/expense-helper-components.tsx/input
 import InputDetailsNumber from '@/app/ui/forms/expense-helper-components.tsx/input-details-number';
 import DeleteDetailButton from './delete-detail-button';
 import FormSubmitDetailsButton from './details-submit-button';
+import { Tooltip } from "@/app/ui/material-tailwind-wrapper";
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
 
 export default function ExpenseDetailsEditForm({
 
@@ -148,16 +150,34 @@ export default function ExpenseDetailsEditForm({
 		notFound();
 	}
 
-	const topTableHeaders: [string, number][] = [
+	const TravelHeader = (
+		<div className='flex flex-row justify-center items-center'>
+			Travel 
+			<Tooltip content="Air/Train/Bus/Taxi">
+				<InformationCircleIcon className="w-4 h-4"/>
+			</Tooltip>
+		</div>
+	)
+
+	const CarFeesHeader = (
+		<div className='w-full flex flex-row justify-center items-center'>
+			Car Fees 
+			<Tooltip content="Parking/Tolls/Gas">
+				<InformationCircleIcon className="w-full h-4"/>
+			</Tooltip>
+		</div>
+	)
+
+	const topTableHeaders: [React.ReactNode, number][] = [
 		["", 1], ["", 1],
-		["Travel(Air/Train/Bus/Taxi)", 2],
+		[TravelHeader, 2],
 		["Lodging", 1],
-		["Parking/Tolls/Gas", 1],
+		[CarFeesHeader, 1],
 		["Car Rental", 1],
 		["Mileage", 2],
 		["Perdiem", 1],
-		["Entertainment", 1],
-		["Miscellaneous", 2],
+		["Ent.", 1],
+		["Misc", 2],
 		["", 1],
 	];
 
@@ -260,7 +280,7 @@ export default function ExpenseDetailsEditForm({
 								className={`w-min h-min border-t ${index != 0 ? "border-l" : ""} border-blue-gray-100 bg-blue-gray-50/50 pt-4 px-2`}
 							>
 								<div
-									className="w-min h-min font-normal leading-none text-blue-gray-900 opacity-80 text-xs"
+									className="flex items-center justify-center w-full h-full font-normal leading-none text-blue-gray-900 opacity-80 text-xs"
 								>
 									{val[0]}
 								</div>
@@ -334,7 +354,7 @@ export default function ExpenseDetailsEditForm({
 							</td>
 
 							{/* Travel To/From */}
-							<td className={"w-11"}>
+							<td className={"w-max"}>
 								<InputDetailsDesc
 									index={index}
 									attr='transportwhere'
@@ -406,9 +426,11 @@ export default function ExpenseDetailsEditForm({
 							</td>
 
 							{/* Mileage Amount - This is just a display*/}
-							<td className={"w-11"}>
-								<div>
-									{}
+							<td className={"w-20"}>
+								<div className="max-w-sm mx-auto py-2.5 bg-white border border-black">
+									<p className='text-sm px-1'>
+										{Number(val.transportation) + Number(val.lodging) + Number(val.cabsparking) + Number(val.carrental) + (Number(val.miles) * Number(val.mileage)) + Number(val.perdiem) + Number(val.entertainment) + Number(val.miscvalue)}
+									</p>
 								</div>
 							</td>
 
@@ -437,7 +459,8 @@ export default function ExpenseDetailsEditForm({
 							</td>
 
 							{/* Misc Description */}
-							<td className={"w-11"}>
+							{/* changing the width to 48 makes the description change size when resizing??? */}
+							<td className={"w-32"}> 
 								<ControlledSelect
 									index={index}
 									attr='miscid'
@@ -464,16 +487,9 @@ export default function ExpenseDetailsEditForm({
 							</td>
 
 							{/* Total - this is just a display */}
-							<td className={"w-11"}>
-								<div>
-									{}
-								</div>
-							</td>
-
-							{/* Total */}
-							<td className={dayRowStyle}>
-								<div className="max-w-sm mx-auto m-0.5 bg-white border border-black">
-									<p className='text-sm'>
+							<td className={"w-20"}>
+								<div className="w-full py-2.5 bg-white border border-black">
+									<p className='w-full text-sm px-1'>
 										{Number(val.transportation) + Number(val.lodging) + Number(val.cabsparking) + Number(val.carrental) + (Number(val.miles) * Number(val.mileage)) + Number(val.perdiem) + Number(val.entertainment) + Number(val.miscvalue)}
 									</p>
 								</div>
