@@ -35,7 +35,8 @@ export default function InputDetailsDesc({
 	const formattedValue = (value !== null && value !== undefined) ? value : '';
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const newValue = event.target.value;
+		let newValue: string | null = event.target.value;
+		newValue = newValue !== '' ? newValue : null;
 		context.setLocalExpenseDetails(prev => {
 		  if (prev === null) return null;
 		  const updatedEXDs = [...prev];
@@ -45,7 +46,11 @@ export default function InputDetailsDesc({
 		});
 	};
 
-	const editStyle = dbValue !== value ? "bg-red-300 " : "bg-white";
+	const dbValueProcessed = dbValue !== null ? dbValue : '';
+	const valueProcessed = value !== null ? value : '';
+	const editStyle = dbValueProcessed !== valueProcessed ? "bg-red-300 " : "bg-white";
+
+	console.log(dbValue, value);
 
 	return (
         <div className="flex w-full h-full">

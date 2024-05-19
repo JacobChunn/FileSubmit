@@ -28,7 +28,7 @@ export default function ExpenseTableBody({
 
     const databaseDS = context.databaseExpenseDateStart;
     const localDS = context.localExpenseDateStart;
-    console.log(databaseDS && localDS && databaseDS.equals(localDS));
+    //console.log(databaseDS && localDS && databaseDS.equals(localDS));
 
     const handleEditDetails = (data: Expense) => {
         const dateString = data['datestart'];

@@ -43,22 +43,25 @@ export default function InputDetailsNumber({
 		const result = inputValue.match(/\d/g);
 		const newValue = result && !Number.isNaN(result) ? parseInt(result.join(''), 10) : "";
 
-		const formattedNewValue = newValue == "" ? 0.0 : newValue
+		const formattedNewValue = newValue == "" ? null : String(newValue)
 
 		//console.log(newValue, typeof(newValue))
 
 		context.setLocalExpenseDetails(prev => {
 		  if (prev === null) return null;
 		  const updatedEXDs = [...prev];
-		  const updatedItem = { ...updatedEXDs[index], [attr]: String(formattedNewValue) };
+		  const updatedItem = { ...updatedEXDs[index], [attr]: formattedNewValue };
 		  updatedEXDs[index] = updatedItem;
 		  return updatedEXDs;
 		});
 	};
 
-	const bgCol = dbValue == null || String(dbValue) !== String(value) ? "bg-red-300 " : "bg-white ";
+	const dbValueProcessed = dbValue !== null ? String(dbValue) : '';
+	const valueProcessed = value !== null ? String(value) : '';
+	const bgCol = dbValueProcessed !== valueProcessed ? "bg-red-300 " : "bg-white ";
 
-	//console.log("compare: ", info, dbValue, typeof dbValue,  value, typeof value)
+	console.log("compare: ", dbValueProcessed, typeof dbValueProcessed, valueProcessed, typeof valueProcessed);
+
 
 	return (
 		<div className="flex w-full h-full">

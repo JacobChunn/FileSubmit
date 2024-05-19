@@ -315,7 +315,7 @@ export default function ExpenseDetailsEditForm({
 							key={"k-" + index + expenseID}
 							className='w-full h-full'
 						>
-							<td className={'w-32'}>
+							<td className={'w-24'}>
 								{/* Hidden EXD id */}
 								<input
 									id={"EXD" + index + "[" + "id" + "]"}
@@ -342,7 +342,7 @@ export default function ExpenseDetailsEditForm({
 							</td>
 
 							{/* Purpose */}
-							<td className={"w-max"}>
+							<td className={"w-auto"}>
 								<InputDetailsDesc
 									index={index}
 									attr='purpose'
@@ -354,7 +354,7 @@ export default function ExpenseDetailsEditForm({
 							</td>
 
 							{/* Travel To/From */}
-							<td className={"w-max"}>
+							<td className={"w-auto"}>
 								<InputDetailsDesc
 									index={index}
 									attr='transportwhere'
@@ -459,7 +459,6 @@ export default function ExpenseDetailsEditForm({
 							</td>
 
 							{/* Misc Description */}
-							{/* changing the width to 48 makes the description change size when resizing??? */}
 							<td className={"w-32"}> 
 								<ControlledSelect
 									index={index}
