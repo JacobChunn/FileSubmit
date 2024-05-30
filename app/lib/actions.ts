@@ -736,6 +736,99 @@ export async function fetchExpenseDetailsEditFormData(
 	}
 }
 
+export async function deleteExpense(
+	expenseid: number
+  ) {
+	const validatedFields = OnlyExpenseID.safeParse({
+	  id: expenseid,
+	});
+  
+	// If form validation fails, return errors early. Otherwise, continue.
+	if (!validatedFields.success) {
+	  return {
+		errors: validatedFields.error.flatten().fieldErrors,
+		message: 'Missing Fields. Failed to delete expense.',
+	  };
+	}
+  
+	const { id } = validatedFields.data;
+  
+	// Get the user session to ensure they are who they say they are
+	const session = await getServerSession(authOptions);
+  
+	if (!session) {
+	  console.log("Session was unable to be retrieved!");
+	  return {
+		message: 'Session was unable to be retrieved!',
+	  };
+  
+	}
+  
+	const sessionEmployeeid = Number(session.user.id);
+  
+	// Get database data
+	var DBexpenseData;
+	try {
+		DBexpenseData = await sql`
+		  SELECT 
+		  employeeid
+		  FROM expenses
+		  WHERE expenses.id = ${id};
+	  `;
+	} catch (error) {
+	  return {
+		  message: 'Database Error: Failed to get Expense Data.',
+	  };
+  }
+  
+	if (!(DBexpenseData && DBexpenseData.rowCount > 0)) {
+	  console.log("Expense of ID was not found!");
+	  return {
+		message: 'Expense of ID was not found!',
+	  };
+	}
+  
+	const DBdata = DBexpenseData.rows[0];
+  
+	// Validate the user is trying to delete their own expense
+	const DBemployeeid = DBdata.employeeid;
+  
+	if (Number(DBemployeeid) != sessionEmployeeid) {
+	  console.log("Session user id did not match with associated expense!");
+	  return {
+		message: 'Session user id did not match with associated expense!',
+	  };
+	}
+  
+	try {
+	  await deleteExpenseDetailsByExpense(id);
+  
+	  await sql`
+		DELETE FROM expenses
+		WHERE id = ${id}; 
+	  `;
+	} catch (error) {
+	  console.log(error);
+	  return {
+		message: 'Database Error: Failed to Delete Expense.',
+	  };
+	}
+  
+	revalidatePath('/dashboard/expenses');
+	redirect('/dashboard/expenses');
+}
+
+async function deleteExpenseDetailsByExpense(expenseid: number) {
+	try {
+		await sql`
+			DELETE FROM expensedetails WHERE expenseid = ${expenseid};
+		`;
+	} catch(error) {
+		console.log(error);
+		return;
+	}
+}
+
 export async function editExpenseDetails(
 	expenseID: number,
 	prevState: any,
