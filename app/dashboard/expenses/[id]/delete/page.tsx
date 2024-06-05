@@ -22,11 +22,11 @@ export default async function Page({ params }: { params: { id: any } }) {
     return (
         <main className='flex flex-col h-full'>
 			<Breadcrumbs className='bg-transparent'>
-				<Link href='/dashboard' className={clsx(lusitana.className,"text-2xl opacity-60")}>
+				<Link href='/dashboard/expenses' className={clsx(lusitana.className,"text-2xl opacity-60")}>
 				    Expenses
 				</Link>
-				<Link href={`/dashboard/${id}/edit`} className={clsx(lusitana.className,"text-2xl")}>
-				    Delete Timesheet
+				<Link href={`/dashboard/expenses/${id}/delete`} className={clsx(lusitana.className,"text-2xl")}>
+				    Delete Expense
 				</Link>
 			</Breadcrumbs>
 			<div className='flex flex-col flex-1 justify-center items-center'>

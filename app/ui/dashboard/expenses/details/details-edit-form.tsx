@@ -164,6 +164,9 @@ export default function ExpenseDetailsEditForm({
 		setCurrentPerdiem(perdiem);
 	}, [context.localExpenseDateStart]);
 
+	console.log("currentMileage: ", currentMileage);
+	console.log("currentPerdiem: ", currentPerdiem);
+
 	if (!EXDRateAndOptions || !currentMileage || !currentPerdiem) {
 		console.log("Loading...")
 		return (<div>Loading...</div>)
