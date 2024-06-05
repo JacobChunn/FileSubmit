@@ -59,7 +59,20 @@ export default function ExpenseDetailsEditForm({
 					mileage: processRateArray(EXDDataReturn.rates.mileage),
 					perdiem: processRateArray(EXDDataReturn.rates.perdiem)
 				}
+
 				setAllRates(processedRates);
+
+				if (!context.localExpenseDateStart) {
+					throw new Error(
+						"localExpenseDateStart of ExpenseContext has not been set!"
+					);
+				}
+
+				let mileage = getMostRecentRate(processedRates.mileage, context.localExpenseDateStart);
+				let perdiem = getMostRecentRate(processedRates.perdiem, context.localExpenseDateStart);
+
+				setCurrentMileage(mileage);
+				setCurrentPerdiem(perdiem);
 
 				context.setLocalExpenseDetails(EXDDataReturn.expenseDetails);
 				context.setDatabaseExpenseDetails(EXDDataReturn.expenseDetails);
@@ -151,12 +164,14 @@ export default function ExpenseDetailsEditForm({
 	]);
 
 	useEffect(() => {
+		console.log("context.localExpenseDateStart changed!")
 		let mileage = null;
 		let perdiem = null;
-		// recalculate current mileage and perdiem
 		const dateStart = context.localExpenseDateStart;
+		// recalculate current mileage and perdiem
+
 		if (allRates && dateStart) {
-			mileage = getMostRecentRate(allRates.mileage, dateStart); // test to see if the recent rates work when datestart changes
+			mileage = getMostRecentRate(allRates.mileage, dateStart);
 			perdiem = getMostRecentRate(allRates.perdiem, dateStart);
 		}
 
@@ -166,6 +181,7 @@ export default function ExpenseDetailsEditForm({
 
 	console.log("currentMileage: ", currentMileage);
 	console.log("currentPerdiem: ", currentPerdiem);
+	console.log("context.localExpenseDateStart", context.localExpenseDateStart?.toLocaleString());
 
 	if (!EXDRateAndOptions || !currentMileage || !currentPerdiem) {
 		console.log("Loading...")
@@ -455,20 +471,17 @@ export default function ExpenseDetailsEditForm({
 								<td className={"w-20"}>
 									<div className="max-w-sm mx-auto py-2.5 bg-white border border-black">
 										<p className='text-sm px-1'>
-											{(Number(val.miles) * Number(val.mileage)).toFixed(2)}
+											{(Number(val.miles) * Number(mileage)).toFixed(2)}
 										</p>
 									</div>
 								</td>
 								{/* Perdiem */}
 								<td className={"w-11"}>
-									<InputDetailsNumber
-										index={index}
-										attr='perdiem'
-										info={"EXD" + index + "[" + "perdiem" + "]"}
-										value={val.perdiem}
-										dbValue={dbVal?.perdiem}
-										disabled={isNotEditable}
-									/>
+								<div className="max-w-sm mx-auto py-2.5 bg-white border border-black">
+										<p className='text-sm px-1'>
+											{Number(perdiem).toFixed(2)}
+										</p>
+									</div>
 								</td>
 								{/* Entertainment */}
 								<td className={"w-11"}>
@@ -510,7 +523,7 @@ export default function ExpenseDetailsEditForm({
 								<td className={"w-20"}>
 									<div className="w-full py-2.5 bg-white border border-black">
 										<p className='w-full text-sm px-1'>
-											{Number(val.transportation) + Number(val.lodging) + Number(val.cabsparking) + Number(val.carrental) + (Number(val.miles) * Number(val.mileage)) + Number(val.perdiem) + Number(val.entertainment) + Number(val.miscvalue)}
+											{Number(val.transportation) + Number(val.lodging) + Number(val.cabsparking) + Number(val.carrental) + (Number(val.miles) * Number(mileage)) + Number(perdiem) + Number(val.entertainment) + Number(val.miscvalue)}
 										</p>
 									</div>
 								</td>
@@ -638,6 +651,8 @@ export default function ExpenseDetailsEditForm({
 			</table>
             <FormSubmitDetailsButton
 				submitDisabled={isNotSubmitable}
+				mileage={mileage}
+				perdiem={perdiem}
             /> 
         </form>
     );
