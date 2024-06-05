@@ -101,19 +101,36 @@ export default function ControlledSelect({
 		});
 	}, []);
 
+	const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
+		context.setSelectedExpenseDetails(index);
+		// Manually trigger click on the select element
+		const selectElement = document.getElementById(info) as HTMLSelectElement;
+		if (selectElement) {
+			console.log("select Clicked")
+			selectElement.click();
+		}
+	};
+
 	const editStyle = dbValue == null || dbValue !== value ? "bg-red-300 " : "";
 
 	return (
-		<select
-			id={info}
-			key={info}
-			name={info}
-			className={editStyle + " text-xs px-1 " + className}
-			onChange={handleChange}
-			value={value}
-			disabled={disabled}
-		>
-			{children}
-		</select>
+		<div className="relative w-full h-full">
+			<select
+				id={info}
+				key={info}
+				name={info}
+				className={editStyle + " text-xs px-1 " + className}
+				onChange={handleChange}
+				value={value}
+				disabled={disabled}
+			>
+				{children}
+			</select>
+			<div
+				className="absolute top-0 left-0 w-full h-full"
+				onClick={handleOverlayClick}
+				style={{ cursor: 'pointer', pointerEvents: disabled ? 'auto' : 'none' }}
+			/>
+		</div>
 	)
 }
