@@ -56,6 +56,15 @@ export default function InputDetailsNumber({
 		});
 	};
 
+	const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
+		context.setSelectedExpenseDetails(index);
+		// Manually trigger click on the input element
+		const inputElement = document.getElementById(info+len) as HTMLInputElement;
+		if (inputElement) {
+			inputElement.click();
+		}
+	};
+
 	const dbValueProcessed = dbValue !== null ? String(dbValue) : '';
 	const valueProcessed = value !== null ? String(value) : '';
 	const bgCol = dbValueProcessed !== valueProcessed ? "bg-red-300 " : "bg-white ";
@@ -64,7 +73,7 @@ export default function InputDetailsNumber({
 
 
 	return (
-		<div className="flex w-full h-full">
+		<div className="relative flex w-full h-full">
 			<input
 				id={info+len}
 				key={info+len}
@@ -72,7 +81,7 @@ export default function InputDetailsNumber({
 				className={bgCol + " flex-grow w-full text-xs px-1 " + className}
 				value={formattedValue}
 				onChange={handleChange}
-				disabled={disabled}
+				readOnly={disabled}
 			/>
 		</div>
 	)

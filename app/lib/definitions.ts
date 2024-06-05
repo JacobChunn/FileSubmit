@@ -1,6 +1,9 @@
 // This file contains type definitions for your data.
 // It describes the shape of the data, and what data type each property should accept.
 // For simplicity of teaching, we're manually defining these types.
+
+import { DateTime } from "luxon";
+
 // However, these types are generated automatically if you're using an ORM such as Prisma.
 export type User = {
   id: string;
@@ -340,6 +343,36 @@ export type CostCodeOption = {
 export type MiscOption = {
 	id: number;
 	description: string;
+}
+
+export type Mileage = {
+	rate: number;
+	datestart: string;
+}
+
+export type Perdiem = {
+	rate: number;
+	datestart: string;
+}
+
+export type ExpenseRates = {
+	mileage: Mileage[];
+	perdiem: Perdiem[];
+}
+
+export type MileageDateTime = {
+	rate: number;
+	datestart: DateTime<true> | DateTime<false>;
+}
+
+export type PerdiemDateTime = {
+	rate: number;
+	datestart: DateTime<true> | DateTime<false>;
+}
+
+export type AllRates = {
+	mileage: MileageDateTime[];
+	perdiem: PerdiemDateTime[];
 }
 
 export type PhaseCostCodeOption = {

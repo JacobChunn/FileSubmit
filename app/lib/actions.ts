@@ -6,7 +6,7 @@ import { revalidatePath, unstable_noStore } from 'next/cache';
 import { redirect } from 'next/navigation';
 //import { signIn } from '@/auth';
 //import { AuthError } from 'next-auth';
-import { CostCodeOption, EditDetailsType, EmployeeState, Expense, ExpenseDetails, ExpenseOptions, MiscOption, Options, PhaseCostCodeOption, PhaseOption, ProjectOption, ProjectState, Timesheet, TimesheetDetails } from './definitions';
+import { CostCodeOption, EditDetailsType, EmployeeState, Expense, ExpenseDetails, ExpenseOptions, ExpenseRates, Mileage, MiscOption, Options, Perdiem, PhaseCostCodeOption, PhaseOption, ProjectOption, ProjectState, Timesheet, TimesheetDetails } from './definitions';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../api/auth/[...nextauth]/options';
 import { fetchEmployeeByID, fetchTimesheetsByEmployeeID } from './data';
@@ -123,6 +123,7 @@ const EditExpenseDetails = ExpenseDetailsSchema.omit({
 	employeeid: true,
 	total: true,
 	mileage: true,
+	perdiem: true,
 });
 
 const TimesheetSchema = z.object({
@@ -438,17 +439,31 @@ async function addExpenseHelper(
 	totalexpenses: number,
 	datepaid: string | null
 ) {
-  // Get Milage Rate
+  // Get Milage + Perdiem Rate
   let mileagerate: number;
+  let perdiemrate: number;
   try {
-    const mileagerateData = await sql`
-      SELECT rate
-      FROM mileagerates
-      ORDER BY DateStart DESC
-      LIMIT 1;
+    const mileageData = await sql`
+		SELECT rate
+		FROM mileagerates
+		WHERE datestart <= ${datestart}
+		ORDER BY datestart DESC
+		LIMIT 1;
     `;
+	if (!mileageData.rows[0].rate) throw new Error("Error getting mileage data!");
 
-    mileagerate = mileagerateData.rows[0].rate;
+    mileagerate = mileageData.rows[0].rate;
+
+	const perdiemData = await sql`
+		SELECT rate
+		FROM perdiemrates
+		WHERE datestart <= ${datestart}
+		ORDER BY datestart DESC
+		LIMIT 1;
+	`;
+	if (!perdiemData.rows[0].rate) throw new Error("Error getting perdiem data!");
+	
+	perdiemrate = perdiemData.rows[0].rate;
   } catch (error) {
     console.error(error);
     return {
@@ -456,6 +471,20 @@ async function addExpenseHelper(
       message: JSON.stringify(error),
     };
   }
+
+//   console.log(`employeeid: ${employeeid}`);
+//   console.log(`datestart: ${datestart}`);
+//   console.log(`numdays: ${numdays}`);
+//   console.log(`usercommitted: ${usercommitted ? 1 : 0}`);
+//   console.log(`mgrapproved: ${mgrapproved ? 1 : 0}`);
+//   console.log(`paid: ${paid ? 1 : 0}`);
+//   console.log(`totalexpenses: ${totalexpenses}`);
+//   console.log(`approvedby: ${approvedby}`);
+//   console.log(`submittedby: ${submittedby}`);
+//   console.log(`processedby: ${processedby}`);
+//   console.log(`datepaid: ${datepaid}`);
+//   console.log(`mileagerate: ${mileagerate}`);
+  
 
   // Add a expense entry
   let expenseID: number;
@@ -481,6 +510,8 @@ async function addExpenseHelper(
       const addExpenseDetailsRes = await addExpenseDetailsHelper({
         expenseid: expenseID,
         employeeid: employeeid,
+		mileage: mileagerate,
+		perdiem: perdiemrate,
       });
 		  
       if(!addExpenseDetailsRes.success) {
@@ -553,6 +584,30 @@ async function addExpenseDetailsHelper({
 	entpurpose?: string | null,
 }) {
 	try {
+
+		console.log(`expenseid: ${expenseid}`);
+		console.log(`employeeid: ${employeeid}`);
+		console.log(`jobid: ${jobid}`);
+		console.log(`purpose: ${purpose}`);
+		console.log(`transportwhere: ${transportwhere}`);
+		console.log(`transportation: ${transportation}`);
+		console.log(`lodging: ${lodging}`);
+		console.log(`cabsparking: ${cabsparking}`);
+		console.log(`carrental: ${carrental}`);
+		console.log(`miles: ${miles}`);
+		console.log(`mileage: ${mileage}`);
+		console.log(`perdiem: ${perdiem}`);
+		console.log(`entertainment: ${entertainment}`);
+		console.log(`miscid: ${miscid}`);
+		console.log(`miscvalue: ${miscvalue}`);
+		console.log(`total: ${total}`);
+		console.log(`miscdetail: ${miscdetail}`);
+		console.log(`entlocation: ${entlocation}`);
+		console.log(`entactivity: ${entactivity}`);
+		console.log(`entwho: ${entwho}`);
+		console.log(`entpurpose: ${entpurpose}`);
+		
+
 		await sql`
 			INSERT INTO expensedetails (
 				expenseid, employeeid, jobid,
@@ -711,28 +766,139 @@ export async function fetchExpenseDetailsEditFormData(
 			WHERE expensedetails.expenseid = ${validatedExpenseID}
 				AND expensedetails.employeeid = ${employeeID}
 		`;
-		const expenseDetails = EXDData.rows;
+		
 		const projectsData = await sql<ProjectOption>`
 			SELECT id, number, shortname, description FROM projects;
 		`;
 	
 		const miscData = await sql<MiscOption>`
-		  SELECT id, description FROM misc;
+			SELECT id, description FROM misc;
 		`;
 
+		const mileageData = await sql<Mileage>`
+			SELECT rate, datestart FROM mileagerates;
+		`;
+
+		const perdiemData = await sql<Perdiem>`
+			SELECT rate, datestart FROM perdiemrates;
+		`;
+
+		const expenseDetails = EXDData.rows;
 		const projects = projectsData.rows;
 		const misc = miscData.rows;
 
+		const mileage = mileageData.rows;
+
+		const perdiem = perdiemData.rows;
+
 		const options: ExpenseOptions = {
 			projects,
-			misc,
+			misc
+		}
+
+		const rates: ExpenseRates = {
+			mileage,
+			perdiem
 		}
 		
-		return {options, expenseDetails};
+		return {rates, options, expenseDetails};
 
 	} catch (error) {
 		console.error('Database Error:', error);
 		throw error;
+	}
+}
+
+export async function deleteExpense(
+	expenseid: number
+  ) {
+	const validatedFields = OnlyExpenseID.safeParse({
+	  id: expenseid,
+	});
+  
+	// If form validation fails, return errors early. Otherwise, continue.
+	if (!validatedFields.success) {
+	  return {
+		errors: validatedFields.error.flatten().fieldErrors,
+		message: 'Missing Fields. Failed to delete expense.',
+	  };
+	}
+  
+	const { id } = validatedFields.data;
+  
+	// Get the user session to ensure they are who they say they are
+	const session = await getServerSession(authOptions);
+  
+	if (!session) {
+	  console.log("Session was unable to be retrieved!");
+	  return {
+		message: 'Session was unable to be retrieved!',
+	  };
+  
+	}
+  
+	const sessionEmployeeid = Number(session.user.id);
+  
+	// Get database data
+	var DBexpenseData;
+	try {
+		DBexpenseData = await sql`
+		  SELECT 
+		  employeeid
+		  FROM expenses
+		  WHERE expenses.id = ${id};
+	  `;
+	} catch (error) {
+	  return {
+		  message: 'Database Error: Failed to get Expense Data.',
+	  };
+  }
+  
+	if (!(DBexpenseData && DBexpenseData.rowCount > 0)) {
+	  console.log("Expense of ID was not found!");
+	  return {
+		message: 'Expense of ID was not found!',
+	  };
+	}
+  
+	const DBdata = DBexpenseData.rows[0];
+  
+	// Validate the user is trying to delete their own expense
+	const DBemployeeid = DBdata.employeeid;
+  
+	if (Number(DBemployeeid) != sessionEmployeeid) {
+	  console.log("Session user id did not match with associated expense!");
+	  return {
+		message: 'Session user id did not match with associated expense!',
+	  };
+	}
+  
+	try {
+	  await deleteExpenseDetailsByExpense(id);
+  
+	  await sql`
+		DELETE FROM expenses
+		WHERE id = ${id}; 
+	  `;
+	} catch (error) {
+	  console.log(error);
+	  return {
+		message: 'Database Error: Failed to Delete Expense.',
+	  };
+	}
+  
+	revalidatePath('/dashboard/expenses');
+	redirect('/dashboard/expenses');
+}
+
+async function deleteExpenseDetailsByExpense(expenseid: number) {
+	try {
+		await sql`
+			DELETE FROM expensedetails WHERE expenseid = ${expenseid};
+		`;
+	} catch(error) {
+		console.log(error);
+		return;
 	}
 }
 
@@ -784,7 +950,7 @@ export async function editExpenseDetails(
 	try {
 		const expenseIsSigned = await sql`
 			SELECT usercommitted
-			FROM expense
+			FROM expenses
 			WHERE id = ${validatedExpenseID}
 				AND employeeid = ${employeeID};
 		`;
@@ -848,8 +1014,9 @@ export async function editExpenseDetails(
 		}
 	}
 
-	// Get mileage
-	let mileage;
+	// Get mileage + perdiem
+	let mileage: number;
+	let perdiem: number;
 	try {
 		const mileageData = await sql`
 			SELECT rate
@@ -861,12 +1028,23 @@ export async function editExpenseDetails(
 		if (!mileageData.rows[0].rate) throw new Error("Error getting mileage data!");
 		
 		mileage = mileageData.rows[0].rate;
+
+		const perdiemData = await sql`
+			SELECT rate
+			FROM perdiemrates
+			WHERE datestart <= ${validatedDateStart.data.date}
+			ORDER BY datestart DESC
+			LIMIT 1;
+		`;
+		if (!perdiemData.rows[0].rate) throw new Error("Error getting perdiem data!");
+		
+		perdiem = perdiemData.rows[0].rate;
 	} catch(error) {
 		console.error(error);
 		return {
 			success: false,
 			errors: JSON.stringify(error),
-			message: 'Error getting mileage data!'
+			message: 'Error getting mileage/perdiem data!'
 		}
 	}
 
@@ -911,7 +1089,7 @@ export async function editExpenseDetails(
 			cabsparking: Number(separateEXDs[exdkey]['cabsparking']),
 			carrental: Number(separateEXDs[exdkey]['carrental']),
 			miles: Number(separateEXDs[exdkey]['miles']),
-			perdiem: Number(separateEXDs[exdkey]['perdiem']),
+			//perdiem: Number(separateEXDs[exdkey]['perdiem']),
 			entertainment: Number(separateEXDs[exdkey]['entertainment']),
 			miscid: Number(separateEXDs[exdkey]['miscid']),
 			miscvalue: Number(separateEXDs[exdkey]['miscvalue']),
@@ -936,16 +1114,24 @@ export async function editExpenseDetails(
 		const transportation = validatedEXD.data.transportation ? validatedEXD.data.transportation : 0;
 		const lodging = validatedEXD.data.lodging ? validatedEXD.data.lodging : 0;
 		const milesCost = validatedEXD.data.miles ? validatedEXD.data.miles * mileage : 0;
-		const perdiem = validatedEXD.data.perdiem ? validatedEXD.data.perdiem : 0;
+		//const perdiem = validatedEXD.data.perdiem ? validatedEXD.data.perdiem : 0;
 		const entertainment = validatedEXD.data.entertainment ? validatedEXD.data.entertainment : 0;
 		const misc = validatedEXD.data.miscvalue ? validatedEXD.data.miscvalue : 0;
 
 		// Calculate total. Add travel, parking/etc, miles * mileage, perdiem, entertainment, and misc
-		const total = transportation + lodging + milesCost + perdiem + entertainment + misc;
+		const total = transportation + lodging + milesCost + Number(perdiem) + entertainment + misc;
+
+		console.log(`transportation: ${transportation}`);
+		console.log(`lodging: ${lodging}`);
+		console.log(`milesCost: ${milesCost}`);
+		console.log(`perdiem: ${perdiem}`);
+		console.log(`entertainment: ${entertainment}`);
+		console.log(`misc: ${misc}`);
+		console.log(`total: ${total}`);
 
 
 		// Push validated Expense details with mileage and total
-		validatedEXDs.push({...validatedEXD.data, mileage, total});
+		validatedEXDs.push({...validatedEXD.data, perdiem, mileage, total});
 
 	}
 
@@ -975,6 +1161,8 @@ export async function editExpenseDetails(
 			entwho, entpurpose
 
 		} = EXD;
+
+		console.log("inner total: ", total)
 
 		try {
 			const addExpenseDetailsRes = await addExpenseDetailsHelper({ // Do I need to ensure user is authorized?

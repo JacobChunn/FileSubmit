@@ -8,6 +8,9 @@ type expenseContextType = {
     selectedExpense: number | null;
     setSelectedExpense: React.Dispatch<React.SetStateAction<number | null>>;
 
+	selectedExpenseDetails: number | null;
+	setSelectedExpenseDetails: React.Dispatch<React.SetStateAction<number | null>>;
+
     localExpenses: Expense[] | null;
     setLocalExpenses: React.Dispatch<React.SetStateAction<Expense[] | null>>;
 
@@ -39,6 +42,7 @@ export default function ExpenseContextWrapper({
 }) {
 
 	const [selectedExpense, setSelectedExpense] = useState<number | null>(null);
+	const [selectedExpenseDetails, setSelectedExpenseDetails] = useState<number | null>(null);
     const [localExpenses, setLocalExpenses] = useState<Expense[] | null>(null);
     const [localExpenseDetails, setLocalExpenseDetails] = useState<ExpenseDetailsExtended[] | null>(null);
     const [databaseExpenseDetails, setDatabaseExpenseDetails] = useState<ExpenseDetailsExtended[] | null>(null);
@@ -51,6 +55,7 @@ export default function ExpenseContextWrapper({
         <ExpenseContext.Provider
             value={{
                 selectedExpense, setSelectedExpense,
+				selectedExpenseDetails, setSelectedExpenseDetails,
                 localExpenses, setLocalExpenses,
                 localExpenseDetails, setLocalExpenseDetails,
                 databaseExpenseDetails, setDatabaseExpenseDetails,

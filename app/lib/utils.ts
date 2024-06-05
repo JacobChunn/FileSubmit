@@ -56,6 +56,31 @@ export function compareDates(
 	return local.equals(database);
 }
 
+export function getMostRecentRate<T extends { rate: number; datestart: DateTime<true> | DateTime<false> }>(
+	items: T[],
+	dateStart: DateTime<true> | DateTime<false>
+): number | null {
+	const filteredItems = items.filter(item => item.datestart <= dateStart);
+	if (filteredItems.length === 0) {
+	  return null;
+	}
+	const mostRecent = filteredItems.reduce((mostRecent, current) => {
+		return current.datestart > mostRecent.datestart ? current : mostRecent;
+	});
+	return mostRecent.rate;
+}
+
+export function processRateArray(rateArr: Array<any>) {
+	let newArr = [];
+	for (const element of rateArr) {
+		const dateString = element["datestart"];
+        const jsDate = new Date(dateString);
+        const luxonDateTime = DateTime.fromJSDate(jsDate);
+		newArr.push({rate: element["rate"], datestart: luxonDateTime})
+	}
+	return newArr;
+}
+
 export const formatCurrency = (amount: number) => {
   return (amount / 100).toLocaleString('en-US', {
     style: 'currency',
