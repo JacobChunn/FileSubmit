@@ -12,7 +12,6 @@ import { authOptions } from '../api/auth/[...nextauth]/options';
 import { fetchEmployeeByID, fetchTimesheetsByEmployeeID } from './data';
 import * as bcrypt from 'bcrypt';
 import { DateTime } from 'luxon';
-import { time } from 'console';
  
 const FormSchema = z.object({
   id: z.string(),
@@ -339,15 +338,15 @@ export async function addProject( // make it not break when project table doesnt
   // Prepare data for insertion into the database
   // Noting needed as of now
 
-  console.log("Start Date: ")
-  console.log(startdate)
-  console.log(startdate.toISOString())
-  console.log(startdate.toUTCString())
-  console.log(startdate.toTimeString())
-  console.log(startdate.toJSON())
-  console.log(startdate.toDateString())
-  console.log(startdate.getDate())
-  console.log(startdate.getUTCDate())
+//   console.log("Start Date: ")
+//   console.log(startdate)
+//   console.log(startdate.toISOString())
+//   console.log(startdate.toUTCString())
+//   console.log(startdate.toTimeString())
+//   console.log(startdate.toJSON())
+//   console.log(startdate.toDateString())
+//   console.log(startdate.getDate())
+//   console.log(startdate.getUTCDate())
   
 
   try {
@@ -585,27 +584,27 @@ async function addExpenseDetailsHelper({
 }) {
 	try {
 
-		console.log(`expenseid: ${expenseid}`);
-		console.log(`employeeid: ${employeeid}`);
-		console.log(`jobid: ${jobid}`);
-		console.log(`purpose: ${purpose}`);
-		console.log(`transportwhere: ${transportwhere}`);
-		console.log(`transportation: ${transportation}`);
-		console.log(`lodging: ${lodging}`);
-		console.log(`cabsparking: ${cabsparking}`);
-		console.log(`carrental: ${carrental}`);
-		console.log(`miles: ${miles}`);
-		console.log(`mileage: ${mileage}`);
-		console.log(`perdiem: ${perdiem}`);
-		console.log(`entertainment: ${entertainment}`);
-		console.log(`miscid: ${miscid}`);
-		console.log(`miscvalue: ${miscvalue}`);
-		console.log(`total: ${total}`);
-		console.log(`miscdetail: ${miscdetail}`);
-		console.log(`entlocation: ${entlocation}`);
-		console.log(`entactivity: ${entactivity}`);
-		console.log(`entwho: ${entwho}`);
-		console.log(`entpurpose: ${entpurpose}`);
+		// console.log(`expenseid: ${expenseid}`);
+		// console.log(`employeeid: ${employeeid}`);
+		// console.log(`jobid: ${jobid}`);
+		// console.log(`purpose: ${purpose}`);
+		// console.log(`transportwhere: ${transportwhere}`);
+		// console.log(`transportation: ${transportation}`);
+		// console.log(`lodging: ${lodging}`);
+		// console.log(`cabsparking: ${cabsparking}`);
+		// console.log(`carrental: ${carrental}`);
+		// console.log(`miles: ${miles}`);
+		// console.log(`mileage: ${mileage}`);
+		// console.log(`perdiem: ${perdiem}`);
+		// console.log(`entertainment: ${entertainment}`);
+		// console.log(`miscid: ${miscid}`);
+		// console.log(`miscvalue: ${miscvalue}`);
+		// console.log(`total: ${total}`);
+		// console.log(`miscdetail: ${miscdetail}`);
+		// console.log(`entlocation: ${entlocation}`);
+		// console.log(`entactivity: ${entactivity}`);
+		// console.log(`entwho: ${entwho}`);
+		// console.log(`entpurpose: ${entpurpose}`);
 		
 
 		await sql`

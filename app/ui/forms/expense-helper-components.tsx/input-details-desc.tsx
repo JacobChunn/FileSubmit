@@ -50,7 +50,7 @@ export default function InputDetailsDesc({
 	const valueProcessed = value !== null ? value : '';
 	const editStyle = dbValueProcessed !== valueProcessed ? "bg-red-300 " : "bg-white";
 
-	console.log(dbValue, value);
+	//console.log(dbValue, value);
 
 	return (
         <div className="flex w-full h-full">

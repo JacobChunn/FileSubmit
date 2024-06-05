@@ -6,10 +6,14 @@ import { Expense } from "@/app/lib/definitions";
 
 export type Props = {
 	submitDisabled: boolean,
+	mileage: number,
+	perdiem: number
 }
 
 export default function FormSubmitDetailsButton({
 	submitDisabled,
+	mileage,
+	perdiem
 }: Props
 ) {
 	const context = useContext(ExpenseContext);
@@ -40,7 +44,7 @@ export default function FormSubmitDetailsButton({
 		let totalexpenses = 0.0;
 
 		localEXDs.forEach(EXD => {
-			totalexpenses += (Number(EXD.transportation) + Number(EXD.lodging) + Number(EXD.cabsparking) + Number(EXD.carrental) + (Number(EXD.miles) * Number(EXD.mileage)) + Number(EXD.perdiem) + Number(EXD.entertainment) + Number(EXD.miscvalue));
+			totalexpenses += (Number(EXD.transportation) + Number(EXD.lodging) + Number(EXD.cabsparking) + Number(EXD.carrental) + (Number(EXD.miles) * Number(mileage)) + Number(perdiem) + Number(EXD.entertainment) + Number(EXD.miscvalue));
 			
 		});
 

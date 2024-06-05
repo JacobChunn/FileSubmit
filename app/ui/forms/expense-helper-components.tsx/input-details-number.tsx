@@ -69,7 +69,7 @@ export default function InputDetailsNumber({
 	const valueProcessed = value !== null ? String(value) : '';
 	const bgCol = dbValueProcessed !== valueProcessed ? "bg-red-300 " : "bg-white ";
 
-	console.log("compare: ", dbValueProcessed, typeof dbValueProcessed, valueProcessed, typeof valueProcessed);
+	//console.log("compare: ", dbValueProcessed, typeof dbValueProcessed, valueProcessed, typeof valueProcessed);
 
 
 	return (
