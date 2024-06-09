@@ -523,7 +523,7 @@ export default function ExpenseDetailsEditForm({
 								<td className={"w-20"}>
 									<div className="w-full py-2.5 bg-white border border-black">
 										<p className='w-full text-sm px-1'>
-											{Number(val.transportation) + Number(val.lodging) + Number(val.cabsparking) + Number(val.carrental) + (Number(val.miles) * Number(mileage)) + Number(perdiem) + Number(val.entertainment) + Number(val.miscvalue)}
+											{(Number(val.transportation) + Number(val.lodging) + Number(val.cabsparking) + Number(val.carrental) + (Number(val.miles) * Number(mileage)) + Number(perdiem) + Number(val.entertainment) + Number(val.miscvalue)).toFixed(2)}
 										</p>
 									</div>
 								</td>
