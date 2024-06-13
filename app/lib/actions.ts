@@ -756,7 +756,7 @@ export async function fetchExpenseDetailsEditFormData(
 	try {
 		const EXDData = await sql<ExpenseDetails>`
 			SELECT
-				id, expenseid, employeeid, jobid,
+				id, expenseid, employeeid, jobid, day,
 				purpose, transportwhere, transportation,
 				lodging, cabsparking, carrental, miles, mileage,
 				perdiem, entertainment, miscid, miscvalue, total,

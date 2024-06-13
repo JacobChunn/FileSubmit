@@ -1,7 +1,7 @@
 'use client';
 
 import { useFormState } from 'react-dom';
-import { AllRates, ExpenseDetails, ExpenseOptions, ExpenseRates, SavingState } from '@/app/lib/definitions';
+import { AllRates, ExpenseOptions, ExpenseRates, SavingState } from '@/app/lib/definitions';
 import { Fragment, useContext, useEffect, useState } from 'react';
 import { notFound } from 'next/navigation';
 import { compareExpenseDetailsExtended, compareDates, getMostRecentRate, processRateArray } from '@/app/lib/utils';
@@ -15,6 +15,7 @@ import FormSubmitDetailsButton from './details-submit-button';
 import { Tooltip } from "@/app/ui/material-tailwind-wrapper";
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { DateTime } from 'luxon';
+import DaySelector from './day-selector';
 
 export default function ExpenseDetailsEditForm({
 
@@ -214,7 +215,7 @@ export default function ExpenseDetailsEditForm({
 	)
 
 	const topTableHeaders: [React.ReactNode, number][] = [
-		["", 1], ["", 1],
+		["", 1], ["", 1], ["", 1],
 		[TravelHeader, 2],
 		["Lodging", 1],
 		[CarFeesHeader, 1],
@@ -227,7 +228,7 @@ export default function ExpenseDetailsEditForm({
 	];
 
 	const tableSubheaders = [
-		"Job", "Purpose", 
+		"Day", "Job", "Purpose", 
 		"To/From", "Amount",
 		"Amount",
 		"Amount",
@@ -366,6 +367,12 @@ export default function ExpenseDetailsEditForm({
 									context.setSelectedExpenseDetails(index);
 								}}
 							>
+								{/* Day */}
+								<td>
+									<DaySelector
+										index={index}
+									/>
+								</td>
 								<td className={'w-24'} >
 									{/* Hidden EXD id */}
 									<input

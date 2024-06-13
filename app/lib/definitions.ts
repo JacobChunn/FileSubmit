@@ -200,6 +200,7 @@ export type ExpenseDetailsExtended = {
 	expenseid: number;
 	employeeid: number;
 	jobid: number;
+	day: number;
 	purpose: string | null;
 	transportwhere: string | null;
 	transportation: number | null;
@@ -225,6 +226,7 @@ export type ExpenseDetails = {
 	expenseid: number;
 	employeeid: number;
 	jobid: number;
+	day: number;
 	purpose: string | null;
 	transportwhere: string | null;
 	transportation: number | null;

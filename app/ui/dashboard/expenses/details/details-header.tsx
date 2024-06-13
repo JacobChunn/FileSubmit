@@ -42,6 +42,7 @@ export default function ExpenseDetailsHeader({
             expenseid: 0,
             employeeid: -1,
             jobid: 0,
+			day: 1,
             purpose: null,
             transportwhere: null,
             transportation: null,
