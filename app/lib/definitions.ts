@@ -90,6 +90,14 @@ export type InvoiceForm = {
   status: 'pending' | 'paid';
 };
 
+export type Subordinate = {
+	id: number;
+	firstname: string;
+	lastname: string;
+}
+
+export type SubordinateTuple = [id: number, name: string, value: string];
+
 export type Employee = {
   id: number;
   number: number;

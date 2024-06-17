@@ -6,7 +6,7 @@ import { revalidatePath, unstable_noStore } from 'next/cache';
 import { redirect } from 'next/navigation';
 //import { signIn } from '@/auth';
 //import { AuthError } from 'next-auth';
-import { CostCodeOption, EditDetailsType, EmployeeState, Expense, ExpenseDetails, ExpenseOptions, ExpenseRates, Mileage, MiscOption, Options, Perdiem, PhaseCostCodeOption, PhaseOption, ProjectOption, ProjectState, Timesheet, TimesheetDetails } from './definitions';
+import { CostCodeOption, EditDetailsType, EmployeeState, Expense, ExpenseDetails, ExpenseOptions, ExpenseRates, Mileage, MiscOption, Options, Perdiem, PhaseCostCodeOption, PhaseOption, ProjectOption, ProjectState, Subordinate, SubordinateTuple, Timesheet, TimesheetDetails } from './definitions';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../api/auth/[...nextauth]/options';
 import { fetchEmployeeByID, fetchTimesheetsByEmployeeID } from './data';
@@ -230,6 +230,47 @@ export type InvoiceState = {
 //       throw error;
 //     }
 // }
+
+export async function fetchSubordinatesWithAuth(
+
+) {
+	unstable_noStore();
+
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+	  console.log("Session was unable to be retrieved!");
+	  return null;
+  
+	}
+  
+	const managerid = Number(session.user.id);
+  
+	if (isNaN(managerid)) {
+	  console.error('id is not a number');
+	  return null;
+	}
+
+	try {
+		const data = await sql<Subordinate>`
+			SELECT
+			id, firstname, lastname
+			FROM employees
+			WHERE employees.managerid = ${managerid}
+			ORDER BY lastname ASC;
+		`;
+		const dataRows = data.rows;
+		
+		// Transform the data to match the expected state type
+		const transformedData: SubordinateTuple[] = dataRows.map(row => [row.id, row.firstname, row.lastname]);
+
+		return transformedData;
+	  } catch (error) {
+		console.error('Database Error:', error);
+		return null;
+	  }
+
+}
 
 export async function addEmployee(
 	prevState: EmployeeState,
