@@ -67,7 +67,7 @@ export default function DaySelector({
 			<input
 				form={"form"+context.selectedExpense}
 				id="day"
-				name="day"
+				name={"EXD" + index + "[day]"}
 				type="text"
 				value={context.localExpenseDetails[index]['day']}
 				readOnly
