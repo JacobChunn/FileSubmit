@@ -12,6 +12,7 @@ import { authOptions } from '../api/auth/[...nextauth]/options';
 import { fetchEmployeeByID, fetchTimesheetsByEmployeeID } from './data';
 import * as bcrypt from 'bcrypt';
 import { DateTime } from 'luxon';
+import assert from 'assert';
  
 const FormSchema = z.object({
   id: z.string(),
@@ -93,6 +94,7 @@ const ExpenseSchema = z.object({
 const OnlyExpenseID = ExpenseSchema.pick({ id: true });
 
 const ExpenseDetailsSchema = z.object({
+	day: z.number().int().min(0).max(31),
     id: z.number(),
     expenseid: z.number(),
     employeeid: z.number(),
@@ -440,27 +442,29 @@ export async function addEmptyExpense() {
   const totalexpenses = 0.00;
 	const datepaid = null;
 
-  const addSuccess = await addExpenseHelper(
-    true,
-    employeeid,
-    submittedby,
-    datestart,
-    numdays,
-    usercommitted,
+	const addSuccess = await addExpenseHelper(
+		true,
+		employeeid,
+		submittedby,
+		datestart,
+		numdays,
+		usercommitted,
 		mgrapproved,
 		approvedby,
 		processedby,
-    paid,
-    totalexpenses,
-    datepaid
-  );
+		paid,
+		totalexpenses,
+		datepaid,
+		null,
+		null
+	);
 
-  return {
-    ...addSuccess,
-    datestart,
-    numdays,
-    submittedby
-  }
+	return {
+		...addSuccess,
+		datestart,
+		numdays,
+		submittedby,
+	};
 }
 
 // Only call this funciton if session and employee ID is verified, 
@@ -477,33 +481,36 @@ async function addExpenseHelper(
 	processedby: string | null,
 	paid: boolean,
 	totalexpenses: number,
-	datepaid: string | null
+	datepaid: string | null,
+	mileagerate: number | null,
+	perdiemrate: number | null,
 ) {
   // Get Milage + Perdiem Rate
-  let mileagerate: number;
-  let perdiemrate: number;
   try {
-    const mileageData = await sql`
-		SELECT rate
-		FROM mileagerates
-		WHERE datestart <= ${datestart}
-		ORDER BY datestart DESC
-		LIMIT 1;
-    `;
-	if (!mileageData.rows[0].rate) throw new Error("Error getting mileage data!");
+    if (mileagerate == null) {
+		const mileageData = await sql`
+			SELECT rate
+			FROM mileagerates
+			WHERE datestart <= ${datestart}
+			ORDER BY datestart DESC
+			LIMIT 1;
+		`;
+		if (!mileageData.rows[0].rate) throw new Error("Error getting mileage data!");
 
-    mileagerate = mileageData.rows[0].rate;
-
-	const perdiemData = await sql`
-		SELECT rate
-		FROM perdiemrates
-		WHERE datestart <= ${datestart}
-		ORDER BY datestart DESC
-		LIMIT 1;
-	`;
-	if (!perdiemData.rows[0].rate) throw new Error("Error getting perdiem data!");
-	
-	perdiemrate = perdiemData.rows[0].rate;
+		mileagerate = mileageData.rows[0].rate;
+	}
+	if (perdiemrate == null) {
+		const perdiemData = await sql`
+			SELECT rate
+			FROM perdiemrates
+			WHERE datestart <= ${datestart}
+			ORDER BY datestart DESC
+			LIMIT 1;
+		`;
+		if (!perdiemData.rows[0].rate) throw new Error("Error getting perdiem data!");
+		
+		perdiemrate = perdiemData.rows[0].rate;
+	}
   } catch (error) {
     console.error(error);
     return {
@@ -512,6 +519,11 @@ async function addExpenseHelper(
     };
   }
 
+  mileagerate = Number(mileagerate)
+  perdiemrate = Number(perdiemrate)
+
+  assert(mileagerate != null && typeof mileagerate == 'number')
+  assert(perdiemrate != null && typeof perdiemrate == 'number')
 //   console.log(`employeeid: ${employeeid}`);
 //   console.log(`datestart: ${datestart}`);
 //   console.log(`numdays: ${numdays}`);
@@ -579,6 +591,7 @@ async function addExpenseHelper(
 }
 
 async function addExpenseDetailsHelper({
+	day = 1,
 	expenseid,
 	employeeid,
 	jobid = 0,
@@ -601,6 +614,7 @@ async function addExpenseDetailsHelper({
 	entwho = null,
 	entpurpose = null,
 }: {
+	day?: number,
 	expenseid: number,
 	employeeid: number,
 	jobid?: number,
@@ -654,14 +668,16 @@ async function addExpenseDetailsHelper({
 				purpose, transportwhere, transportation,
 				lodging, cabsparking, carrental, miles, mileage,
 				perdiem, entertainment, miscid, miscvalue, total,
-				miscdetail, entlocation, entactivity, entwho, entpurpose
+				miscdetail, entlocation, entactivity, entwho, entpurpose,
+				day
 			)
 			VALUES (
 			${expenseid}, ${employeeid}, ${jobid},
 			${purpose}, ${transportwhere}, ${transportation},
 			${lodging}, ${cabsparking}, ${carrental}, ${miles}, ${mileage},
 			${perdiem}, ${entertainment}, ${miscid}, ${miscvalue}, ${total},
-			${miscdetail}, ${entlocation}, ${entactivity}, ${entwho}, ${entpurpose}
+			${miscdetail}, ${entlocation}, ${entactivity}, ${entwho}, ${entpurpose},
+			${day}
 			)
 		`;
 
@@ -846,6 +862,267 @@ export async function fetchExpenseDetailsEditFormData(
 	} catch (error) {
 		console.error('Database Error:', error);
 		throw error;
+	}
+}
+
+export async function duplicateExpense() {
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		console.error('Session was unable to be retrieved!');
+		return {
+		success: false,
+		message: 'Session was unable to be retrieved!',
+		};
+	}
+
+	const employeeid = Number(session.user.id);
+	const user = await fetchEmployeeByID(employeeid);
+	const submittedby = user.username;
+
+	const now = DateTime.now();
+	const datestart = now.startOf('month').toLocaleString();
+	const numdays = now.daysInMonth;
+
+	const usercommitted = false;
+	const paid = false;
+
+	const mgrapproved = false;
+	const approvedby = null;
+	const processedby = null;
+
+	const expenseHelperRes = await duplicateExpenseHelper(
+		employeeid,
+		datestart,
+		numdays,
+		usercommitted,
+		mgrapproved,
+		paid,
+		submittedby,
+		approvedby,
+		processedby,
+	);
+
+	return {
+		...expenseHelperRes,
+		datestart,
+		numdays,
+		submittedby,
+	};
+}
+  
+  async function duplicateExpenseHelper(
+		employeeid: number,
+		datestart: string,
+		numdays: number,
+		usercommitted: boolean,
+		mgrapproved: boolean,
+		paid: boolean,
+		submittedby: string,
+		approvedby: string | null,
+		processedby: string | null,
+  ) {
+	  // Get recent expense
+	  const recentExpenseRes = await getRecentExpense(employeeid);
+	  if (!recentExpenseRes.success || !recentExpenseRes.recentExpense){
+		  return {
+			  success: false,
+			  message: "Failed to get recent expense"
+		  }
+	  }
+  
+	  // Parse recent expense
+	  const recentExpense = recentExpenseRes.recentExpense;
+	  const expenseID = recentExpense.id;
+  
+	  // Get mileagerate and perdiemrate
+	  let mileagerate: number;
+	  let perdiemrate: number;
+	  try {
+		const mileageData = await sql`
+			SELECT rate
+			FROM mileagerates
+			WHERE datestart <= ${datestart}
+			ORDER BY datestart DESC
+			LIMIT 1;
+		`;
+		if (!mileageData.rows[0].rate) throw new Error("Error getting mileage data!");
+
+		mileagerate = mileageData.rows[0].rate;
+	
+		const perdiemData = await sql`
+			SELECT rate
+			FROM perdiemrates
+			WHERE datestart <= ${datestart}
+			ORDER BY datestart DESC
+			LIMIT 1;
+		`;
+		if (!perdiemData.rows[0].rate) throw new Error("Error getting perdiem data!");
+		
+		perdiemrate = perdiemData.rows[0].rate;
+	
+	  } catch (error) {
+		console.error(error);
+		return {
+		  success: false,
+		  message: JSON.stringify(error),
+		};
+	  }
+
+	  // Get recent expense details
+	  const recentExpenseDetailsRes = await getExpenseDetails(expenseID, employeeid);
+	  if (!recentExpenseDetailsRes.success || !recentExpenseDetailsRes.expenseDetails) {
+		  return {
+			  success: false,
+			  message: "Failed to get recent expense details"
+		  }
+	  }
+	  const thresholdDay = DateTime.fromFormat(datestart, "M/d/yyyy").daysInMonth
+	  assert(thresholdDay)
+	  // Parse recent expense details
+	  const recentExpenseDetails = recentExpenseDetailsRes.expenseDetails.filter(exd => exd.day <= thresholdDay);
+  
+	  let recentExpenseDetailsTotal = 0;
+	  // Total expense details
+	  for (const exd of recentExpenseDetails) {
+		recentExpenseDetailsTotal += Number(exd.transportation);
+		recentExpenseDetailsTotal += Number(exd.lodging);
+		recentExpenseDetailsTotal += Number(exd.cabsparking);
+		recentExpenseDetailsTotal += Number(exd.carrental);
+		recentExpenseDetailsTotal += Number(exd.entertainment);
+		recentExpenseDetailsTotal += Number(exd.miscvalue);
+	  
+		recentExpenseDetailsTotal += Number(exd.miles) * Number(mileagerate);
+		recentExpenseDetailsTotal += Number(perdiemrate);
+	  }
+	  
+	  console.log("here")
+	  // Create new expense
+	  const addExpenseHelperRes = await addExpenseHelper(
+		  false,
+			employeeid,
+			submittedby,
+			datestart,
+			numdays,
+			usercommitted,
+			mgrapproved,
+			approvedby,
+			processedby,
+			paid,
+			recentExpenseDetailsTotal,
+			null,
+			mileagerate,
+			perdiemrate,
+	  );
+  
+	  // Parse the newly created timesheet response
+	  if (!addExpenseHelperRes.success || !addExpenseHelperRes.id) {
+		  return {
+			  success: false,
+			  message: "Failed to get create a new recent timesheet"
+		  }
+	  }
+	  const newExpenseID = addExpenseHelperRes.id;
+  
+	  // Create new timesheet details with recent timesheet details' data but references newly created timesheet
+	  console.log("recentTSDs: ", recentExpenseDetails);
+	  for (const exd of recentExpenseDetails) {
+		  const addExpenseDetailsRes = await addExpenseDetailsHelper({
+				day: exd.day,
+				expenseid: newExpenseID,
+				employeeid: employeeid,
+				jobid: exd.jobid,
+				purpose: exd.purpose,
+				transportwhere: exd.transportwhere,
+				transportation: exd.transportation,
+				lodging: exd.lodging,
+				cabsparking: exd.cabsparking,
+				carrental: exd.carrental,
+				miles: exd.miles,
+				mileage: mileagerate,
+				perdiem: perdiemrate,
+				entertainment: exd.entertainment,
+				miscid: exd.miscid,
+				miscvalue: exd.miscvalue,
+				total: Number(exd.transportation) + 
+						Number(exd.lodging) + 
+						Number(exd.cabsparking) + 
+						Number(exd.carrental) + 
+						(Number(exd.miles) * Number(mileagerate)) + 
+						Number(perdiemrate) + 
+						Number(exd.entertainment) + 
+						Number(exd.miscvalue),
+				miscdetail: exd.miscdetail,
+				entlocation: exd.entlocation,
+				entactivity: exd.entactivity,
+				entwho: exd.entwho,
+				entpurpose: exd.entpurpose
+				
+				
+		  });
+  
+		  if (!addExpenseDetailsRes.success) return addExpenseDetailsRes;
+	  }
+  
+	  return {
+		  success: true,
+		  message: "Recent expense has been successfully duplicated!",
+		  id: newExpenseID,
+		  totalexpenses: recentExpenseDetailsTotal,
+		  mileagerate: mileagerate
+	  }
+  }
+  
+  // Only call this funciton if session is verified, and the recipiant of the recent expense for the given
+  // employee has been authorized to recieve it.
+  async function getRecentExpense(employeeID: number) {
+	try {
+	  const recentExpenseData = await sql`
+		SELECT *
+		FROM expenses
+		WHERE employeeid = ${employeeID}
+		ORDER BY datestart DESC
+		LIMIT 1;    
+	  `;
+  
+	  const recentExpense = recentExpenseData.rows[0];
+  
+	  return {
+		success: true,
+		recentExpense: recentExpense
+	  }
+	} catch(error) {
+	  console.error(error);
+	  return {
+		success: false,
+		message: JSON.stringify(error)
+	  }
+	}
+  }
+
+// Only call this funciton if session is verified, and the recipiant of the expense details for the given
+// employee + expense has been authorized to recieve it.
+async function getExpenseDetails(expenseID: number, employeeID: number) {
+	try {
+	  const expenseDetailsData = await sql`
+		SELECT *
+		FROM expensedetails
+		WHERE expenseid = ${expenseID}
+		  AND employeeid = ${employeeID};
+	  `;
+  
+	  const expenseDetails = expenseDetailsData.rows;
+  
+	  return {
+		success: true,
+		expenseDetails: expenseDetails
+	  }
+	} catch(error) {
+	  console.error(error);
+	  return {
+		success: false,
+		message: JSON.stringify(error)
+	  }
 	}
 }
 
@@ -1094,6 +1371,7 @@ export async function editExpenseDetails(
 	// Validate each EXD and add it to array
 
   	type validatedEXDType = {
+		day: number;
 		id: number;
 		jobid: number;
 		purpose: string | null;
@@ -1120,6 +1398,7 @@ export async function editExpenseDetails(
 
  	for (const exdkey in separateEXDs) {
 		const validatedEXD = EditExpenseDetails.safeParse({
+			day: Number(separateEXDs[exdkey]['day']),
 			id: Number(separateEXDs[exdkey]['id']),
 			jobid: Number(separateEXDs[exdkey]['jobid']),
 			purpose: separateEXDs[exdkey]['purpose'],
@@ -1129,7 +1408,6 @@ export async function editExpenseDetails(
 			cabsparking: Number(separateEXDs[exdkey]['cabsparking']),
 			carrental: Number(separateEXDs[exdkey]['carrental']),
 			miles: Number(separateEXDs[exdkey]['miles']),
-			//perdiem: Number(separateEXDs[exdkey]['perdiem']),
 			entertainment: Number(separateEXDs[exdkey]['entertainment']),
 			miscid: Number(separateEXDs[exdkey]['miscid']),
 			miscvalue: Number(separateEXDs[exdkey]['miscvalue']),
@@ -1154,7 +1432,6 @@ export async function editExpenseDetails(
 		const transportation = validatedEXD.data.transportation ? validatedEXD.data.transportation : 0;
 		const lodging = validatedEXD.data.lodging ? validatedEXD.data.lodging : 0;
 		const milesCost = validatedEXD.data.miles ? validatedEXD.data.miles * mileage : 0;
-		//const perdiem = validatedEXD.data.perdiem ? validatedEXD.data.perdiem : 0;
 		const entertainment = validatedEXD.data.entertainment ? validatedEXD.data.entertainment : 0;
 		const misc = validatedEXD.data.miscvalue ? validatedEXD.data.miscvalue : 0;
 
@@ -1195,7 +1472,7 @@ export async function editExpenseDetails(
 	let totalTotal = 0.0;
 	for (const EXD of validatedEXDs) {
 		const {
-			id, jobid, purpose, transportwhere, transportation, lodging, 
+			day, id, jobid, purpose, transportwhere, transportation, lodging, 
 			cabsparking, carrental, miles, mileage, perdiem, entertainment, 
 			miscid, miscvalue, total, miscdetail, entlocation, entactivity, 
 			entwho, entpurpose
@@ -1206,6 +1483,7 @@ export async function editExpenseDetails(
 
 		try {
 			const addExpenseDetailsRes = await addExpenseDetailsHelper({ // Do I need to ensure user is authorized?
+				day: day,
 				expenseid: validatedExpenseID,
 				employeeid: employeeID,
 				jobid: jobid,

@@ -3,6 +3,7 @@ import AddExpenseButton from "@/app/ui/dashboard/expenses/add-expense-button";
 import ExpenseDetailsEditForm from "@/app/ui/dashboard/expenses/details/details-edit-form";
 import ExpenseDetailsHeader from "@/app/ui/dashboard/expenses/details/details-header";
 import ExpenseDetailsWrapper from "@/app/ui/dashboard/expenses/details/details-wrapper";
+import DuplicateExpenseButton from "@/app/ui/dashboard/expenses/duplicate-expense-button";
 import ExpenseContextWrapper from "@/app/ui/dashboard/expenses/expense-context-wrapper";
 import ExpenseWrapper from "@/app/ui/dashboard/expenses/expense-wrapper";
 import ExpenseTableBody from "@/app/ui/dashboard/expenses/table/expense-table-body";
@@ -35,7 +36,7 @@ export default async function Page() {
 					<ExpenseWrapper>
 						<div className='flex items-center justify-end gap-3'>
 							<AddExpenseButton className = "pb-2"/>
-							{/* <DuplicateExpenseButton className = "pb-2"/> */}
+							<DuplicateExpenseButton className = "pb-2"/>
 						</div>
 						<ExpenseTableWrapper>
 							<ExpenseTableHeader/>
