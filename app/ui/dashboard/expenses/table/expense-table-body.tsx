@@ -80,11 +80,11 @@ export default function ExpenseTableBody({
                             </td>
 
                             {/* Days */}
-                            <td className={rowStyles}>
+                            {/* <td className={rowStyles}>
                                 <TextEntry>
                                     {data['numdays']}
                                 </TextEntry>
-                            </td>
+                            </td> */}
 
                             {/* User Committed */}
                             <td className={rowStyles}>
@@ -124,7 +124,7 @@ export default function ExpenseTableBody({
                             {/* Total */}
                             <td className={rowStyles}>
                                 <TextEntry>
-                                    {"$" + data['totalexpenses']}
+                                    {"$" + Number(data['totalexpenses']).toFixed(2)}
                                 </TextEntry>
                             </td>
 

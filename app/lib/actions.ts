@@ -1312,13 +1312,15 @@ export async function editExpenseDetails(
 		};
 	}
 
+	const numdaysFromDateStart = DateTime.fromISO(validatedDateStart.data.date).daysInMonth
 	//console.log(validatedWeekEnding.data.weekEnding)
 
 	// Update DateStart for expense
 	try {
 		await sql`
 			UPDATE expenses
-			SET datestart = ${validatedDateStart.data.date}
+			SET datestart = ${validatedDateStart.data.date},
+				numdays = ${numdaysFromDateStart}
 			WHERE id = ${validatedExpenseID}
 				AND employeeid = ${employeeID};
 		`;

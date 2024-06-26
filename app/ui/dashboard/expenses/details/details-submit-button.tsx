@@ -1,8 +1,9 @@
 "use client"
 
-import { useContext } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { ExpenseContext } from "../expense-context-wrapper";
 import { Expense } from "@/app/lib/definitions";
+import { assert } from "console";
 
 export type Props = {
 	submitDisabled: boolean,
@@ -23,6 +24,28 @@ export default function FormSubmitDetailsButton({
 			"context has to be used within <ExpenseContext.Provider>"
 		);
 	}
+
+	const buttonRef = useRef<HTMLButtonElement>(null);
+
+	useEffect(() => {
+		const input = buttonRef.current;
+	
+		if (input == null) throw new Error('Expense Form Submit button was not found');
+	
+		const handleKeyPress = (event: KeyboardEvent) => {
+		  if (event.key === "Enter") {
+			event.preventDefault();
+			input.click();
+		  }
+		};
+	
+		document.addEventListener("keypress", handleKeyPress);
+	
+		// Cleanup event listener on component unmount
+		return () => {
+		  document.removeEventListener("keypress", handleKeyPress);
+		};
+	  }, []);
 
 	const handleCloseOnClick = () => {
 		context.setLocalExpenseDetails(null);
@@ -67,6 +90,7 @@ export default function FormSubmitDetailsButton({
 			</button>
 			<button 
 				type="submit"
+				ref={buttonRef}
 				className={`flex h-10 items-center rounded-lg px-4 text-sm font-medium text-white transition-colors
 					${submitDisabled ? 'bg-gray-400 cursor-not-allowed opacity-50' : 'bg-blue-500 hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600'}`}
 				onClick={handleSubmitOnClick}
