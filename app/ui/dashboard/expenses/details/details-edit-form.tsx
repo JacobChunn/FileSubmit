@@ -180,9 +180,9 @@ export default function ExpenseDetailsEditForm({
 		setCurrentPerdiem(perdiem);
 	}, [context.localExpenseDateStart]);
 
-	console.log("currentMileage: ", currentMileage);
-	console.log("currentPerdiem: ", currentPerdiem);
-	console.log("context.localExpenseDateStart", context.localExpenseDateStart?.toLocaleString());
+	//console.log("currentMileage: ", currentMileage);
+	//console.log("currentPerdiem: ", currentPerdiem);
+	//console.log("context.localExpenseDateStart", context.localExpenseDateStart?.toLocaleString());
 
 	if (!EXDRateAndOptions || !currentMileage || !currentPerdiem) {
 		console.log("Loading...")
@@ -224,7 +224,7 @@ export default function ExpenseDetailsEditForm({
 		["Perdiem", 1],
 		["Ent.", 1],
 		["Misc", 2],
-		["", 1],
+		["", 1], ["", 1],
 	];
 
 	const tableSubheaders = [
@@ -237,7 +237,7 @@ export default function ExpenseDetailsEditForm({
 		"Amount",
 		"Amount",
 		"Description", "Amount",
-		"Total"
+		"Total", ''
 	];
 
     const {projects, misc} = options;
@@ -546,7 +546,7 @@ export default function ExpenseDetailsEditForm({
 								key={'dropdown-' + index + expenseID}
 								className={`h-10 bg-blue-50 ${context?.selectedExpenseDetails == index ? '' : 'hidden'}`}
 							>
-								<td colSpan={14}>
+								<td colSpan={16}>
 									<table className='w-full'>
 										<thead>
 											<tr>
@@ -617,8 +617,8 @@ export default function ExpenseDetailsEditForm({
 						</Fragment>
 					)
 				}) : null}
-					{/* <tr>
-						<td colSpan={3}>
+					<tr>
+						<td colSpan={4}>
 							<p className='text-right'>
 								Total: 
 							</p>
@@ -639,21 +639,21 @@ export default function ExpenseDetailsEditForm({
 							{milesTot}
 						</td>
 						<td>
-							{mileageTot}
+							{mileageTot.toFixed(2)}
 						</td>
 						<td>
-							{perdiemTot}
-						</td>
-						<td>
-							{entertainmentTot}
+							{perdiemTot.toFixed(2)}
 						</td>
 						<td colSpan={2}>
+							{entertainmentTot}
+						</td>
+						<td>
 							{miscvalueTot}
 						</td>
 						<td>
-							{totalTot}
+							{totalTot.toFixed(2)}
 						</td>
-					</tr> */}
+					</tr>
 				</tbody>
 			</table>
             <FormSubmitDetailsButton

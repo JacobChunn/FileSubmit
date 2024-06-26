@@ -27,7 +27,7 @@ export default function ExpenseTableHeader({
 	)
 
     const TABLE_HEAD = [
-		"Start Date", "Days",
+		"Start Date",
 		signedIcon, approvedIcon, processedIcon,
 		"Signatory", "Date Paid", "Total", "Delete"
 	] as const;

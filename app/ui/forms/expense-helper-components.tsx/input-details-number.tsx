@@ -1,6 +1,6 @@
 "use client"
 
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { ExpenseDetailsExtended } from "@/app/lib/definitions";
 import { ExpenseContext } from "../../dashboard/expenses/expense-context-wrapper";
 
@@ -27,24 +27,32 @@ export default function InputDetailsNumber({
 
 	if (context == null) {
 		throw new Error(
-			"context has to be used within <TimesheetContext.Provider>"
+			"context has to be used within <ExpenseContext.Provider>"
 		);
 	}
+	const [visualValue, setVisualValue] = useState<string | number | null | undefined>(value)
 
 	const len = context.localExpenseDetails?.length || 0;
 
-	const definedValue = (value !== null && value !== undefined) ? value : 0;
+
+	const definedValue = (visualValue !== null && visualValue !== undefined) ? visualValue : 0;
 
 	const formattedValue = definedValue == 0 ? "" : definedValue;
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		let inputValue = event.target.value;
+		if (attr == 'miles')
+			inputValue = String(parseInt(inputValue))
+
+		setVisualValue(inputValue)
+	};
+
+	const handleBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const inputValue = event.target.value;
 
-		const result = inputValue.match(/\d/g);
-		const newValue = result && !Number.isNaN(result) ? parseInt(result.join(''), 10) : "";
-
-		const formattedNewValue = newValue == "" ? null : String(newValue)
-
+		const result = inputValue.match(/\d+(\.\d*)?|\.\d+/g);
+		const newValue = result && !Number.isNaN(result) ? parseFloat(result.join('')) : 0;
+		const formattedNewValue = newValue == 0 ? 0 : String(newValue)
 		//console.log(newValue, typeof(newValue))
 
 		context.setLocalExpenseDetails(prev => {
@@ -54,23 +62,22 @@ export default function InputDetailsNumber({
 		  updatedEXDs[index] = updatedItem;
 		  return updatedEXDs;
 		});
-	};
 
-	const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
-		context.setSelectedExpenseDetails(index);
-		// Manually trigger click on the input element
-		const inputElement = document.getElementById(info+len) as HTMLInputElement;
-		if (inputElement) {
-			inputElement.click();
-		}
-	};
+		setVisualValue(formattedNewValue)
+	}
+
+	// const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
+	// 	context.setSelectedExpenseDetails(index);
+	// 	// Manually trigger click on the input element
+	// 	const inputElement = document.getElementById(info+len) as HTMLInputElement;
+	// 	if (inputElement) {
+	// 		inputElement.click();
+	// 	}
+	// };
 
 	const dbValueProcessed = dbValue !== null ? String(dbValue) : '';
-	const valueProcessed = value !== null ? String(value) : '';
+	const valueProcessed = value !== null && value !== '' ? String(value) : '0';
 	const bgCol = dbValueProcessed !== valueProcessed ? "bg-red-300 " : "bg-white ";
-
-	//console.log("compare: ", dbValueProcessed, typeof dbValueProcessed, valueProcessed, typeof valueProcessed);
-
 
 	return (
 		<div className="relative flex w-full h-full">
@@ -81,6 +88,7 @@ export default function InputDetailsNumber({
 				className={bgCol + " flex-grow w-full text-xs px-1 " + className}
 				value={formattedValue}
 				onChange={handleChange}
+				onBlur={handleBlur}
 				readOnly={disabled}
 			/>
 		</div>
