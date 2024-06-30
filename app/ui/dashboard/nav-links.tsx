@@ -10,6 +10,7 @@ import {
 import clsx from 'clsx';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 // Map of links to display in the side navigation.
 // Depending on the size of the application, this would be stored in a database.
@@ -27,6 +28,16 @@ export default function NavLinks({
 	displayText: boolean,
 }) {
 	const pathname = usePathname();
+	const [fadeClass, setFadeClass] = useState('');
+
+	useEffect(() => {
+		if (displayText) {
+			setFadeClass('duration-300 max-w-min opacity-100');
+		} else {
+			setFadeClass('duration-75 max-w-0 opacity-0');
+		}
+	}, [displayText]);
+	
 	return (
 		<>
 			{links.map((link) => {
@@ -42,8 +53,8 @@ export default function NavLinks({
 					},
 					)}
 				>
-					<LinkIcon className="w-6" />
-					{displayText ? <p className="hidden md:block">{link.name}</p> : null}
+					<LinkIcon className="w-6 h-6" />
+					<div className={`transition-all ${fadeClass}`}>{link.name}</div>
 				</Link>
 				);
 			})}

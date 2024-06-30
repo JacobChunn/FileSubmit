@@ -2,10 +2,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import NavLinks from '@/app/ui/dashboard/nav-links';
-import AcmeLogo from '@/app/ui/acme-logo';
 import Logo from '@/app/EncoreLogo.jpg'
 import { ChevronLeftIcon, ChevronRightIcon, PowerIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
+
 
 export default function SideNav() {
 	const [isNavMin, setIsNavMin] = useState<boolean>(false);
@@ -35,8 +35,8 @@ export default function SideNav() {
 	// console.log("-----------------------")
 
 	return (
-		<div className={`flex ${!isTransitioning && isNavMin ? "w-16" : "w-64"} `}>
-			<div className={`relative flex h-full flex-col px-2 py-4 transition-width duration-300 ${isNavMin ? "w-16" : "w-64"}`}>
+		<div className={`flex ${isNavMin ? "w-16" : "w-64"} transition-all duration-500`}>
+			<div className={`relative flex h-full flex-col px-2 py-4 transition-all duration-500 ${isNavMin ? "w-18" : "w-66"}`}>
 				<Link
 					className="mb-2 flex items-start justify-start rounded-md bg-blue-600"
 					href="/"
