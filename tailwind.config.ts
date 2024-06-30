@@ -12,7 +12,7 @@ const config: Config = withMT({
 	theme: {
 		extend: {
 			transitionProperty: {
-				'width': 'width'
+				'width': 'width',
 			},
 			gridTemplateColumns: {
 				'13': 'repeat(13, minmax(0, 1fr))',
