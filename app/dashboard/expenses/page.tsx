@@ -5,6 +5,7 @@ import ExpenseDetailsHeader from "@/app/ui/dashboard/expenses/details/details-he
 import ExpenseDetailsWrapper from "@/app/ui/dashboard/expenses/details/details-wrapper";
 import DuplicateExpenseButton from "@/app/ui/dashboard/expenses/duplicate-expense-button";
 import ExpenseContextWrapper from "@/app/ui/dashboard/expenses/expense-context-wrapper";
+import ExpenseHeader from "@/app/ui/dashboard/expenses/expense-header";
 import ExpenseWrapper from "@/app/ui/dashboard/expenses/expense-wrapper";
 import ExpenseTableBody from "@/app/ui/dashboard/expenses/table/expense-table-body";
 import ExpenseTableHeader from "@/app/ui/dashboard/expenses/table/expense-table-header";
@@ -34,10 +35,7 @@ export default async function Page() {
 			<div className='flex space-x-6'>
 				<ExpenseContextWrapper>
 					<ExpenseWrapper>
-						<div className='flex items-center justify-end gap-3'>
-							<AddExpenseButton className = "pb-2"/>
-							<DuplicateExpenseButton className = "pb-2"/>
-						</div>
+						<ExpenseHeader/>
 						<ExpenseTableWrapper>
 							<ExpenseTableHeader/>
 							<ExpenseTableBody/>
