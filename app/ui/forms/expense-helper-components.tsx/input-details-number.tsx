@@ -40,9 +40,10 @@ export default function InputDetailsNumber({
 	const formattedValue = definedValue == 0 ? "" : definedValue;
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		let inputValue = event.target.value;
+		let inputValue: string | number = event.target.value;
 		if (attr == 'miles')
-			inputValue = String(parseInt(inputValue))
+			var parsed = parseInt(inputValue);
+			inputValue = Number.isNaN(parsed) ? 0 : String(parsed);
 
 		setVisualValue(inputValue)
 	};
@@ -52,7 +53,13 @@ export default function InputDetailsNumber({
 
 		const result = inputValue.match(/\d+(\.\d*)?|\.\d+/g);
 		const newValue = result && !Number.isNaN(result) ? parseFloat(result.join('')) : 0;
-		const formattedNewValue = newValue == 0 ? 0 : String(newValue)
+		let formattedNewValue: string | number;
+		if (attr == 'miles') {
+			formattedNewValue =  Number.isNaN(Number(newValue)) ? 0 : Number(newValue)
+		} else {
+			formattedNewValue = String(newValue)
+		}
+		
 		//console.log(newValue, typeof(newValue))
 
 		context.setLocalExpenseDetails(prev => {
@@ -65,6 +72,12 @@ export default function InputDetailsNumber({
 
 		setVisualValue(formattedNewValue)
 	}
+	
+	const handleFocus = () => {
+		if (attr == 'entertainment') {
+			context.setSelectedExpenseDetails(index);
+		}
+	}
 
 	// const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
 	// 	context.setSelectedExpenseDetails(index);
@@ -74,6 +87,9 @@ export default function InputDetailsNumber({
 	// 		inputElement.click();
 	// 	}
 	// };
+	// if (attr == 'miles') {
+	// 	console.log("MILES: ", )
+	// }
 
 	const dbValueProcessed = dbValue !== null ? String(dbValue) : '';
 	const valueProcessed = value !== null && value !== '' ? String(value) : '0';
@@ -88,6 +104,7 @@ export default function InputDetailsNumber({
 				className={bgCol + " flex-grow w-full text-xs px-1 " + className}
 				value={formattedValue}
 				onChange={handleChange}
+				onFocus={handleFocus}
 				onBlur={handleBlur}
 				readOnly={disabled}
 			/>

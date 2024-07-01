@@ -1,7 +1,7 @@
 "use client"
 import { useContext } from "react"
 import { ExpenseContext } from "../expense-context-wrapper";
-import { ExpenseDetails } from "@/app/lib/definitions";
+import { ExpenseDetails, ExpenseDetailsExtended } from "@/app/lib/definitions";
 import ExpenseDetailsStateIndicator from "./details-state-indicator";
 import MonthEditor from "./month-editor";
 import SignExpenseToggleButton from "./sign-expense-toggle-button";
@@ -37,7 +37,7 @@ export default function ExpenseDetailsHeader({
 
 	const addEXD = () => {
 		const currentEXDs = context.localExpenseDetails || [];
-		const newEXD: ExpenseDetails = {
+		const newEXD: ExpenseDetailsExtended = {
             id: 0,
             expenseid: 0,
             employeeid: -1,
@@ -45,16 +45,16 @@ export default function ExpenseDetailsHeader({
 			day: 1,
             purpose: null,
             transportwhere: null,
-            transportation: null,
-            lodging: null,
-            cabsparking: null,
-            carrental: null,
-            miles: null,
+            transportation: 0,
+            lodging: 0,
+            cabsparking: 0,
+            carrental: 0,
+            miles: 0,
             mileage: null,
             perdiem: null,
-            entertainment: null,
+            entertainment: 0,
             miscid: 0,
-            miscvalue: null,
+            miscvalue: 0,
             total: null,
             miscdetail: null,
             entlocation: null,
