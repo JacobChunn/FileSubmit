@@ -143,6 +143,9 @@ export default function ExpenseDetailsEditForm({
 		const localDateStart = context.localExpenseDateStart;
 		const databaseDateStart = context.databaseExpenseDateStart;
 
+		console.log('localEXDs: ', localEXDs);
+		console.log('dbEXDs: ', dbEXDs);
+
 		let expenseDetailsState: SavingState;
 		if (context.expenseDetailsState === "signed") {
 			expenseDetailsState = "signed";
@@ -363,9 +366,6 @@ export default function ExpenseDetailsEditForm({
 							<tr
 								key={"k-" + index + expenseID}
 								className={`w-full h-full ${context.selectedExpenseDetails == index ? 'bg-blue-500' : 'bg-white'}`}
-								onClick={() => {
-									context.setSelectedExpenseDetails(index);
-								}}
 							>
 								{/* Day */}
 								<td>
@@ -542,6 +542,7 @@ export default function ExpenseDetailsEditForm({
 									/>
 								</td>
 							</tr>
+							{/* Entertainment Dropdown */}
 							<tr
 								key={'dropdown-' + index + expenseID}
 								className={`h-10 bg-blue-50 ${context?.selectedExpenseDetails == index ? '' : 'hidden'}`}
