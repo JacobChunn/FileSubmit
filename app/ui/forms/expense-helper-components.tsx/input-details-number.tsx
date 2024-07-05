@@ -41,9 +41,11 @@ export default function InputDetailsNumber({
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		let inputValue: string | number = event.target.value;
-		if (attr == 'miles')
+		if (attr == 'miles') {
 			var parsed = parseInt(inputValue);
 			inputValue = Number.isNaN(parsed) ? 0 : String(parsed);
+		}
+
 
 		setVisualValue(inputValue)
 	};
