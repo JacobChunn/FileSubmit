@@ -6,19 +6,68 @@ import Logo from '@/app/EncoreLogo.jpg'
 import { ChevronLeftIcon, ChevronRightIcon, PowerIcon } from '@heroicons/react/24/outline';
 import { useContext, useEffect, useState } from 'react';
 import { LayoutContext } from './layout-context-wrapper';
+import { usePathname } from 'next/navigation';
+import { ExpenseContext } from './expenses/expense-context-wrapper';
+import assert from 'assert';
 
 export default function SideNav() {
-	const context = useContext(LayoutContext);
+	const layoutContext = useContext(LayoutContext);
 
-	if (context == null) {
+	if (layoutContext == null) {
 		throw new Error(
 			"context has to be used within <LayoutContext.Provider>"
 		);
 	}
 
+	const expenseContext = useContext(ExpenseContext);
+
+	const pathname = usePathname();
+
+	useEffect(() => {
+		console.log('Navigated to:\"', pathname, '\"');
+		console.log('Expense is selected:', layoutContext.expenseIsSelected);
+
+		console.log(pathname == '/dashboard/expenses')
+
+		if (pathname == '/dashboard/expenses') {
+			if (layoutContext.expenseIsSelected) {
+				console.log('a.)');
+
+				layoutContext.setStoreIsNavMin(layoutContext.isNavMin);
+
+				const timeoutId = setTimeout(() => {
+					assert(layoutContext.expenseIsSelected);
+					// toggle nav minimization
+					layoutContext.setIsNavMin(layoutContext.expenseIsSelected);
+					layoutContext.setIsTransitioning(layoutContext.expenseIsSelected);
+		
+					// toggle nav min button visibility
+					layoutContext.setIsMinNavButtonVisible(!layoutContext.expenseIsSelected);
+				}, 300);
+		
+				// Cleanup the timeout if the component is unmounted
+				return () => clearTimeout(timeoutId);
+			}
+		} else {
+			console.log('b.)');
+
+			layoutContext.setStoreIsNavMin(null);
+			if (layoutContext.storeIsNavMin != null) { // if it is not null, we came from expenses page
+				layoutContext.setIsNavMin(layoutContext.storeIsNavMin);
+				layoutContext.setIsTransitioning(layoutContext.storeIsNavMin);	
+			} else {
+				layoutContext.setIsNavMin(layoutContext.isNavMin);
+				layoutContext.setIsTransitioning(layoutContext.isNavMin);
+			}
+
+			layoutContext.setIsMinNavButtonVisible(true);
+		}
+		
+	}, [pathname, layoutContext.expenseIsSelected])
+
     useEffect(() => {
         const handleTransitionEnd = () => {
-			context.setIsTransitioning(false);
+			layoutContext.setIsTransitioning(false);
         };
 
         document.addEventListener('transitionend', handleTransitionEnd);
@@ -29,18 +78,18 @@ export default function SideNav() {
     }, []);
 
 	const toggleNav = () => {
-		context.setIsNavMin(!context.isNavMin);
-		context.setIsTransitioning(true);
+		layoutContext.setIsNavMin(!layoutContext.isNavMin);
+		layoutContext.setIsTransitioning(true);
 	}
 
-	const displayText = !context.isTransitioning && !context.isNavMin;
+	const displayText = !layoutContext.isTransitioning && !layoutContext.isNavMin;
 	// console.log("transition", isTransitioning)
 	// console.log("isNavMin", isNavMin);
 	// console.log("displayText", displayText)
 	// console.log("-----------------------")
 
 	return (
-		<div className={`flex ${context.isNavMin ? "w-16" : "w-64"} transition-all duration-500`}>
+		<div className={`flex ${layoutContext.isNavMin ? "w-16" : "w-64"} transition-all duration-500`}>
 			<div className={`relative flex h-full flex-col px-2 py-4`}>
 				<Link
 					className="mb-2 flex items-start justify-start rounded-md bg-blue-600"
@@ -54,12 +103,12 @@ export default function SideNav() {
 					/>
 				</Link>
 				{/* Minimize nav button */}
-				{context.isMinNavButtonVisible &&
+				{layoutContext.isMinNavButtonVisible &&
 				<div
 					className='absolute w-5 h-6 top-4 right-1 translate-x-full bg-gray-300 rounded-sm flex items-center justify-center hover:bg-gray-400 active:bg-gray-500 select-none'
 					onClick={toggleNav}
 				>
-					{context.isNavMin ? <ChevronRightIcon className='w-5 h-5'/> : <ChevronLeftIcon className='w-5 h-5'/>}
+					{layoutContext.isNavMin ? <ChevronRightIcon className='w-5 h-5'/> : <ChevronLeftIcon className='w-5 h-5'/>}
 				</div>
 				}
 				{/* Main body of nav */}
