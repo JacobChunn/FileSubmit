@@ -37,7 +37,7 @@ export default function ExpenseHeader({
 	return (
 		<>
 			{shouldRender && (
-				<div className={`flex items-center justify-end gap-3 transition-opacity duration-300 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
+				<div className={`flex items-center justify-end gap-3 transition-all duration-300 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
 					<AddExpenseButton className="pb-2" />
 					<DuplicateExpenseButton className="pb-2" />
 					{children}

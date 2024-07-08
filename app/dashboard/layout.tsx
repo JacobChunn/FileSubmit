@@ -1,5 +1,6 @@
 import SideNav from '@/app/ui/dashboard/sidenav';
 import LayoutContextWrapper from '../ui/dashboard/layout-context-wrapper';
+import '../ui/global.css'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
 

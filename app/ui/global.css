@@ -17,3 +17,15 @@ input[type='number']::-webkit-outer-spin-button {
 }
 
 @tailwind utilities;
+
+.transition-min-width {
+    transition: min-width 0.5s ease-in-out;
+}
+
+.min-content {
+    min-width: min-content;
+}
+
+.collapsed-width {
+    min-width: 100px; /* Adjust this to your desired collapsed width */
+}

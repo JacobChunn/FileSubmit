@@ -1,5 +1,5 @@
 "use client"
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { IconButton, Tooltip, Typography } from "../../../material-tailwind-wrapper";
 import { DateTime } from "luxon";
 import TextEntry from "../../entries/text-entry";
@@ -24,7 +24,25 @@ export default function ExpenseTableBody({
 		);
 	}
 
+	const [isFading, setIsFading] = useState(false);
+	const [shouldRender, setShouldRender] = useState(true);
+
+	useEffect(() => {
+		if (context.selectedExpense == null) {
+			setShouldRender(true);
+			setTimeout(() => {
+				setIsFading(false);
+			}, 0); // Start fading in immediately
+		} else {
+			setIsFading(true);
+			setTimeout(() => {
+				setShouldRender(false);
+			}, 300); // Duration should match the CSS transition duration
+		}
+	}, [context.selectedExpense]);
+
     const rowStyles = 'p-2 align-middle border-b border-blue-gray-50';
+	const transitionStyles = ` transition-opacity duration-300 ${isFading ? 'opacity-0' : 'opacity-80'}`
 
     const databaseDS = context.databaseExpenseDateStart;
     const localDS = context.localExpenseDateStart;
@@ -39,6 +57,7 @@ export default function ExpenseTableBody({
         context.setLocalExpenseDateStart(luxonDateTime);
         context.setDatabaseExpenseDateStart(luxonDateTime);
     }
+
 
     return (
         <tbody className="w-full h-full">
@@ -65,7 +84,7 @@ export default function ExpenseTableBody({
                                 </TextEntry>
                             </td> */}
 
-                            {/* End Date */}
+                            {/* Start Date */}
                             <td className={rowStyles + ` ${selectedExpenseUnsavedDateStyles}`}>
                                 <Tooltip content="Edit Entry">
                                     <button
@@ -78,69 +97,64 @@ export default function ExpenseTableBody({
                                     </button>
                                 </Tooltip>
                             </td>
+							{shouldRender ? (
+								<>
+									{/* User Committed */}
+									<td className={rowStyles + transitionStyles}>
+										<BoolEntry>
+											{data['usercommitted']}
+										</BoolEntry>
+									</td>
 
-                            {/* Days */}
-                            {/* <td className={rowStyles}>
-                                <TextEntry>
-                                    {data['numdays']}
-                                </TextEntry>
-                            </td> */}
+									{/* Approved */}
+									<td className={rowStyles + transitionStyles}>
+										<BoolEntry>
+											{data['mgrapproved']}
+										</BoolEntry>
+									</td>
 
-                            {/* User Committed */}
-                            <td className={rowStyles}>
-                                <BoolEntry>
-                                    {data['usercommitted']}
-                                </BoolEntry>
-                            </td>
+									{/* Paid */}
+									<td className={rowStyles + transitionStyles}>
+										<BoolEntry>
+											{data['paid']}
+										</BoolEntry>
+									</td>
 
-                            {/* Approved */}
-                            <td className={rowStyles}>
-                                <BoolEntry>
-                                    {data['mgrapproved']}
-                                </BoolEntry>
-                            </td>
+									{/* Signed By */}
+									<td className={rowStyles + transitionStyles}>
+										<TextEntry>
+											{data['submittedby']}
+										</TextEntry>
+									</td>
 
-                            {/* Paid */}
-                            <td className={rowStyles}>
-                                <BoolEntry>
-                                    {data['paid']}
-                                </BoolEntry>
-                            </td>
+									{/* Date Paid */}
+									<td className={rowStyles + transitionStyles}>
+										<DateEntry>
+											{data['datepaid']}
+										</DateEntry>
+									</td>
 
-                            {/* Signed By */}
-                            <td className={rowStyles}>
-                                <TextEntry>
-                                    {data['submittedby']}
-                                </TextEntry>
-                            </td>
+									{/* Total */}
+									<td className={rowStyles + transitionStyles}>
+										<TextEntry>
+											{"$" + Number(data['totalexpenses']).toFixed(2)}
+										</TextEntry>
+									</td>
 
-                            {/* Date Paid */}
-                            <td className={rowStyles}>
-                                <DateEntry>
-                                    {data['datepaid']}
-                                </DateEntry>
-                            </td>
+									
 
-                            {/* Total */}
-                            <td className={rowStyles}>
-                                <TextEntry>
-                                    {"$" + Number(data['totalexpenses']).toFixed(2)}
-                                </TextEntry>
-                            </td>
-
-                            
-
-                            {/* Delete */}
-                            <td className={rowStyles}>
-                                <Link href={"/dashboard/expenses/" + data['id'] + "/delete"}>
-                                    <Tooltip content="Delete Entry">
-                                        <IconButton variant="text">
-                                            <TrashIcon className="h-4 w-4" />
-                                        </IconButton>
-                                    </Tooltip>
-                                </Link>
-                            </td>
-
+									{/* Delete */}
+									<td className={rowStyles + transitionStyles}>
+										<Link href={"/dashboard/expenses/" + data['id'] + "/delete"}>
+											<Tooltip content="Delete Entry">
+												<IconButton variant="text">
+													<TrashIcon className="h-4 w-4" />
+												</IconButton>
+											</Tooltip>
+										</Link>
+									</td>
+								</>
+							) : null}
                         </tr>
                     )
                 })

@@ -27,7 +27,7 @@ export default function ExpenseTableWrapper({
 	}, []);
 
 	return (
-		<table className="w-full h-full">
+		<table className="w-full h-full transition-width duration-500 ease-in-out">
 			{children}
 		</table>
 	)
