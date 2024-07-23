@@ -1,6 +1,8 @@
 import ApprovalContextWrapper from '@/app/ui/dashboard/approvals/approval-context-wrapper';
 import ApprovalDataFetcher from '@/app/ui/dashboard/approvals/approval-data-fetcher';
 import TimesheetApprovalTable from '@/app/ui/dashboard/approvals/timesheet-approval-table';
+import TimesheetApprovalWrapper from '@/app/ui/dashboard/approvals/timesheet-approval-wrapper';
+import WeekendingSelector from '@/app/ui/dashboard/approvals/weekending-selector';
 import { lusitana } from '@/app/ui/fonts';
 import { Metadata } from 'next';
 
@@ -20,7 +22,10 @@ export default async function Page() {
 		<div className='flex space-x-6'>
 			<ApprovalContextWrapper>
 				<ApprovalDataFetcher>
-					<TimesheetApprovalTable/>
+					<TimesheetApprovalWrapper>
+						<WeekendingSelector/>
+						<TimesheetApprovalTable/>
+					</TimesheetApprovalWrapper>
 					{/* <ExpenseApprovalTable/> */}
 				</ApprovalDataFetcher>
 			</ApprovalContextWrapper>

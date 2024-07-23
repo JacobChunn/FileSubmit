@@ -96,7 +96,34 @@ export type Subordinate = {
 	lastname: string;
 }
 
+export type SubordinateTimesheet = {
+  subordinateid: number;
+  firstname: string;
+  lastname: string;
+  id: number;
+  employeeid: number;
+  weekending: string; // ISO 8601 format string
+  processed: boolean;
+  mgrapproved: boolean;
+  usercommitted: boolean;
+  totalreghours: string;
+  totalovertime: string;
+  approvedby: string | null;
+  submittedby: string;
+  processedby: string | null;
+  dateprocessed: string | null; // Assuming ISO 8601 format string, change to Date if needed
+  message: string | null;
+};
+
 export type SubordinateTuple = [id: number, name: string, value: string];
+
+export type DisplayTimesheet = {
+  id: number;
+  firstname: string;
+  lastname: string;
+  found: boolean;
+  timesheet?: SubordinateTimesheet;
+};
 
 export type Employee = {
   id: number;

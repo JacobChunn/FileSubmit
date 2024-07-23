@@ -50,6 +50,22 @@ export default function InputDetailsNumber({
 		setVisualValue(inputValue)
 	};
 
+	function roundToHundredths(value: string): string {
+		// Parse the string to a float number
+		const num = parseFloat(value);
+		
+		// Check if the number is not a valid number
+		if (isNaN(num)) {
+			throw new Error('Invalid number');
+		}
+		
+		// Round the number to the hundredths place
+		const roundedNum = Math.round(num * 100) / 100;
+		
+		// Convert the number back to a string with 2 decimal places
+		return roundedNum.toFixed(2);
+	}
+
 	const handleBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const inputValue = event.target.value;
 
@@ -59,7 +75,7 @@ export default function InputDetailsNumber({
 		if (attr == 'miles') {
 			formattedNewValue =  Number.isNaN(Number(newValue)) ? 0 : Number(newValue)
 		} else {
-			formattedNewValue = String(newValue)
+			formattedNewValue = roundToHundredths(String(newValue))
 		}
 		
 		//console.log(newValue, typeof(newValue))

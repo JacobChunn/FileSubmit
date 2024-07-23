@@ -2,6 +2,7 @@
 
 import { useContext } from "react"
 import { ApprovalContext } from "./approval-context-wrapper"
+import { DisplayTimesheet } from "@/app/lib/definitions"
 
 export default function TimesheetApprovalTable({
 	children
@@ -10,8 +11,52 @@ export default function TimesheetApprovalTable({
 }) {
 	const context = useContext(ApprovalContext)
 
-	if (!context) {
+	if (!context || !context.subordinateTimesheets) {
 		return <div>Loading...</div>;
+	}
+
+	function createDisplayTimesheets(): DisplayTimesheet[] | null {
+		const displayTimesheets: DisplayTimesheet[] = [];
+
+		if (!context) return null;
+	
+		if (!context.subordinates || !context.subordinateTimesheets) {
+			return displayTimesheets;
+		}
+	
+		for (const [id, firstname, lastname] of context.subordinates) {
+			const matchingTimesheets = context.subordinateTimesheets.filter(
+				(subTS) => subTS.subordinateid === id
+			);
+	
+			if (matchingTimesheets.length > 0) {
+				for (const timesheet of matchingTimesheets) {
+					displayTimesheets.push({
+						id,
+						firstname,
+						lastname,
+						found: true,
+						timesheet: timesheet
+					});
+				}
+			} else {
+				displayTimesheets.push({
+					id,
+					firstname,
+					lastname,
+					found: false
+				});
+			}
+		}
+	
+		return displayTimesheets;
+	}
+
+	const displayTimesheets = createDisplayTimesheets();
+	if (!displayTimesheets) {
+		throw new Error(
+			"Display Timesheets was not set up properly"
+		);
 	}
 
 	return (
@@ -24,12 +69,12 @@ export default function TimesheetApprovalTable({
 				</tr>
 			</thead>
 			<tbody>
-				{context.subordinates?.map(([id, firstname, lastname]) => (
-					<tr key={id}>
-						<td>{id}</td>
-						<td>{lastname}</td>
-						<td>{firstname}</td>
-					</tr>
+				{displayTimesheets.map(({ id, firstname, lastname, found }) => (
+				<tr key={id}>
+					<td className={found ? 'text-blue-500' : 'text-red-500'}>{id}</td>
+					<td className={found ? 'text-blue-500' : 'text-red-500'}>{lastname}</td>
+					<td className={found ? 'text-blue-500' : 'text-red-500'}>{firstname}</td>
+				</tr>
 				))}
 			</tbody>
 		</table>
