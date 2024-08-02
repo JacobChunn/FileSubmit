@@ -115,6 +115,25 @@ export type SubordinateTimesheet = {
   message: string | null;
 };
 
+export type SubordinateExpense = {
+  subordinateid: number;
+  firstname: string;
+  lastname: string;
+  id: number;
+	employeeid: number;
+	datestart: string;
+	numdays: number;
+	usercommitted: boolean;
+	mgrapproved: boolean;
+	paid: boolean;
+	totalexpenses: number;
+	submittedby: string | null;
+	approvedby: string | null;
+	processedby: string | null;
+	datepaid: string | null;
+	mileagerate: number;
+}
+
 export type SubordinateTuple = [id: number, name: string, value: string];
 
 export type DisplayTimesheet = {
@@ -123,6 +142,14 @@ export type DisplayTimesheet = {
   lastname: string;
   found: boolean;
   timesheet?: SubordinateTimesheet;
+};
+
+export type DisplayExpense = {
+  id: number;
+  firstname: string;
+  lastname: string;
+  found: boolean;
+  expense?: SubordinateExpense;
 };
 
 export type Employee = {

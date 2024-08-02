@@ -25,12 +25,20 @@ export default function ApprovalDataFetcher({
 		return nextSunday;
 	}
 
+	function getFirstOfMonth(): DateTime {
+		const now = DateTime.local();
+		const firstOfMonth = now.set({ day: 1, hour: 0, minute: 0, second: 0, millisecond: 0 });
+		//console.log('first of the month: ', firstOfMonth.toISO()); // Outputs: '2024-08-01T00:00:00.000Z' (example format)
+		return firstOfMonth;
+	}
+
     useEffect(() => {
 		const handleDataPromise = async() => {
 			const data = await fetchSubordinatesWithAuth();
 			//console.log(data)
 			context.setSubordinates(data);
 			context.setTimesheetWeekending(getNextSunday());
+			context.setExpenseDatestart(getFirstOfMonth());
 		}
 		
 		handleDataPromise();
@@ -42,9 +50,9 @@ export default function ApprovalDataFetcher({
 			{context == undefined || context.subordinates == null ?
 				null
 				:
-				<div>
+				<>
 					{children}
-				</div>
+				</>
 			}
 		</>
 	)
