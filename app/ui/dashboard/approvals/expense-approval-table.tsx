@@ -2,45 +2,45 @@
 
 import { useContext } from "react"
 import { ApprovalContext } from "./approval-context-wrapper"
-import { DisplayTimesheet } from "@/app/lib/definitions"
+import { DisplayExpense } from "@/app/lib/definitions"
 
-export default function TimesheetApprovalTable({
+export default function ExpenseApprovalTable({
 	children
 }: {
 	children?: React.ReactNode
 }) {
 	const context = useContext(ApprovalContext)
 
-	if (!context || !context.subordinateTimesheets) {
+	if (!context || !context.subordinateExpenses) {
 		return <div>Loading...</div>;
 	}
 
-	function createDisplayTimesheets(): DisplayTimesheet[] | null {
-		const displayTimesheets: DisplayTimesheet[] = [];
+	function createDisplayExpenses(): DisplayExpense[] | null {
+		const displayExpenses: DisplayExpense[] = [];
 
 		if (!context) return null;
 	
-		if (!context.subordinates || !context.subordinateTimesheets) {
-			return displayTimesheets;
+		if (!context.subordinates || !context.subordinateExpenses) {
+			return displayExpenses;
 		}
 	
 		for (const [id, firstname, lastname] of context.subordinates) {
-			const matchingTimesheets = context.subordinateTimesheets.filter(
-				(subTS) => subTS.subordinateid === id
+			const matchingExpenses = context.subordinateExpenses.filter(
+				(subEX) => subEX.subordinateid === id
 			);
 	
-			if (matchingTimesheets.length > 0) {
-				for (const timesheet of matchingTimesheets) {
-					displayTimesheets.push({
+			if (matchingExpenses.length > 0) {
+				for (const expense of matchingExpenses) {
+					displayExpenses.push({
 						id,
 						firstname,
 						lastname,
 						found: true,
-						timesheet: timesheet
+						expense: expense
 					});
 				}
 			} else {
-				displayTimesheets.push({
+				displayExpenses.push({
 					id,
 					firstname,
 					lastname,
@@ -49,18 +49,18 @@ export default function TimesheetApprovalTable({
 			}
 		}
 	
-		return displayTimesheets;
+		return displayExpenses;
 	}
 
-	const displayTimesheets = createDisplayTimesheets();
-	if (!displayTimesheets) {
+	const displayExpenses = createDisplayExpenses();
+	if (!displayExpenses) {
 		throw new Error(
-			"Display Timesheets was not set up properly"
+			"Display Expenses was not set up properly"
 		);
 	}
 
 	const handleRowClick = (id: number) => {
-		context.setSelectedSubordinate([id, "timesheet"])
+		context.setSelectedSubordinate([id, "expense"])
 	}
 
 	return (
@@ -73,11 +73,11 @@ export default function TimesheetApprovalTable({
 				</tr>
 			</thead>
 			<tbody>
-				{displayTimesheets.map(({ id, firstname, lastname, found }) => (
+				{displayExpenses.map(({ id, firstname, lastname, found }) => (
 				<tr
 					key={id}
 					onClick={() => handleRowClick(id)}
-                	className="cursor-pointer"
+					className="cursor-pointer"
 				>
 					<td className={found ? 'text-blue-500' : 'text-red-500'}>{id}</td>
 					<td className={found ? 'text-blue-500' : 'text-red-500'}>{lastname}</td>
