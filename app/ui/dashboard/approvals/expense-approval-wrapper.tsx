@@ -20,9 +20,12 @@ export default function ExpenseApprovalWrapper({
     useEffect(() => {
 		const handleDataPromise = async() => {
             const datestart = context.expenseDatestart?.toISO();
+			
 			const data = await fetchSubordinateExpensesWithAuth(datestart);
 			console.log("data", data)
-			context.setSubordinateExpenses(data);
+
+			context.setDbSubordinateExpenses(data);
+			context.setLocalSubordinateExpenses(data);
 		}
 		
 		handleDataPromise();

@@ -106,8 +106,8 @@ export type SubordinateTimesheet = {
   processed: boolean;
   mgrapproved: boolean;
   usercommitted: boolean;
-  totalreghours: string;
-  totalovertime: string;
+  totalreghours: number;
+  totalovertime: number;
   approvedby: string | null;
   submittedby: string;
   processedby: string | null;
@@ -140,7 +140,9 @@ export type DisplayTimesheet = {
   id: number;
   firstname: string;
   lastname: string;
-  found: boolean;
+  signed: boolean;
+  approved: boolean,
+  timesheetCount: number;
   timesheet?: SubordinateTimesheet;
 };
 
@@ -148,7 +150,9 @@ export type DisplayExpense = {
   id: number;
   firstname: string;
   lastname: string;
-  found: boolean;
+  signed: boolean;
+  approved: boolean;
+  expenseCount: number;
   expense?: SubordinateExpense;
 };
 
@@ -385,7 +389,7 @@ export type TimesheetDetails = {
   lasteditdate: string;
 };
 
-export type SavingState = "signed" | "unsaved" | "saving" | "saved" | null;
+export type SavingState = "approved" | "signed" | "unsaved" | "saving" | "saved" | null;
 
 export type ProjectOption = {
   id: number;

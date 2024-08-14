@@ -11,7 +11,7 @@ export default function ExpenseApprovalTable({
 }) {
 	const context = useContext(ApprovalContext)
 
-	if (!context || !context.subordinateExpenses) {
+	if (!context || !context.localSubordinateExpenses) {
 		return <div>Loading...</div>;
 	}
 
@@ -20,12 +20,12 @@ export default function ExpenseApprovalTable({
 
 		if (!context) return null;
 	
-		if (!context.subordinates || !context.subordinateExpenses) {
+		if (!context.subordinates || !context.localSubordinateExpenses) {
 			return displayExpenses;
 		}
 	
 		for (const [id, firstname, lastname] of context.subordinates) {
-			const matchingExpenses = context.subordinateExpenses.filter(
+			const matchingExpenses = context.localSubordinateExpenses.filter(
 				(subEX) => subEX.subordinateid === id
 			);
 	
@@ -35,7 +35,9 @@ export default function ExpenseApprovalTable({
 						id,
 						firstname,
 						lastname,
-						found: true,
+						signed: expense.usercommitted,
+						approved: expense.mgrapproved,
+						expenseCount: matchingExpenses.length,
 						expense: expense
 					});
 				}
@@ -44,7 +46,10 @@ export default function ExpenseApprovalTable({
 					id,
 					firstname,
 					lastname,
-					found: false
+					signed: false,
+					approved: false,
+					expenseCount: 0,
+					expense: undefined
 				});
 			}
 		}
@@ -59,8 +64,8 @@ export default function ExpenseApprovalTable({
 		);
 	}
 
-	const handleRowClick = (id: number) => {
-		context.setSelectedSubordinate([id, "expense"])
+	const handleRowClick = (subordinateID: number, expenseID: number) => {
+		context.setSelectedSubordinate([subordinateID, "expense", expenseID])
 	}
 
 	return (
@@ -73,17 +78,24 @@ export default function ExpenseApprovalTable({
 				</tr>
 			</thead>
 			<tbody>
-				{displayExpenses.map(({ id, firstname, lastname, found }) => (
-				<tr
-					key={id}
-					onClick={() => handleRowClick(id)}
-					className="cursor-pointer"
-				>
-					<td className={found ? 'text-blue-500' : 'text-red-500'}>{id}</td>
-					<td className={found ? 'text-blue-500' : 'text-red-500'}>{lastname}</td>
-					<td className={found ? 'text-blue-500' : 'text-red-500'}>{firstname}</td>
-				</tr>
-				))}
+				{displayExpenses.map(({ id, firstname, lastname, signed, approved, expenseCount, expense }) => {
+					const textColor = !signed
+					? "text-red-500"
+					: signed && approved
+						? "text-green-500"
+						: "text-blue-500";
+					return (
+					<tr
+						key={id}
+						onClick={expense ? () => handleRowClick(id, expense.id) : undefined}
+						className={expense ? "cursor-pointer" : ""}
+					>
+							<td className={textColor}>{id}</td>
+							<td className={textColor}>{lastname}</td>
+							<td className={textColor}>{firstname}</td>
+					</tr>
+					);
+				})}
 			</tbody>
 		</table>
 	);

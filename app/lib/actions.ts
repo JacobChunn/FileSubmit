@@ -874,6 +874,213 @@ export async function toggleExpenseSignedValue(expenseid: number) {
 	}
 }
 
+export async function managerToggleExpenseSignedValue(
+	subordinateID: number,
+	expenseID: number
+) {
+	const validatedSubordinate = z.number().safeParse(subordinateID);
+	const validatedExpense = z.number().safeParse(expenseID);
+	
+	  // If form validation fails, return errors early. Otherwise, continue.
+	if (!validatedSubordinate.success) {
+		return {
+			errors: validatedSubordinate.error.flatten().fieldErrors,
+			message: 'Missing fields. Failed to validate subordinate ID.',
+		};
+	}
+
+	if (!validatedExpense.success) {
+		return {
+			errors: validatedExpense.error.flatten().fieldErrors,
+			message: 'Missing fields. Failed to validate expense ID.',
+		};
+	}
+	
+	const validatedSubordinateID = validatedSubordinate.data;
+	const validatedExpenseID = validatedExpense.data;
+
+	// Get the user session to ensure they are who they say they are
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		console.log("Session was unable to be retrieved!");
+		return {
+			message: 'Session was unable to be retrieved!',
+		};
+	}
+	
+	const managerID = Number(session.user.id);
+
+	try {
+		await sql`
+			UPDATE expenses
+			SET usercommitted = NOT usercommitted
+			WHERE id = ${validatedExpenseID}
+			AND employeeid = ${validatedSubordinateID}
+			AND EXISTS (
+				SELECT 1
+				FROM employees
+				WHERE employees.id = ${validatedSubordinateID}
+				AND employees.managerid = ${managerID}
+			);
+		`;
+	} catch(error) {
+		console.error(error);
+		return {
+			message: 'Failed to toggle signed value!',
+		};
+	}
+}
+
+export async function managerToggleExpenseApprovedValue(
+	subordinateID: number,
+	expenseID: number
+) {
+	const validatedSubordinate = z.number().safeParse(subordinateID);
+	const validatedExpense = z.number().safeParse(expenseID);
+	
+	  // If form validation fails, return errors early. Otherwise, continue.
+	if (!validatedSubordinate.success) {
+		return {
+			errors: validatedSubordinate.error.flatten().fieldErrors,
+			message: 'Missing fields. Failed to validate subordinate ID.',
+		};
+	}
+
+	if (!validatedExpense.success) {
+		return {
+			errors: validatedExpense.error.flatten().fieldErrors,
+			message: 'Missing fields. Failed to validate expense ID.',
+		};
+	}
+	
+	const validatedSubordinateID = validatedSubordinate.data;
+	const validatedExpenseID = validatedExpense.data;
+
+	// Get the user session to ensure they are who they say they are
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		console.log("Session was unable to be retrieved!");
+		return {
+			message: 'Session was unable to be retrieved!',
+		};
+	}
+	
+	const managerID = Number(session.user.id);
+
+	try {
+		await sql`
+			UPDATE expenses
+			SET mgrapproved = NOT mgrapproved
+			WHERE id = ${validatedExpenseID}
+			AND employeeid = ${validatedSubordinateID}
+			AND EXISTS (
+				SELECT 1
+				FROM employees
+				WHERE employees.id = ${validatedSubordinateID}
+				AND employees.managerid = ${managerID}
+			);
+		`;
+	} catch(error) {
+		console.error(error);
+		return {
+			message: 'Failed to toggle signed value!',
+		};
+	}
+}
+
+export async function fetchSubordinateExpenseDetailsEditFormData(
+	subordinateID: number,
+	expenseID: number
+) {
+	unstable_noStore();
+
+	const validatedExpense = z.number().safeParse(expenseID);
+	const validatedSubordinate = z.number().safeParse(subordinateID);
+
+	if (!validatedExpense.success) {
+		console.error(validatedExpense.error.flatten().fieldErrors);
+		throw new Error('Failed to Validate ExpenseID.')
+	}
+
+	if (!validatedSubordinate.success) {
+		console.error(validatedSubordinate.error.flatten().fieldErrors);
+		throw new Error('Failed to Validate SubordinateID.')
+	}
+
+	// Ensure user is logged in
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		throw new Error('Failed to user Session.');
+	}
+	
+	const managerID = Number(session.user.id);
+	const validatedExpenseID = validatedExpense.data;
+	const validatedSubordinateID = validatedSubordinate.data;
+
+	// Ensure expenseID belongs to subordinate
+	const validOwnership = await subordinateOwnsExpense(managerID, validatedSubordinateID, validatedExpenseID);
+	if (!validOwnership) {
+		throw new Error("Subordinate does not own provided expense!")
+	}
+
+	try {
+		const EXDData = await sql<ExpenseDetails>`
+			SELECT
+				id, expenseid, employeeid, jobid, day,
+				purpose, transportwhere, transportation,
+				lodging, cabsparking, carrental, miles, mileage,
+				perdiem, entertainment, miscid, miscvalue, total,
+				miscdetail, entlocation, entactivity, entwho, entpurpose
+			FROM expensedetails
+			WHERE expensedetails.expenseid = ${validatedExpenseID}
+				AND expensedetails.employeeid = ${validatedSubordinateID}
+		`;
+		
+		const projectsData = await sql<ProjectOption>`
+			SELECT id, number, shortname, description FROM projects;
+		`;
+	
+		const miscData = await sql<MiscOption>`
+			SELECT id, description FROM misc;
+		`;
+
+		const mileageData = await sql<Mileage>`
+			SELECT rate, datestart FROM mileagerates;
+		`;
+
+		const perdiemData = await sql<Perdiem>`
+			SELECT rate, datestart FROM perdiemrates;
+		`;
+
+		const expenseDetails = EXDData.rows;
+		const projects = projectsData.rows;
+		const misc = miscData.rows;
+
+		const mileage = mileageData.rows;
+
+		const perdiem = perdiemData.rows;
+
+		const options: ExpenseOptions = {
+			projects,
+			misc
+		}
+
+		const rates: ExpenseRates = {
+			mileage,
+			perdiem
+		}
+		
+		return {rates, options, expenseDetails};
+
+	} catch (error) {
+		console.error('Database Error:', error);
+		throw error;
+	}
+}
+
 export async function fetchExpenseDetailsEditFormData(
 	expenseID: number
 ) {
@@ -953,6 +1160,30 @@ export async function fetchExpenseDetailsEditFormData(
 
 	} catch (error) {
 		console.error('Database Error:', error);
+		throw error;
+	}
+}
+
+async function subordinateOwnsExpense(managerID: number, employeeID: number, expenseID: number) {
+	try{
+		const validOwnership = await sql`
+			SELECT EXISTS (
+				SELECT 1
+				FROM expenses t
+				WHERE t.id = ${expenseID}
+				AND t.employeeid = ${employeeID}
+				AND EXISTS (
+					SELECT 1
+					FROM employees e
+					WHERE e.id = ${employeeID}
+					AND e.managerid = ${managerID}
+				)
+			) AS expense_exists;
+		`;
+
+		return validOwnership.rows[0].expense_exists;
+	} catch(error) {
+		console.error(error);
 		throw error;
 	}
 }
@@ -1309,6 +1540,357 @@ async function deleteExpenseDetailsByExpense(expenseid: number) {
 		console.log(error);
 		return;
 	}
+}
+
+export async function managerEditExpenseDetails(
+	subordinateID: number,
+	expenseID: number,
+	prevState: any,
+	formData: FormData
+): Promise<EditDetailsType> {
+	//console.log(formData);
+
+	const validatedExpense = z.number().safeParse(expenseID);
+	const validatedSubordinate = z.number().safeParse(subordinateID);
+
+	// If form validation fails, return errors early. Otherwise, continue.
+	if (!validatedExpense.success) {
+		return {
+      		success: false,
+			errors: validatedExpense.error.flatten().fieldErrors,
+			message: 'Failed to Validate expenseID.',
+		};
+	}
+
+	if (!validatedSubordinate.success) {
+		return {
+      		success: false,
+			errors: validatedSubordinate.error.flatten().fieldErrors,
+			message: 'Failed to Validate subordinateID.',
+		};
+	}
+
+  	const validatedExpenseID = validatedExpense.data;
+	const validatedSubordinateID = validatedSubordinate.data;
+
+	// Get user session and id
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		console.log("Session was unable to be retrieved!");
+		return {
+    		success: false,
+			message: 'Session was unable to be retrieved!',
+		};
+
+	}
+
+	const managerID = Number(session.user.id);
+
+	
+
+	// Ensure expenseID belongs to employee
+	const validOwnership = await subordinateOwnsExpense(managerID, validatedSubordinateID, validatedExpenseID);
+	if (!validOwnership) {
+		console.log("Employee does not own provided expense!");
+		return {
+			success: false,
+			message: 'Employee does not own provided expense!',
+		};
+	}
+
+	const managerUsername = await getUsernameByEmployeeID(managerID);
+
+	// Ensure that expense is not signed
+	try {
+		const expenseIsSigned = await sql`
+			SELECT usercommitted
+			FROM expenses
+			WHERE id = ${validatedExpenseID}
+				AND employeeid = ${subordinateID};
+		`;
+		console.log(expenseIsSigned.rows[0]);
+		if (expenseIsSigned.rows[0].usercommitted) {
+			return {
+				success: false,
+				message: 'Cannot edit a signed expense!'
+			}
+		}
+
+	} catch(error) {
+		console.error(error);
+		return {
+			success: false,
+			errors: JSON.stringify(error),
+			message: 'Error checking if expense is signed!'
+		}
+	}
+
+	// Validate DateStart
+  	let validatedDateStart;
+	try {
+		validatedDateStart = DateSchema.safeParse({
+			date: formData.get('dateStart')
+		})
+	} catch(error) {
+		console.error(error);
+		return {
+			success: false,
+			errors: JSON.stringify(error),
+			message: 'Error validating Week Ending value!'
+		}
+	}
+
+	if (!validatedDateStart.success) {
+		console.error(validatedDateStart.error);
+		return {
+			success: false,
+			errors: validatedDateStart.error.flatten().fieldErrors,
+			message: 'Error validating Date Start value!',
+		};
+	}
+
+	//const numdaysFromDateStart = DateTime.fromISO(validatedDateStart.data.date).daysInMonth
+	//console.log(validatedWeekEnding.data.weekEnding)
+
+	// Update DateStart for expense
+	// try {
+	// 	await sql`
+	// 		UPDATE expenses
+	// 		SET datestart = ${validatedDateStart.data.date},
+	// 			numdays = ${numdaysFromDateStart}
+	// 		WHERE id = ${validatedExpenseID}
+	// 			AND employeeid = ${employeeID};
+	// 	`;
+	// } catch(error) {
+	// 	console.error(error);
+	// 	return {
+	// 		success: false,
+	// 		errors: JSON.stringify(error),
+	// 		message: 'Error entering Date Start value into database!'
+	// 	}
+	// }
+
+	// Get mileage + perdiem
+	let mileage: number;
+	let perdiem: number;
+	try {
+		const mileageData = await sql`
+			SELECT rate
+			FROM mileagerates
+			WHERE datestart <= ${validatedDateStart.data.date}
+			ORDER BY datestart DESC
+			LIMIT 1;
+		`;
+		if (!mileageData.rows[0].rate) throw new Error("Error getting mileage data!");
+		
+		mileage = mileageData.rows[0].rate;
+
+		const perdiemData = await sql`
+			SELECT rate
+			FROM perdiemrates
+			WHERE datestart <= ${validatedDateStart.data.date}
+			ORDER BY datestart DESC
+			LIMIT 1;
+		`;
+		if (!perdiemData.rows[0].rate) throw new Error("Error getting perdiem data!");
+		
+		perdiem = perdiemData.rows[0].rate;
+	} catch(error) {
+		console.error(error);
+		return {
+			success: false,
+			errors: JSON.stringify(error),
+			message: 'Error getting mileage/perdiem data!'
+		}
+	}
+
+	// Separate EXDs from formData
+	const separateEXDs = separateExpenseFormData(formData);
+
+	// Validate each EXD and add it to array
+
+  	type validatedEXDType = {
+		day: number;
+		id: number;
+		jobid: number;
+		purpose: string | null;
+		transportwhere: string | null;
+		transportation: number | null;
+		lodging: number | null;
+		cabsparking: number | null;
+		carrental: number | null;
+		miles: number | null;
+		mileage: number | null;
+		perdiem: number | null;
+		entertainment: number | null;
+		miscid: number;
+		miscvalue: number | null;
+		total: number | null;
+		miscdetail: string | null;
+		entlocation: string | null;
+		entactivity: string | null;
+		entwho: string | null;
+		entpurpose: string | null;
+	};
+
+	const validatedEXDs: validatedEXDType[] = [];
+
+ 	for (const exdkey in separateEXDs) {
+		const validatedEXD = EditExpenseDetails.safeParse({
+			day: Number(separateEXDs[exdkey]['day']),
+			id: Number(separateEXDs[exdkey]['id']),
+			jobid: Number(separateEXDs[exdkey]['jobid']),
+			purpose: separateEXDs[exdkey]['purpose'],
+			transportwhere: separateEXDs[exdkey]['transportwhere'],
+			transportation: Number(separateEXDs[exdkey]['transportation']),
+			lodging: Number(separateEXDs[exdkey]['lodging']),
+			cabsparking: Number(separateEXDs[exdkey]['cabsparking']),
+			carrental: Number(separateEXDs[exdkey]['carrental']),
+			miles: Number(separateEXDs[exdkey]['miles']),
+			entertainment: Number(separateEXDs[exdkey]['entertainment']),
+			miscid: Number(separateEXDs[exdkey]['miscid']),
+			miscvalue: Number(separateEXDs[exdkey]['miscvalue']),
+			miscdetail: separateEXDs[exdkey]['miscdetail'],
+			entlocation: separateEXDs[exdkey]['entlocation'],
+			entactivity: separateEXDs[exdkey]['entactivity'],
+			entwho: separateEXDs[exdkey]['entwho'],
+			entpurpose: separateEXDs[exdkey]['entpurpose']
+		});
+
+
+		if (!validatedEXD.success) {
+			console.error(validatedEXD.error);
+			return {
+        		success: false,
+				errors: validatedEXD.error.flatten().fieldErrors,
+				message: 'Incorrect or Missing Fields. Failed to Validate expense.',
+			};
+		}
+
+		// Prep data to calculate total
+		const transportation = validatedEXD.data.transportation ? validatedEXD.data.transportation : 0;
+		const lodging = validatedEXD.data.lodging ? validatedEXD.data.lodging : 0;
+		const milesCost = validatedEXD.data.miles ? validatedEXD.data.miles * mileage : 0;
+		const entertainment = validatedEXD.data.entertainment ? validatedEXD.data.entertainment : 0;
+		const misc = validatedEXD.data.miscvalue ? validatedEXD.data.miscvalue : 0;
+
+		// Calculate total. Add travel, parking/etc, miles * mileage, perdiem, entertainment, and misc
+		const total = transportation + lodging + milesCost + Number(perdiem) + entertainment + misc;
+
+		console.log(`transportation: ${transportation}`);
+		console.log(`lodging: ${lodging}`);
+		console.log(`milesCost: ${milesCost}`);
+		console.log(`perdiem: ${perdiem}`);
+		console.log(`entertainment: ${entertainment}`);
+		console.log(`misc: ${misc}`);
+		console.log(`total: ${total}`);
+
+
+		// Push validated Expense details with mileage and total
+		validatedEXDs.push({...validatedEXD.data, perdiem, mileage, total});
+
+	}
+
+	// Delete all EXDs associated with the timesheet
+	try{ // Note - could make this more robost by temporarily storing the EXDs in DB before deletion
+		await sql`
+		DELETE FROM expensedetails
+		WHERE expenseid = ${validatedExpenseID}
+			AND employeeid = ${validatedSubordinateID};
+		`;
+	} catch(error) {
+		console.error(error);
+		return {
+			success: false,
+			errors: JSON.stringify(error),
+			message: 'Failed to delete old EXDs'
+		}
+	}
+
+	// Add all validated EXDs to Database
+	let totalTotal = 0.0;
+	for (const EXD of validatedEXDs) {
+		const {
+			day, id, jobid, purpose, transportwhere, transportation, lodging, 
+			cabsparking, carrental, miles, mileage, perdiem, entertainment, 
+			miscid, miscvalue, total, miscdetail, entlocation, entactivity, 
+			entwho, entpurpose
+
+		} = EXD;
+
+		console.log("inner total: ", total)
+
+		try {
+			const addExpenseDetailsRes = await addExpenseDetailsHelper({ // Do I need to ensure user is authorized?
+				day: day,
+				expenseid: validatedExpenseID,
+				employeeid: validatedSubordinateID,
+				jobid: jobid,
+				purpose: purpose,
+				transportwhere: transportwhere,
+				transportation: transportation,
+				lodging: lodging,
+				cabsparking: cabsparking,
+				carrental: carrental,
+				miles: miles,
+				mileage: mileage,
+				perdiem: perdiem,
+				entertainment: entertainment,
+				miscid: miscid,
+				miscvalue: miscvalue,
+				total: total,
+				miscdetail: miscdetail,
+				entlocation: entlocation,
+				entactivity: entactivity,
+				entwho: entwho,
+				entpurpose: entpurpose,
+			});
+			
+			if(!addExpenseDetailsRes.success) {
+				return {
+					success: false,
+					message: 'Failed to Create Expense Details.',
+				};
+			}
+
+			totalTotal += (total ? total : 0);
+	
+		} catch(error) {
+			console.error(error);
+			return {
+				success: false,
+				errors: JSON.stringify(error),
+				message: 'Failed to Create Expense Details.',
+			};
+		}
+	}
+
+	// Update the associated expense's totalexpenses and mileagerate
+	try {
+		await sql`
+		UPDATE expenses
+		SET totalexpenses = ${totalTotal}, 
+		mileagerate =${mileage},
+		submittedby = ${managerUsername}
+		WHERE id = ${validatedExpenseID}
+			AND employeeid = ${validatedSubordinateID};
+		`;
+	} catch(error) {
+		console.error(error);
+		return {
+			success: false,
+			errors: JSON.stringify(error),
+			message: 'Failed to Update Expense Details',
+		};
+	}
+
+	// Return success
+	return {
+		success: true,
+		message: 'Expense Details were successfully updated!'
+	}
+
 }
 
 export async function editExpenseDetails(
@@ -2209,7 +2791,293 @@ export async function addTimesheetDetails(timesheetID: number) {
 	// redirect(`/dashboard/${validatedTimesheetID}/edit/details`);
 }
 
+// Edit timesheet only if user is a manager of the provided subordinate's timesheet
+export async function managerEditTimesheetDetails(
+	employeeID: number,
+	timesheetID: number,
+	prevState: any,
+	formData: FormData
+): Promise<EditDetailsType> {
+	//console.log(formData);
 
+	const validatedTimesheet = z.number().safeParse(timesheetID);
+	const validatedEmployee = z.number().safeParse(employeeID);
+
+	// If form validation fails, return errors early. Otherwise, continue.
+	if (!validatedTimesheet.success) {
+		return {
+      		success: false,
+			errors: validatedTimesheet.error.flatten().fieldErrors,
+			message: 'Failed to Validate timesheetID.',
+		};
+	}
+
+	// If form validation fails, return errors early. Otherwise, continue.
+	if (!validatedEmployee.success) {
+		return {
+			success: false,
+			errors: validatedEmployee.error.flatten().fieldErrors,
+			message: 'Failed to Validate employeeID.',
+		};
+	}
+
+	const validatedTimesheetID = validatedTimesheet.data;
+	const validatedEmployeeID = validatedEmployee.data;
+
+	// Get user session and id
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		console.log("Session was unable to be retrieved!");
+		return {
+    		success: false,
+			message: 'Session was unable to be retrieved!',
+		};
+
+	}
+
+	const managerID = Number(session.user.id);
+
+	// Ensure timesheetID belongs to subordinate
+	const validOwnership = await subordinateOwnsTimesheet(managerID, validatedEmployeeID, validatedTimesheetID);
+	if (!validOwnership) {
+		console.log("Subordinate does not own provided timesheet!");
+		return {
+    		success: false,
+			message: 'Subordinate does not own provided timesheet!',
+		};
+	}
+
+	const managerUsername = await getUsernameByEmployeeID(managerID);
+
+	// Ensure that timesheet is signed
+	try {
+		const timesheetIsSigned = await sql`
+			SELECT usercommitted
+			FROM timesheets
+			WHERE id = ${validatedTimesheetID};
+		`
+		console.log(timesheetIsSigned.rows[0]);
+		if (!timesheetIsSigned.rows[0].usercommitted) {
+			return {
+				success: false,
+				message: 'Can only get signed timesheets!'
+			}
+		}
+
+	} catch(error) {
+		console.error(error);
+		return {
+			success: false,
+			errors: JSON.stringify(error),
+			message: 'Error checking if timesheet is signed!'
+		}
+	}
+
+
+	// Separate TDSs from formData
+	const separateTSDs = separateTimesheetFormData(formData);
+
+	// Validate each TSD and add it to array
+
+	type validatedTSDType = {
+		id: number;
+		project: number;
+    	phase_costcode: string;
+		// phase: number;
+		// costcode: number;
+		description: string;
+		mon: number;
+		tues: number;
+		wed: number;
+		thurs: number;
+		fri: number;
+		sat: number;
+		sun: number;
+		monot: number;
+		tuesot: number;
+		wedot: number;
+		thursot: number;
+		friot: number;
+		satot: number;
+		sunot: number;
+	};
+
+	const validatedTSDs: validatedTSDType[] = [];
+
+ 	for (const tsdkey in separateTSDs) {
+		const validatedTSD = EditTimesheetDetails.safeParse({
+			id: Number(separateTSDs[tsdkey]['id']),
+			project: Number(separateTSDs[tsdkey]['project']),
+      		phase_costcode: separateTSDs[tsdkey]['phase_costcode'],
+			// phase: Number(separateTSDs[tsdkey]['phase']),
+			// costcode: Number(separateTSDs[tsdkey]['costcode']),
+			description: separateTSDs[tsdkey]['description'],
+			mon: Number(separateTSDs[tsdkey]['mon']),
+			tues: Number(separateTSDs[tsdkey]['tues']),
+			wed: Number(separateTSDs[tsdkey]['wed']),
+			thurs: Number(separateTSDs[tsdkey]['thurs']),
+			fri: Number(separateTSDs[tsdkey]['fri']),
+			sat: Number(separateTSDs[tsdkey]['sat']),
+			sun: Number(separateTSDs[tsdkey]['sun']),
+			monot: Number(separateTSDs[tsdkey]['monOT']),
+			tuesot: Number(separateTSDs[tsdkey]['tuesOT']),
+			wedot: Number(separateTSDs[tsdkey]['wedOT']),
+			thursot: Number(separateTSDs[tsdkey]['thursOT']),
+			friot: Number(separateTSDs[tsdkey]['friOT']),
+			satot: Number(separateTSDs[tsdkey]['satOT']),
+			sunot: Number(separateTSDs[tsdkey]['sunOT'])
+		});
+
+
+		if (!validatedTSD.success) {
+			console.error(validatedTSD.error);
+			return {
+        		success: false,
+				errors: validatedTSD.error.flatten().fieldErrors,
+				message: 'Incorrect or Missing Fields. Failed to Validate timesheet ID.',
+			};
+		}
+
+		validatedTSDs.push(validatedTSD.data);
+
+	}
+
+  // Delete all TSDs associated with the timesheet
+  try{ // Note - could make this more robost by temporarily storing the TSDs in DB before deletion
+    await sql`
+      DELETE FROM timesheetdetails
+      WHERE timesheetid = ${validatedTimesheetID}
+	  	AND employeeid = ${validatedEmployeeID};
+    `;
+  } catch(error) {
+    console.error(error);
+    return {
+      success: false,
+      errors: JSON.stringify(error),
+      message: 'Failed to delete old TSDs'
+    }
+  }
+
+  // Add all validated TSDs to Database
+  let totalReg = 0.0;
+  let totalOT = 0.0;
+	for (const TSD of validatedTSDs) {
+		const {id, project, phase_costcode, description,
+			mon, tues, wed, thurs, fri, sat, sun,
+			monot, tuesot, wedot, thursot, friot, satot, sunot} = TSD;
+
+    const phase_costcode_split = phase_costcode.split('-');
+    const phase = Number(phase_costcode_split[0]);
+    const costcode = Number(phase_costcode_split[1]);
+
+    try{
+      const addTimesheetDetailsRes = await addTimesheetDetailsHelper({
+        timesheetid: validatedTimesheetID,
+        employeeid: validatedEmployeeID,
+        projectid: project,
+        phase: phase,
+        costcode: costcode,
+        description: description,
+        mon: mon,
+        monot: monot,
+        tues: tues,
+        tuesot: tuesot,
+        wed: wed,
+        wedot: wedot,
+        thurs: thurs,
+        thursot: thursot,
+        fri: fri,
+        friot: friot,
+        sat: sat,
+        satot: satot,
+        sun: sun,
+        sunot: sunot,
+      });
+
+      totalReg += (mon + tues + wed + thurs + fri + sat + sun);
+      totalOT += (monot + tuesot + wedot + thursot + friot + satot + sunot);
+    
+      if(!addTimesheetDetailsRes.success) {
+        return {
+          success: false,
+          message: 'Failed to Create Timesheet Details.',
+        };
+      }
+  
+    } catch(error) {
+      console.error(error);
+      return {
+        success: false,
+        errors: JSON.stringify(error),
+        message: 'Failed to Create Timesheet Details.',
+      };
+    }
+	}
+
+  // Update the associated timesheet's totalreghours and totalovertime
+  try {
+    await sql`
+      UPDATE timesheets
+      SET totalreghours = ${totalReg}, 
+        totalovertime = ${totalOT},
+		submittedby = ${managerUsername}
+      WHERE id = ${validatedTimesheetID};    
+    `;
+  } catch(error) {
+    console.error(error);
+    return {
+      success: false,
+      errors: JSON.stringify(error),
+      message: 'Failed to Update Timesheet Details',
+    };
+  }
+
+  // Return success
+  return {
+    success: true,
+    message: 'Timesheet Details were successfully updated!'
+  }
+
+}
+
+async function getUsernameByEmployeeID(employeeID: number) {
+	try {
+		const username = await sql`
+			SELECT username
+            FROM employees
+            WHERE id = ${employeeID}
+		`;
+		return username.rows[0].username as string;
+	} catch (error) {
+		console.error(error);
+		throw error;
+	}
+}
+
+async function subordinateOwnsTimesheet(managerID: number, employeeID: number, timesheetID: number) {
+	try{
+		const validOwnership = await sql`
+			SELECT EXISTS (
+				SELECT 1
+				FROM timesheets t
+				WHERE t.id = ${timesheetID}
+				AND t.employeeid = ${employeeID}
+				AND EXISTS (
+					SELECT 1
+					FROM employees e
+					WHERE e.id = ${employeeID}
+					AND e.managerid = ${managerID}
+				)
+			) AS timesheet_exists;
+		`;
+
+		return validOwnership.rows[0].timesheet_exists;
+	} catch(error) {
+		console.error(error);
+		throw error;
+	}
+}
 
 export async function editTimesheetDetails(
 	timesheetID: number,
@@ -2254,6 +3122,8 @@ export async function editTimesheetDetails(
 			message: 'Employee does not own provided timesheet!',
 		};
 	}
+
+	const employeeUsername = await getUsernameByEmployeeID(employeeID);
 
 	// Ensure that timesheet is not signed
 	try {
@@ -2394,7 +3264,8 @@ export async function editTimesheetDetails(
   try{ // Note - could make this more robost by temporarily storing the TSDs in DB before deletion
     await sql`
       DELETE FROM timesheetdetails
-      WHERE timesheetid = ${validatedTimesheetID};
+      WHERE timesheetid = ${validatedTimesheetID}
+	  	AND employeeid = ${employeeID};
     `;
   } catch(error) {
     console.error(error);
@@ -2466,7 +3337,8 @@ export async function editTimesheetDetails(
     await sql`
       UPDATE timesheets
       SET totalreghours = ${totalReg}, 
-        totalovertime =${totalOT}
+        totalovertime =${totalOT},
+		submittedby = ${employeeUsername}
       WHERE id = ${validatedTimesheetID};    
     `;
   } catch(error) {
@@ -2546,6 +3418,98 @@ function separateTimesheetFormData(formData: FormData): SeparatedFormData {
   });
   
   return result;
+}
+
+export async function fetchSubordinateTimesheetDetailsEditFormData(
+	subordinateID: number,
+	timesheetID: number
+) {
+	unstable_noStore();
+
+	const validatedTimesheet = z.number().safeParse(timesheetID);
+	const validatedSubordinate = z.number().safeParse(subordinateID);
+
+	if (!validatedTimesheet.success) {
+		console.error(validatedTimesheet.error.flatten().fieldErrors);
+		throw new Error('Failed to Validate TimesheetID.')
+	}
+
+	if (!validatedSubordinate.success) {
+		console.error(validatedSubordinate.error.flatten().fieldErrors);
+		throw new Error('Failed to Validate SubordinateID.')
+	}
+
+	// Ensure user is logged in
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		throw new Error('Failed to user Session.');
+	}
+
+	const managerID = Number(session.user.id);
+	const validatedTimesheetID = validatedTimesheet.data;
+	const validatedSubordinateID = validatedSubordinate.data;
+
+	// Ensure timesheetID belongs to employee
+	const validOwnership = await subordinateOwnsTimesheet(managerID, validatedSubordinateID, validatedTimesheetID);
+	if (!validOwnership) {
+		throw new Error("Subordinate does not own provided timesheet!")
+	}
+
+	try {
+		const TSDData = await sql<TimesheetDetails>`
+			  SELECT
+				  id, timesheetid, employeeid, projectid,
+				  phase, costcode, description,
+				  mon, monot,
+				  tues, tuesot,
+				  wed, wedot,
+				  thurs, thursot,
+				  fri, friot,
+				  sat, satot,
+				  sun, sunot,
+				  lasteditdate
+			  FROM timesheetdetails
+			  WHERE timesheetdetails.timesheetid = ${validatedTimesheetID}
+		`;
+
+		const timesheetDetails = TSDData.rows;
+
+		const projectsData = await sql<ProjectOption>`
+		  SELECT id, number, shortname, description FROM projects;
+		`;
+
+		// const phasesData = await sql<PhaseOption>`
+		//   SELECT id, description FROM phases;
+		// `;
+
+		// const costCodesData = await sql<CostCodeOption>`
+		//   SELECT id, description FROM costcodes;
+		// `;
+
+		const phaseCostCodesData = await sql<PhaseCostCodeOption>`
+		  SELECT phase, costcode, description FROM phase_costcodes;
+		`;
+
+		const projects = projectsData.rows;
+		const phaseCostCodes = phaseCostCodesData.rows;
+		// const phases = phasesData.rows;
+		// const costcodes = costCodesData.rows;
+
+		const options: Options = {
+			projects,
+			phaseCostCodes,
+			// phases,
+			// costcodes,
+		}
+
+		return { options, timesheetDetails };
+
+	} catch (error) {
+		console.error('Database Error:', error);
+		throw error;
+	}
+
 }
 
 export async function fetchTimesheetDetailsEditFormData(
@@ -3141,6 +4105,123 @@ export async function toggleTimesheetSignedValue(timesheetid: number) {
 		console.error(error);
 		return {
 			message: 'Failed to toggle signed value!',
+		};
+	}
+}
+
+export async function managerToggleTimesheetSignedValue(
+	subordinateID: number,
+	timesheetID: number
+) {
+	console.log("toggle TS signed")
+	const validatedSubordinate = z.number().safeParse(subordinateID);
+	const validatedTimesheet = z.number().safeParse(timesheetID);
+	
+	  // If form validation fails, return errors early. Otherwise, continue.
+	if (!validatedSubordinate.success) {
+		return {
+			errors: validatedSubordinate.error.flatten().fieldErrors,
+			message: 'Missing fields. Failed to validate subordinate ID.',
+		};
+	}
+
+	if (!validatedTimesheet.success) {
+		return {
+			errors: validatedTimesheet.error.flatten().fieldErrors,
+			message: 'Missing fields. Failed to validate timesheet ID.',
+		};
+	}
+	
+	const validatedSubordinateID = validatedSubordinate.data;
+	const validatedTimesheetID = validatedTimesheet.data;
+
+	// Get the user session to ensure they are who they say they are
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		console.log("Session was unable to be retrieved!");
+		return {
+			message: 'Session was unable to be retrieved!',
+		};
+	}
+	
+	const managerid = Number(session.user.id);
+
+	try {
+		await sql`
+			UPDATE timesheets
+			SET usercommitted = NOT usercommitted
+			WHERE id = ${validatedTimesheetID}
+			AND employeeid = ${validatedSubordinateID}
+			AND EXISTS (
+				SELECT 1
+				FROM employees
+				WHERE employees.id = ${validatedSubordinateID}
+				AND employees.managerid = ${managerid}
+			);
+		`;
+	} catch(error) {
+		console.error(error);
+		return {
+			message: 'Failed to toggle signed value!',
+		};
+	}
+}
+
+export async function managerToggleTimesheetApprovedValue(
+	subordinateID: number,
+	timesheetID: number
+) {
+	const validatedSubordinate = z.number().safeParse(subordinateID);
+	const validatedTimesheet = z.number().safeParse(timesheetID);
+	
+	  // If form validation fails, return errors early. Otherwise, continue.
+	if (!validatedSubordinate.success) {
+		return {
+			errors: validatedSubordinate.error.flatten().fieldErrors,
+			message: 'Missing fields. Failed to validate subordinate ID.',
+		};
+	}
+
+	if (!validatedTimesheet.success) {
+		return {
+			errors: validatedTimesheet.error.flatten().fieldErrors,
+			message: 'Missing fields. Failed to validate timesheet ID.',
+		};
+	}
+	
+	const validatedSubordinateID = validatedSubordinate.data;
+	const validatedTimesheetID = validatedTimesheet.data;
+
+	// Get the user session to ensure they are who they say they are
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		console.log("Session was unable to be retrieved!");
+		return {
+			message: 'Session was unable to be retrieved!',
+		};
+	}
+	
+	const managerid = Number(session.user.id);
+
+	try {
+		await sql`
+			UPDATE timesheets
+			SET mgrapproved = NOT mgrapproved
+			WHERE id = ${validatedTimesheetID}
+			AND employeeid = ${validatedSubordinateID}
+			AND EXISTS (
+				SELECT 1
+				FROM employees
+				WHERE employees.id = ${validatedSubordinateID}
+				AND employees.managerid = ${managerid}
+			);
+		`;
+	} catch(error) {
+		console.error(error);
+		return {
+			message: 'Failed to toggle approved value!',
 		};
 	}
 }

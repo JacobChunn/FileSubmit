@@ -45,6 +45,32 @@ export default function ApprovalDataFetcher({
 	
 	}, []);
 
+	// Get the data for setting subordinateDetails
+	// useEffect(() => {
+	// 	const handleDataPromise = async() => {
+	// 		let initialSubordinateDetails = undefined;
+	// 		if (context.selectedSubordinate) {
+	// 			// first see if new selected subordinate is of timesheet or expense variety
+	// 			const selectedSubordinateType = context.selectedSubordinate[1];
+
+	// 			// get appropriately respective data
+	// 			let data;
+	// 			if (selectedSubordinateType === "timesheet") {
+	// 				data = await fetch
+	// 			} else if (selectedSubordinateType === "expense") {
+
+	// 			}
+
+	// 		} else {
+	// 			initialSubordinateDetails = null;
+	// 		}
+	// 		// set the recieved data into context variable
+	// 		context.setLocalSubordinateDetails(initialSubordinateDetails);
+	// 		context.setDbSubordinateDetails(initialSubordinateDetails);
+	// 	}
+
+	// }, [context.selectedSubordinate])
+
 	return (
 		<>
 			{context == undefined || context.subordinates == null ?

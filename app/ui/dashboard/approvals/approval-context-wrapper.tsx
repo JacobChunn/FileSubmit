@@ -1,6 +1,6 @@
 "use client"
 
-import { SubordinateExpense, SubordinateTimesheet, SubordinateTuple } from "@/app/lib/definitions";
+import { ExpenseDetailsExtended, SavingState, SubordinateExpense, SubordinateTimesheet, SubordinateTuple, TimesheetDetailsExtended } from "@/app/lib/definitions";
 import { DateTime } from "luxon";
 import { createContext, useState } from "react";
 
@@ -11,17 +11,35 @@ export type approvalContextType = {
     timesheetWeekending: DateTime<true> | DateTime<false> | null;
     setTimesheetWeekending: React.Dispatch<React.SetStateAction<DateTime<true> | DateTime<false> | null>>;
 
-    subordinateTimesheets: SubordinateTimesheet[] | null;
-    setSubordinateTimesheets: React.Dispatch<React.SetStateAction<SubordinateTimesheet[] | null>>;
+    localSubordinateTimesheets: SubordinateTimesheet[] | null;
+    setLocalSubordinateTimesheets: React.Dispatch<React.SetStateAction<SubordinateTimesheet[] | null>>;
+
+    dBSubordinateTimesheets: SubordinateTimesheet[] | null;
+    setDbSubordinateTimesheets: React.Dispatch<React.SetStateAction<SubordinateTimesheet[] | null>>;
 
     expenseDatestart: DateTime<true> | DateTime<false> | null;
     setExpenseDatestart: React.Dispatch<React.SetStateAction<DateTime<true> | DateTime<false> | null>>;
 
-    subordinateExpenses: SubordinateExpense[] | null;
-    setSubordinateExpenses: React.Dispatch<React.SetStateAction<SubordinateExpense[] | null>>;
+    localSubordinateExpenses: SubordinateExpense[] | null;
+    setLocalSubordinateExpenses: React.Dispatch<React.SetStateAction<SubordinateExpense[] | null>>;
 
-    selectedSubordinate: [number, "expense" | "timesheet"] | null;
-    setSelectedSubordinate: React.Dispatch<React.SetStateAction<[number, "expense" | "timesheet"] | null>>;
+    dBSubordinateExpenses: SubordinateExpense[] | null;
+    setDbSubordinateExpenses: React.Dispatch<React.SetStateAction<SubordinateExpense[] | null>>;
+
+    selectedSubordinate: [number, "expense" | "timesheet", number] | null;
+    setSelectedSubordinate: React.Dispatch<React.SetStateAction<[number, "expense" | "timesheet", number] | null>>;
+
+    localSubordinateDetails: ExpenseDetailsExtended[] | TimesheetDetailsExtended[] | null;
+    setLocalSubordinateDetails: React.Dispatch<React.SetStateAction<ExpenseDetailsExtended[] | TimesheetDetailsExtended[] | null>>;
+
+    dbSubordinateDetails: ExpenseDetailsExtended[] | TimesheetDetailsExtended[] | null;
+    setDbSubordinateDetails: React.Dispatch<React.SetStateAction<ExpenseDetailsExtended[] | TimesheetDetailsExtended[] | null>>;
+
+    subordinateDetailsState: SavingState | "approved";
+    setSubordinateDetailsState: React.Dispatch<React.SetStateAction<SavingState | "approved">>;
+
+    selectedExpenseDetails: number | null;
+    setSelectedExpenseDetails: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
 export const ApprovalContext = createContext<approvalContextType | null>(null)
@@ -33,20 +51,38 @@ export default function ApprovalContextWrapper({
 }) {
 	const [subordinates, setSubordinates] = useState<SubordinateTuple[] | null>(null);
     const [timesheetWeekending, setTimesheetWeekending] = useState<DateTime<true> | DateTime<false> | null>(null);
-    const [subordinateTimesheets, setSubordinateTimesheets] = useState<SubordinateTimesheet[] | null>(null);
+    const [localSubordinateTimesheets, setLocalSubordinateTimesheets] = useState<SubordinateTimesheet[] | null>(null);
+    const [dBSubordinateTimesheets, setDbSubordinateTimesheets] = useState<SubordinateTimesheet[] | null>(null);
     const [expenseDatestart, setExpenseDatestart] = useState<DateTime<true> | DateTime<false> | null>(null);
-    const [subordinateExpenses, setSubordinateExpenses] = useState<SubordinateExpense[] | null>(null);
-    const [selectedSubordinate, setSelectedSubordinate] = useState<[number, "expense" | "timesheet"] | null>(null);
+    const [localSubordinateExpenses, setLocalSubordinateExpenses] = useState<SubordinateExpense[] | null>(null);
+    const [dBSubordinateExpenses, setDbSubordinateExpenses] = useState<SubordinateExpense[] | null>(null);
+    const [selectedSubordinate, setSelectedSubordinate] = useState<[number, "expense" | "timesheet", number] | null>(null);
+    const [localSubordinateDetails, setLocalSubordinateDetails] = useState<ExpenseDetailsExtended[] | TimesheetDetailsExtended[] | null>(null);
+    const [dbSubordinateDetails, setDbSubordinateDetails] = useState<ExpenseDetailsExtended[] | TimesheetDetailsExtended[] | null>(null);
+    const [subordinateDetailsState, setSubordinateDetailsState] = useState<SavingState | "approved">(null);
+    const [selectedExpenseDetails, setSelectedExpenseDetails] = useState<number | null>(null);
 
     return (
         <ApprovalContext.Provider
             value={{
 				subordinates, setSubordinates,
+
                 timesheetWeekending, setTimesheetWeekending,
-                subordinateTimesheets, setSubordinateTimesheets,
+                localSubordinateTimesheets, setLocalSubordinateTimesheets,
+                dBSubordinateTimesheets, setDbSubordinateTimesheets,
+                
                 expenseDatestart, setExpenseDatestart,
-                subordinateExpenses, setSubordinateExpenses,
+                localSubordinateExpenses, setLocalSubordinateExpenses,
+                dBSubordinateExpenses, setDbSubordinateExpenses,
+
                 selectedSubordinate, setSelectedSubordinate,
+
+                localSubordinateDetails, setLocalSubordinateDetails,
+                dbSubordinateDetails, setDbSubordinateDetails,
+
+                subordinateDetailsState, setSubordinateDetailsState,
+
+                selectedExpenseDetails, setSelectedExpenseDetails,
             }}
         >
             {children}

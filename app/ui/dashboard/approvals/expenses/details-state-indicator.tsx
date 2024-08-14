@@ -1,17 +1,17 @@
 import { useContext } from "react";
-import { ExpenseContext } from "../expense-context-wrapper";
+import { ApprovalContext } from "../approval-context-wrapper";
 
 export default function ExpenseDetailsStateIndicator() {
-	const context = useContext(ExpenseContext);
+	const context = useContext(ApprovalContext);
     if (context == null) {
 		throw new Error(
-			"context has to be used within <ExpenseContext.Provider>"
+			"context has to be used within <ApprovalContext.Provider>"
 		);
 	}
 
     let stateDisplayText = "";
     let stateStyles = "";
-    switch (context.expenseDetailsState) {
+    switch (context.subordinateDetailsState) {
         case "saved":
             stateDisplayText = "Saved!"
             stateStyles = "text-blue-500"
@@ -29,10 +29,10 @@ export default function ExpenseDetailsStateIndicator() {
             stateDisplayText = "Signed!"
             stateStyles = "text-green-500"
             break;
-        case "approved":
-            stateDisplayText = "Approved!"
-            stateStyles = "text-green-900 underlined"
-            break;
+            case "approved":
+                stateDisplayText = "Approved!"
+                stateStyles = "text-green-900 underlined"
+                break;
         default:
             stateDisplayText = "";
             break;

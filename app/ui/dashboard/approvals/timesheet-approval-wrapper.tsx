@@ -20,11 +20,14 @@ export default function TimesheetApprovalWrapper({
     useEffect(() => {
 		const handleDataPromise = async() => {
             const weekending = context.timesheetWeekending?.toISO();
+			
 			const data = await fetchSubordinateTimesheetsWithAuth(weekending);
 			console.log("data", data)
-			context.setSubordinateTimesheets(data);
+
+			context.setDbSubordinateTimesheets(data);
+			context.setLocalSubordinateTimesheets(data);
 		}
-		
+		console.log("timesheetWeekending changed!")
 		handleDataPromise();
 	
 	}, [context.timesheetWeekending]);

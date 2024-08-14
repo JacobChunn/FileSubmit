@@ -11,7 +11,7 @@ export default function TimesheetApprovalTable({
 }) {
 	const context = useContext(ApprovalContext)
 
-	if (!context || !context.subordinateTimesheets) {
+	if (!context || !context.localSubordinateTimesheets) {
 		return <div>Loading...</div>;
 	}
 
@@ -19,23 +19,25 @@ export default function TimesheetApprovalTable({
 		const displayTimesheets: DisplayTimesheet[] = [];
 
 		if (!context) return null;
-	
-		if (!context.subordinates || !context.subordinateTimesheets) {
+
+		if (!context.subordinates || !context.localSubordinateTimesheets) {
 			return displayTimesheets;
 		}
-	
+
 		for (const [id, firstname, lastname] of context.subordinates) {
-			const matchingTimesheets = context.subordinateTimesheets.filter(
+			const matchingTimesheets = context.localSubordinateTimesheets.filter(
 				(subTS) => subTS.subordinateid === id
 			);
-	
+
 			if (matchingTimesheets.length > 0) {
 				for (const timesheet of matchingTimesheets) {
 					displayTimesheets.push({
 						id,
 						firstname,
 						lastname,
-						found: true,
+						signed: timesheet.usercommitted,
+						approved: timesheet.mgrapproved,
+						timesheetCount: matchingTimesheets.length,
 						timesheet: timesheet
 					});
 				}
@@ -44,23 +46,26 @@ export default function TimesheetApprovalTable({
 					id,
 					firstname,
 					lastname,
-					found: false
+					signed: false,
+					approved: false,
+					timesheetCount: 0,
+					timesheet: undefined
 				});
 			}
 		}
-	
+
 		return displayTimesheets;
 	}
 
 	const displayTimesheets = createDisplayTimesheets();
-	if (!displayTimesheets) {
+	if (displayTimesheets == null) {
 		throw new Error(
 			"Display Timesheets was not set up properly"
 		);
 	}
 
-	const handleRowClick = (id: number) => {
-		context.setSelectedSubordinate([id, "timesheet"])
+	const handleRowClick = (subordinateID: number, timesheetID: number) => {
+		context.setSelectedSubordinate([subordinateID, "timesheet", timesheetID])
 	}
 
 	return (
@@ -73,17 +78,25 @@ export default function TimesheetApprovalTable({
 				</tr>
 			</thead>
 			<tbody>
-				{displayTimesheets.map(({ id, firstname, lastname, found }) => (
-				<tr
-					key={id}
-					onClick={() => handleRowClick(id)}
-                	className="cursor-pointer"
-				>
-					<td className={found ? 'text-blue-500' : 'text-red-500'}>{id}</td>
-					<td className={found ? 'text-blue-500' : 'text-red-500'}>{lastname}</td>
-					<td className={found ? 'text-blue-500' : 'text-red-500'}>{firstname}</td>
-				</tr>
-				))}
+				{displayTimesheets.map(({ id, firstname, lastname, signed, approved, timesheetCount, timesheet }) => {
+					const textColor = !signed
+						? "text-red-500"
+						: signed && approved
+							? "text-green-500"
+							: "text-blue-500";
+					return (
+						<tr
+							key={id}
+							onClick={timesheet ? () => handleRowClick(id, timesheet.id) : undefined}
+							className={timesheet ? "cursor-pointer" : ""}
+						>
+							<td className={textColor}>{id}</td>
+							<td className={textColor}>{lastname}</td>
+							<td className={textColor}>{firstname}</td>
+						</tr>
+					);
+
+				})}
 			</tbody>
 		</table>
 	);

@@ -1,8 +1,12 @@
 "use client"
 import React, { useContext } from 'react';
 import { ApprovalContext } from './approval-context-wrapper';
-import SubordinateTimesheet from './subordinate-timesheet';
-import SubordinateExpense from './subordinate-expense';
+import SubordinateTimesheetDetails from './subordinate-timesheet-details';
+import SubordinateExpenseDetails from './subordinate-expense-details';
+import TimesheetDetailsWrapper from './timesheets/timesheet-details-wrapper';
+import TimesheetDetailsHeader from './timesheets/details-header';
+import ExpenseDetailsWrapper from './expenses/expense-details-wrapper';
+import ExpenseDetailsHeader from './expenses/details-header';
 
 export default function SelectedSubordinateDetails({
     children,
@@ -21,9 +25,15 @@ export default function SelectedSubordinateDetails({
         <>
             {context.selectedSubordinate && (
                 context.selectedSubordinate[1] === "timesheet" ? 
-                <SubordinateTimesheet /> 
-                : 
-                <SubordinateExpense />
+                <TimesheetDetailsWrapper>
+                    <TimesheetDetailsHeader/>
+                    <SubordinateTimesheetDetails/> 
+                </TimesheetDetailsWrapper>
+                :
+                <ExpenseDetailsWrapper>
+                    <ExpenseDetailsHeader/>
+                    <SubordinateExpenseDetails/>
+                </ExpenseDetailsWrapper>
             )}
         </>
     );

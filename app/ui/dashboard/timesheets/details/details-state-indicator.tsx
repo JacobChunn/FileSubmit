@@ -29,6 +29,10 @@ export default function TimesheetDetailsStateIndicator() {
             stateDisplayText = "Signed!"
             stateStyles = "text-green-500"
             break;
+        case "approved":
+            stateDisplayText = "Approved!"
+            stateStyles = "text-green-900 underlined"
+            break;
         default:
             stateDisplayText = "";
             break;

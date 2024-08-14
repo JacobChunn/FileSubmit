@@ -1,59 +1,70 @@
-'use client';
-
-import { useFormState } from 'react-dom';
-import { AllRates, ExpenseOptions, ExpenseRates, SavingState } from '@/app/lib/definitions';
-import { Fragment, useContext, useEffect, useState } from 'react';
-import { notFound } from 'next/navigation';
-import { compareExpenseDetailsExtended, compareDates, getMostRecentRate, processRateArray } from '@/app/lib/utils';
-import { ExpenseContext } from '../expense-context-wrapper';
-import { editExpenseDetails, fetchExpenseDetailsEditFormData } from '@/app/lib/actions';
-import ControlledSelect from '@/app/ui/forms/expense-helper-components/controlled-sel-w-desc';
-import InputDetailsDesc from '@/app/ui/forms/expense-helper-components/input-details-desc';
-import InputDetailsNumber from '@/app/ui/forms/expense-helper-components/input-details-number';
-import DeleteDetailButton from './delete-detail-button';
-import FormSubmitDetailsButton from './details-submit-button';
-import { Tooltip } from "@/app/ui/material-tailwind-wrapper";
+"use client"
+import React, { Fragment, useContext, useEffect, useState } from 'react';
+import { ApprovalContext } from './approval-context-wrapper';
+import { Tooltip } from '../../material-tailwind-wrapper';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
-import { DateTime } from 'luxon';
-import DaySelector from './day-selector';
+import assert from 'assert';
+import { AllRates, ExpenseDetailsExtended, ExpenseOptions, ExpenseRates, SavingState } from '@/app/lib/definitions';
+import { useFormState } from 'react-dom';
+import { fetchSubordinateExpenseDetailsEditFormData, managerEditExpenseDetails } from '@/app/lib/actions';
+import { compareExpenseDetailsExtended, getMostRecentRate, processRateArray } from '@/app/lib/utils';
+import { notFound } from 'next/navigation';
+import ControlledSelect from './expenses/controlled-sel-w-desc';
+import InputDetailsDesc from './expenses/input-details-desc';
+import InputDetailsNumber from './expenses/input-details-number';
+import DeleteDetailButton from './expenses/delete-detail-button';
+import DaySelector from './expenses/day-selector';
+import ExpenseDetailButtons from './expenses/expense-detail-buttons';
 
-export default function ExpenseDetailsEditForm({
-
+export default function SubordinateExpenseDetails({
+    children,
 }: {
-
+    children?: React.ReactNode,
 }) {
-	const context = useContext(ExpenseContext);
+    const context = useContext(ApprovalContext);
 
 	if (context == null) {
 		throw new Error(
-			"context has to be used within <ExpenseContext.Provider>"
+			"context has to be used within <ApprovalContext.Provider>"
 		);
 	}
 
-	const expenseID = context.selectedExpense;
+	const subordinateID = context.selectedSubordinate ? context.selectedSubordinate[0] : null
+    const localSelectedExpense = context.localSubordinateExpenses?.find(expense => expense.subordinateid === subordinateID);
+    const dBSelectedExpense = context.dBSubordinateExpenses?.find(expense => expense.subordinateid === subordinateID);
 
-	if (expenseID == null) {
+	if (subordinateID == null) {
 		throw new Error(
-			"selectedExpense of ExpenseContext has not been set!"
+			"selectedSubordinate of ApprovalContext has not been set!"
 		);
 	}
+
+    if (!localSelectedExpense || !dBSelectedExpense) {
+		throw new Error(
+			"employeeid does not exist in subordinate expenses!"
+		);
+	}
+
+    assert(localSelectedExpense.id == dBSelectedExpense.id);
+
+    const expenseID = dBSelectedExpense.id;
 
 	const [EXDRateAndOptions, setEXDRateAndOptions] = useState<{options: ExpenseOptions, rates: ExpenseRates} | null>(null);
 	const [currentMileage, setCurrentMileage] = useState<number | null>(null);
 	const [currentPerdiem, setCurrentPerdiem] = useState<number | null>(null);
 	const [allRates, setAllRates] = useState<AllRates | null>(null);
 	const initialState = { message: null, errors: {} };
-	const editExpenseDetailsWithID = editExpenseDetails.bind(null, expenseID);
+	const editExpenseDetailsWithID = managerEditExpenseDetails.bind(null, subordinateID, expenseID);
     const [formState, dispatch] = useFormState(editExpenseDetailsWithID, initialState);
 
 	useEffect(() => {
 		const fetchData = async () => {
 			console.log('EX-ID', expenseID);
 			try {
-				context.setLocalExpenseDetails(null);
+				context.setLocalSubordinateDetails(null);
 				setEXDRateAndOptions(null);
 
-				const EXDDataReturn = await fetchExpenseDetailsEditFormData(expenseID);
+				const EXDDataReturn = await fetchSubordinateExpenseDetailsEditFormData(subordinateID, expenseID);
 				setEXDRateAndOptions({options: EXDDataReturn.options, rates: EXDDataReturn.rates});
 
 				const processedRates = {
@@ -63,30 +74,30 @@ export default function ExpenseDetailsEditForm({
 
 				setAllRates(processedRates);
 
-				if (!context.localExpenseDateStart) {
+				if (!context.expenseDatestart) {
 					throw new Error(
-						"localExpenseDateStart of ExpenseContext has not been set!"
+						"expenseDatestart of ApprovalContext has not been set!"
 					);
 				}
 
-				let mileage = getMostRecentRate(processedRates.mileage, context.localExpenseDateStart);
-				let perdiem = getMostRecentRate(processedRates.perdiem, context.localExpenseDateStart);
+				let mileage = getMostRecentRate(processedRates.mileage, context.expenseDatestart);
+				let perdiem = getMostRecentRate(processedRates.perdiem, context.expenseDatestart);
 
 				setCurrentMileage(mileage);
 				setCurrentPerdiem(perdiem);
 
-				context.setLocalExpenseDetails(EXDDataReturn.expenseDetails);
-				context.setDatabaseExpenseDetails(EXDDataReturn.expenseDetails);
+				context.setLocalSubordinateDetails(EXDDataReturn.expenseDetails);
+				context.setDbSubordinateDetails(EXDDataReturn.expenseDetails);
 
 				//const mileageData = await fetchMileageData();
 
 				let initialExpenseDetailsState: SavingState;
-				if (context.localExpenses?.find(expense => expense.id == expenseID)?.usercommitted) {
+				if (context.localSubordinateExpenses?.find(expense => expense.id == expenseID)?.usercommitted) {
 					initialExpenseDetailsState = "signed";
 				} else {
 					initialExpenseDetailsState = "saved";
 				}
-				context.setExpenseDetailsState(initialExpenseDetailsState);
+				context.setSubordinateDetailsState(initialExpenseDetailsState);
 			} catch (error) {
 				console.error(error);
 				notFound();
@@ -94,16 +105,16 @@ export default function ExpenseDetailsEditForm({
 		}
 
 		fetchData();
-	}, [expenseID]);
+	}, [context.selectedSubordinate]);
 
 	// Change EXD state to saved upon successful save
 	useEffect(() => {
 		console.log("formState: " + JSON.stringify(formState));
 
 		let expenseDetailsState: SavingState;
-		if (context.expenseDetailsState === "signed") {
+		if (context.subordinateDetailsState === "signed") {
 			expenseDetailsState = "signed";
-		} else if (context.expenseDetailsState === null) {
+		} else if (context.subordinateDetailsState === null) {
 			expenseDetailsState = null;
 		} else if (formState.success === true) {
 			expenseDetailsState = "saved";
@@ -112,66 +123,46 @@ export default function ExpenseDetailsEditForm({
 		}
 
 		let newDbExpenseDetails;
-		let newDbDateStart;
-		let newLocalExpenses;
 		if (formState.success == false) {
-			newDbExpenseDetails = context.databaseExpenseDetails;
-			newDbDateStart = context.databaseExpenseDateStart;
-			newLocalExpenses = context.localExpenses;
+			newDbExpenseDetails = context.dbSubordinateDetails;
 		} else {
-			newDbExpenseDetails = context.localExpenseDetails;
-			newDbDateStart = context.localExpenseDateStart;
-			// Update selected expense date start
-			newLocalExpenses = context.localExpenses;
-			if (newLocalExpenses && newDbDateStart) {
-				let toBeChangedExpense = newLocalExpenses.find((ts) => ts.id == context.selectedExpense);
-				if (toBeChangedExpense) {
-					toBeChangedExpense.datestart = newDbDateStart.toLocaleString();
-				}
-			}
+			newDbExpenseDetails = context.localSubordinateDetails;
 		}
 		
-		context.setLocalExpenses(newLocalExpenses);
-		context.setDatabaseExpenseDateStart(newDbDateStart);
-		context.setDatabaseExpenseDetails(newDbExpenseDetails);
-		context.setExpenseDetailsState(expenseDetailsState);
+		context.setDbSubordinateDetails(newDbExpenseDetails);
+		context.setSubordinateDetailsState(expenseDetailsState);
 	},[formState])
 
 	useEffect(() => {
-		const localEXDs = context.localExpenseDetails;
-		const dbEXDs = context.databaseExpenseDetails;
-		const localDateStart = context.localExpenseDateStart;
-		const databaseDateStart = context.databaseExpenseDateStart;
+		const localEXDs = context.localSubordinateDetails as ExpenseDetailsExtended[];
+		const dbEXDs = context.dbSubordinateDetails as ExpenseDetailsExtended[];
 
 		console.log('localEXDs: ', localEXDs);
 		console.log('dbEXDs: ', dbEXDs);
 
 		let expenseDetailsState: SavingState;
-		if (context.expenseDetailsState === "signed") {
+		if (context.subordinateDetailsState === "signed") {
 			expenseDetailsState = "signed";
-		} else if (context.expenseDetailsState === null) {
+		} else if (context.subordinateDetailsState === null) {
 			expenseDetailsState = null;
 		} else if (
-			compareExpenseDetailsExtended(localEXDs, dbEXDs) && 
-			compareDates(localDateStart, databaseDateStart)
+			compareExpenseDetailsExtended(localEXDs, dbEXDs)
 		) {
 			expenseDetailsState = "saved";
 		} else {
 			expenseDetailsState = "unsaved";
 		}
-		context.setExpenseDetailsState(expenseDetailsState);
+		context.setSubordinateDetailsState(expenseDetailsState);
 	}, [
-		context.localExpenseDetails,
-		context.databaseExpenseDetails,
-		context.localExpenseDateStart,
-		context.databaseExpenseDetails
+		context.localSubordinateDetails,
+		context.dbSubordinateDetails,
 	]);
 
 	useEffect(() => {
-		console.log("context.localExpenseDateStart changed!")
+		console.log("context.expenseDatestart changed!")
 		let mileage = null;
 		let perdiem = null;
-		const dateStart = context.localExpenseDateStart;
+		const dateStart = context.expenseDatestart;
 		// recalculate current mileage and perdiem
 
 		if (allRates && dateStart) {
@@ -181,7 +172,7 @@ export default function ExpenseDetailsEditForm({
 
 		setCurrentMileage(mileage);
 		setCurrentPerdiem(perdiem);
-	}, [context.localExpenseDateStart]);
+	}, [context.expenseDatestart]);
 
 	//console.log("currentMileage: ", currentMileage);
 	//console.log("currentPerdiem: ", currentPerdiem);
@@ -194,7 +185,7 @@ export default function ExpenseDetailsEditForm({
 
 	const {options, rates} = EXDRateAndOptions;
 		
-	if (!context.localExpenseDetails) {
+	if (!context.localSubordinateDetails) {
 		console.log("notfound2")
 		notFound();
 	}
@@ -217,7 +208,7 @@ export default function ExpenseDetailsEditForm({
 		</div>
 	)
 
-	const topTableHeaders: [React.ReactNode, number][] = [
+    const topTableHeaders: [React.ReactNode, number][] = [
 		["", 1], ["", 1], ["", 1],
 		[TravelHeader, 2],
 		["Lodging", 1],
@@ -227,7 +218,7 @@ export default function ExpenseDetailsEditForm({
 		["Perdiem", 1],
 		["Ent.", 1],
 		["Misc", 2],
-		["", 1], ["", 1],
+		["", 1],
 	];
 
 	const tableSubheaders = [
@@ -240,10 +231,10 @@ export default function ExpenseDetailsEditForm({
 		"Amount",
 		"Amount",
 		"Description", "Amount",
-		"Total", ''
+		"Total",
 	];
 
-    const {projects, misc} = options;
+	const {projects, misc} = options;
 
     // Changes to focused version after focused
     const projectOptions = projects.map((val, index) => (
@@ -267,17 +258,14 @@ export default function ExpenseDetailsEditForm({
 		</option>
     ));
 
-	const EXDLen = context.localExpenseDetails?.length || 0;
-
-	//const mileage = context.localExpenseDetails?.[0]?.mileage ?? 0;
 	const mileage = currentMileage;
 	const perdiem = currentPerdiem;
 
 	type ExpenseTotalKey = 'transportation' | 'lodging' | 'cabsparking' | 'carrental' | 'miles' | 'perdiem' | 'entertainment' | 'miscvalue';
 	function calculateTotal(key: ExpenseTotalKey) {
-		const details = context?.localExpenseDetails;
+		const details = context?.localSubordinateDetails;
 		return details ? 
-			details.reduce((accumulator, currentValue) => {
+			(details as ExpenseDetailsExtended[]).reduce((accumulator, currentValue) => {
 				return accumulator + Number(currentValue[key]);
 			}, 0) :
 			0;
@@ -296,14 +284,19 @@ export default function ExpenseDetailsEditForm({
 	const mileageTot = milesTot * mileage;
 	const totalTot = transportationTot + lodgingTot + cabsparkingTot + carrentalTot + mileageTot + perdiemTot + entertainmentTot + miscvalueTot;
 
-	const isNotEditable = !(context.expenseDetailsState == "saved" || context.expenseDetailsState == "unsaved");
+	const isNotEditable = !(
+		context.subordinateDetailsState == "saved" ||
+		context.subordinateDetailsState == "unsaved" ||
+		context.subordinateDetailsState == "saving"
+	);
 	const isNotSubmitable =
-		context.expenseDetailsState == "saving" || 
-		context.expenseDetailsState == "saved" ||
-		context.expenseDetailsState == "signed";
+		context.subordinateDetailsState == "saving" || 
+		context.subordinateDetailsState == "saved" ||
+		context.subordinateDetailsState == "signed" ||
+		context.subordinateDetailsState == "approved";
 
 	const dispatchWrapper = (payload: FormData) => {
-		context.setExpenseDetailsState("saving");
+		context.setSubordinateDetailsState("saving");
 		dispatch(payload);
 	}
 	const projectRowStyle = 'w-48';
@@ -315,12 +308,12 @@ export default function ExpenseDetailsEditForm({
 	const selectStyle = 'h-full w-full';
 
     return (
-        <form
-            action={dispatchWrapper}
-            className='w-full h-full'
+		<form
+			action={dispatchWrapper}
+			className='w-full h-full'
 			key={"form" + expenseID}
 			id={"form" + expenseID}
-        >
+		>
 			<table className='w-full'>
 				<thead className='w-full'>
 					<tr className='w-full'>
@@ -354,12 +347,12 @@ export default function ExpenseDetailsEditForm({
 					</tr>
 				</thead>
 				<tbody className='w-full'>
-				{context.localExpenseDetails && context.databaseExpenseDetails ? context.localExpenseDetails.map((val, index) => {
-					const dbEXDs = context.databaseExpenseDetails;
+				{context.localSubordinateDetails && context.dbSubordinateDetails ? (context.localSubordinateDetails as ExpenseDetailsExtended[]).map((val, index) => {
+					const dbEXDs = context.dbSubordinateDetails;
 					const dbEXDsLen = dbEXDs ? dbEXDs.length : 0;
 
 					const dbVal = dbEXDsLen > index && dbEXDs ? 
-						dbEXDs[index] : null;
+						(dbEXDs as ExpenseDetailsExtended[])[index] : null;
 
 					return (
 						<Fragment key={'fragment-' + index}>
@@ -656,14 +649,13 @@ export default function ExpenseDetailsEditForm({
 						</td>
 					</tr>
 				</tbody>
+				{context.selectedSubordinate}
 			</table>
-            <FormSubmitDetailsButton
+			<ExpenseDetailButtons
 				submitDisabled={isNotSubmitable}
 				mileage={mileage}
 				perdiem={perdiem}
-            /> 
-        </form>
+			/>
+		</form>
     );
 }
-
-

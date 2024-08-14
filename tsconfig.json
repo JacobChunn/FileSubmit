@@ -30,6 +30,6 @@
     ".next/types/**/*.ts",
     "app/lib/placeholder-data.js",
     "scripts/seed.js"
-  ],
+, "app/ui/forms/expense-helper-components"  ],
   "exclude": ["node_modules"]
 }
